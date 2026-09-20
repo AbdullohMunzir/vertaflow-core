@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VertaFlow AI — Sotuvchi Agent Platformasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F7F9F6;
+      color: #111827;
+    }
+    .bg-pistachio {
+      background-color: #B5F87B;
+    }
+    .text-pistachio-dark {
+      color: #1A3E08;
+    }
+    .border-pistachio {
+      border-color: #9DE959;
+    }
+    .card-clean {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #E5E7EB;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #D1D5DB;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col antialiased overflow-hidden select-none">
+
+  <!-- Top Navigation Header -->
+  <header class="h-16 bg-white border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-full bg-pistachio flex items-center justify-center font-extrabold text-sm text-black shadow-sm border border-pistachio">
+        V
+      </div>
+      <div class="font-extrabold text-lg tracking-tight text-gray-900 flex items-center gap-2">
+        VertaFlow <span class="bg-[#F0FDF4] text-[#16A34A] text-[11px] px-2 py-0.5 rounded-full font-bold border border-[#BBF7D0]">AI CLOSER</span>
+      </div>
+    </div>
+
+    <!-- Active Mode & Global Status -->
+    <div class="hidden md:flex items-center space-x-6 text-xs font-medium">
+      <div class="flex items-center gap-2 bg-[#F9FAFB] px-3 py-1.5 rounded-full border border-gray-200">
+        <span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+        <span class="text-gray-500">Holati:</span>
+        <span class="text-gray-900 font-semibold">AI Avtopilot Faol</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-gray-400">Metodologiya:</span>
+        <span class="font-bold text-gray-800">SPIN & Challenger</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-gray-400">Messenjer Cheklovi:</span>
+        <span class="font-bold text-gray-800">Maksimal 2-3 Qator</span>
+      </div>
+    </div>
+
+    <!-- Right Quick Actions -->
+    <div class="flex items-center space-x-3">
+      <button onclick="openWidgetModal()" class="px-3.5 py-1.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-full text-xs font-bold transition-all border border-[#BBF7D0] flex items-center gap-1.5">
+        <span>🌐 Vidjet Kori</span>
+      </button>
+      <button onclick="openOnboardingModal()" class="px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full text-xs font-semibold transition-all border border-gray-200 flex items-center gap-1.5">
+        <span>⚡ 2 Daqiqada Sozlash</span>
+      </button>
+      <div class="w-8 h-8 rounded-full bg-pistachio border border-pistachio flex items-center justify-center text-xs font-bold text-black">
+        BS
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-white border-r border-[#E5E7EB] flex flex-col justify-between p-4 shrink-0">
+      <div class="space-y-4">
+        
+        <!-- Workspace Dropdown -->
+        <div class="flex items-center justify-between p-2 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] text-xs font-semibold cursor-pointer">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📁</span>
+            <span id="sidebar-biz-name">Mebel Fabrikasi (Default)</span>
+          </div>
+          <span class="text-gray-400 text-xs">▾</span>
+        </div>
+
+        <!-- Navigation items -->
+        <nav class="space-y-1">
+          <button onclick="switchView('closer')" id="nav-closer" class="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded-xl bg-pistachio text-black transition-all shadow-sm border border-pistachio">
+            <span class="text-base">🤖</span> AI Closer Agent
+          </button>
+          
+          <div class="pt-3 pb-1 px-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Kanallar</div>
+          
+          <div onclick="openTelegramModal()" class="flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <span>✈️</span> Telegram Bot
+            </div>
+            <span id="tg-status-badge" class="text-[#22C55E] text-[10px] font-bold bg-[#DCFCE7] px-1.5 py-0.5 rounded">Faol</span>
+          </div>
+
+          <div class="flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <span>📷</span> Instagram DM
+            </div>
+            <span class="text-gray-400 text-xs font-bold">+ Ulanish</span>
+          </div>
+
+          <div class="flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="openWidgetModal()">
+            <div class="flex items-center gap-2">
+              <span>🌐</span> Web Chat Vidjet
+            </div>
+            <span class="text-[#22C55E] text-[10px] font-bold bg-[#DCFCE7] px-1.5 py-0.5 rounded">Tayyor</span>
+          </div>
+
+          <div class="pt-3 pb-1 px-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Boshqaruv</div>
+
+          <button onclick="switchView('leads')" id="nav-leads" class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-2">
+              <span>👥</span> Mijozlar (Lead CRM)
+            </div>
+            <span id="badge-hot-count" class="text-[10px] bg-[#FEF08A] font-extrabold px-1.5 py-0.5 rounded text-amber-900">HOT 🔥</span>
+          </button>
+
+          <button onclick="switchView('battlecards')" id="nav-battlecards" class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-2">
+              <span>⚔️</span> Raqobat Battlecards
+            </div>
+            <span class="text-xs text-gray-400">3</span>
+          </button>
+
+          <button onclick="switchView('evaluator')" id="nav-evaluator" class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-2">
+              <span>📈</span> Self-Improving Audit
+            </div>
+            <span class="text-[10px] bg-green-100 text-green-800 font-bold px-1.5 py-0.5 rounded">Yangi</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- User Profile at bottom -->
+      <div class="p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-pistachio border border-pistachio flex items-center justify-center font-bold text-[10px] text-black">
+            BS
+          </div>
+          <div>
+            <div class="font-bold text-gray-900">Bahodir Sharipov</div>
+            <div class="text-[10px] text-gray-500">Tarif: Pro Sinov</div>
+          </div>
+        </div>
+        <span class="text-xs text-gray-400">⚙️</span>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 flex overflow-hidden bg-[#F7F9F6]">
+
+      <!-- ================= VIEW 1: LIVE CLOSER CHAT SIMULATOR ================= -->
+      <div id="view-closer" class="flex-1 flex overflow-hidden">
+        
+        <!-- Conversation List (Inbox column) -->
+        <div class="w-80 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0">
+          <div class="p-3.5 border-b border-[#E5E7EB]">
+            <input type="text" placeholder="Muloqotlarni qidirish..." class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-black">
+          </div>
+          
+          <div id="inbox-list" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+            <!-- Active Conversation item -->
+            <div onclick="selectConversation('sess_jamshid')" class="p-3 rounded-xl bg-[#F0FDF4] border border-[#DCFCE7] cursor-pointer">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-xs text-gray-900">Jamshid aka (Mebel)</span>
+                <span class="text-[10px] text-gray-400">Hozir</span>
+              </div>
+              <p class="text-[11px] text-gray-600 truncate">Шу ҳафта ўрнатмоқчимиз. Мана рақамим +998901234567</p>
+              <div class="flex items-center gap-1.5 mt-2">
+                <span class="text-[10px] bg-[#FEF08A] text-amber-900 font-extrabold px-1.5 py-0.2 rounded">🔥 Hot: 100</span>
+                <span class="text-[10px] bg-white border border-gray-200 text-gray-600 px-1.5 py-0.2 rounded font-medium">Kirill</span>
+              </div>
+            </div>
+
+            <!-- Conversation 2 -->
+            <div onclick="selectConversation('sess_farhod')" class="p-3 rounded-xl hover:bg-gray-50 cursor-pointer border border-transparent">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-xs text-gray-900">Farhod Aliyev</span>
+                <span class="text-[10px] text-gray-400">14:25</span>
+              </div>
+              <p class="text-[11px] text-gray-500 truncate">5 ta operatorimiz bor, ulgurmayapti...</p>
+              <div class="flex items-center gap-1.5 mt-2">
+                <span class="text-[10px] bg-[#FEF08A] text-amber-900 font-extrabold px-1.5 py-0.2 rounded">🔥 Hot: 85</span>
+                <span class="text-[10px] bg-white border border-gray-200 text-gray-600 px-1.5 py-0.2 rounded font-medium">Lotin</span>
+              </div>
+            </div>
+
+            <!-- Conversation 3 -->
+            <div onclick="selectConversation('sess_anvar')" class="p-3 rounded-xl hover:bg-gray-50 cursor-pointer border border-transparent">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-xs text-gray-900">Anvar Rasulov</span>
+                <span class="text-[10px] text-gray-400">14:10</span>
+              </div>
+              <p class="text-[11px] text-gray-500 truncate">O'quv markazimiz uchun bot kerak edi...</p>
+              <div class="flex items-center gap-1.5 mt-2">
+                <span class="text-[10px] bg-gray-100 text-gray-600 font-bold px-1.5 py-0.2 rounded">⚡ Warm: 55</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Live Chat Column -->
+        <div class="flex-1 flex flex-col bg-[#F7F9F6] border-r border-[#E5E7EB]">
+          
+          <!-- Chat Header with Quick Chips -->
+          <div class="px-6 py-3 bg-white border-b border-[#E5E7EB] flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-sm text-gray-900" id="chat-header-name">Jamshid aka (Mebel Fabrikasi)</h2>
+                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+                <span class="text-[11px] font-semibold text-gray-500">Messenjerdan murojaat</span>
+              </div>
+              <div class="flex items-center gap-1.5 mt-2">
+                <span id="chip-stage" class="text-[10px] bg-pistachio text-black font-bold px-2 py-0.5 rounded-full border border-pistachio">SPIN: Situation</span>
+                <span class="text-[10px] bg-pistachio text-black font-bold px-2 py-0.5 rounded-full border border-pistachio">Challenger Reframe</span>
+                <span class="text-[10px] bg-white border border-gray-300 text-gray-700 font-medium px-2 py-0.5 rounded-full">2-3 Qator Qoidasi</span>
+                <span id="chip-script" class="text-[10px] bg-white border border-gray-300 text-gray-700 font-medium px-2 py-0.5 rounded-full">Kirill Detektor</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Live Lead Score Tag -->
+            <div id="live-lead-score-tag" class="px-3 py-1 bg-[#FEF08A] border border-[#FDE047] text-amber-900 rounded-full font-extrabold text-xs flex items-center gap-1 shadow-sm">
+              <span>🔥 Lead: Hot (100/100)</span>
+            </div>
+          </div>
+
+          <!-- Messages Thread Container -->
+          <div id="chat-thread" class="flex-1 p-6 space-y-4 overflow-y-auto custom-scrollbar text-xs">
+            <!-- Messages populated via JS -->
+          </div>
+
+          <!-- Quick Objection / Testing Prompts Bar -->
+          <div class="px-4 py-2 bg-white border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+            <span class="text-[11px] font-bold text-gray-400 shrink-0">Tezkor test:</span>
+            <button onclick="sendQuickPrompt('Qimmat ekan')" class="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-semibold shrink-0">
+              "Qimmat ekan"
+            </button>
+            <button onclick="sendQuickPrompt('Boshqa joyda arzon bot bor')" class="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-semibold shrink-0">
+              "Boshqa arzon bot bor"
+            </button>
+            <button onclick="sendQuickPrompt('O\'ylab ko\'raman')" class="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-semibold shrink-0">
+              "O'ylab ko'raman"
+            </button>
+            <button onclick="sendQuickPrompt('Telefonim: +998901234567, shu hafta boshlaylik')" class="px-2.5 py-1 rounded-full bg-pistachio hover:bg-[#A8F06A] text-black text-[11px] font-bold shrink-0 border border-pistachio">
+              "Telefon: +998901234567 (Hot)"
+            </button>
+          </div>
+
+          <!-- Bottom Chat Input Bar -->
+          <div class="p-4 bg-white border-t border-[#E5E7EB] flex items-center gap-3">
+            <input id="chat-input" type="text" placeholder="Mijoz nomidan biror e'tiroz yoki savol yozing..." 
+                   class="flex-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-full px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-black">
+            <button onclick="sendChatMessage()" class="px-5 py-2.5 bg-pistachio hover:bg-[#A8F06A] text-black font-extrabold rounded-full text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0 border border-pistachio">
+              <span>Yuborish →</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right Side: Lead Dossier & Instant Actions (320px) -->
+        <div class="w-80 bg-white p-5 flex flex-col justify-between shrink-0 overflow-y-auto custom-scrollbar border-l border-[#E5E7EB]">
+          <div class="space-y-5">
+            
+            <!-- Lead Dossier Card -->
+            <div class="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-gray-900">📋 Lead Dossier</span>
+                <span id="dossier-badge" class="text-[10px] bg-[#FEF08A] text-amber-900 font-extrabold px-1.5 py-0.5 rounded">Hot Handoff</span>
+              </div>
+              <div class="text-xs space-y-1.5 text-gray-700">
+                <div><strong>Mijoz:</strong> <span id="dossier-name">Jamshid aka</span></div>
+                <div><strong>Telefon:</strong> <span id="dossier-phone" class="font-mono font-bold">+998901234567</span></div>
+                <div><strong>Og'riq / Soha:</strong> <span id="dossier-pain">30-40 ta buyurtmada menejerlar kechikmoqda</span></div>
+                <div><strong>Xarid Muddati:</strong> <span id="dossier-timeline">Shu hafta ichida</span></div>
+              </div>
+              <button onclick="alert('Menejer muvaffaqiyatli chatga ulandi!')" class="w-full mt-2 py-2 bg-black hover:bg-gray-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                Operator Chatga Kirishi →
+              </button>
+            </div>
+
+            <!-- Live Scoring Breakdown -->
+            <div class="space-y-2">
+              <div class="text-xs font-bold text-gray-800">Ballash Sabablari (Lead Scoring):</div>
+              <div id="score-reasons-list" class="text-[11px] space-y-1 text-gray-600">
+                <div class="flex items-center justify-between">
+                  <span>+30 ball: Telefon raqami berildi</span>
+                  <span class="text-green-600 font-bold">✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>+25 ball: Asosiy og'riq aniqlandi</span>
+                  <span class="text-green-600 font-bold">✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>+20 ball: Buyurtma hajmi ma'lum</span>
+                  <span class="text-green-600 font-bold">✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>+15 ball: Xarid muddati aniq</span>
+                  <span class="text-green-600 font-bold">✓</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Battlecard Quick Tester -->
+            <div class="p-3 bg-[#F0FDF4] border border-[#DCFCE7] rounded-xl text-xs space-y-1">
+              <div class="font-bold text-[#16A34A] flex items-center gap-1">
+                <span>🛡️</span> Challenger Reframe:
+              </div>
+              <p class="text-[11px] text-gray-700">Mijoz "boshqa arzon bot bor" desa, AI uni o'zgartiradi: <i>"Sizga shunchaki tugmali bot kerakmi yoki buyurtmani yopadigan agentmi?"</i></p>
+            </div>
+
+          </div>
+
+          <div class="pt-4 border-t border-[#E5E7EB]">
+            <button onclick="openOnboardingModal()" class="w-full py-2.5 bg-pistachio hover:bg-[#A8F06A] text-black font-extrabold text-xs rounded-xl transition-all border border-pistachio shadow-sm">
+              + Yangi E'tiroz / Savol Qo'shish
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= VIEW 2: LEADS CRM TABLE ================= -->
+      <div id="view-leads" class="hidden flex-1 p-6 overflow-y-auto">
+        <div class="card-clean rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
+            <div>
+              <h2 class="text-base font-extrabold text-gray-900">Mijozlar Bazasi (Qualified Leads CRM)</h2>
+              <p class="text-xs text-gray-500">VertaFlow agenti saralab, ball qo'ygan issiq xaridorlar ro'yxati.</p>
+            </div>
+            <button onclick="fetchLeads()" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold rounded-lg border border-gray-200">
+              Yangilash 🔄
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-[#E5E7EB] text-gray-400">
+                  <th class="py-2.5">Mijoz / Kanal</th>
+                  <th>Telefon</th>
+                  <th>Soha & Og'riq</th>
+                  <th>Muddati</th>
+                  <th>Ball</th>
+                  <th>Holati</th>
+                  <th>Amal</th>
+                </tr>
+              </thead>
+              <tbody id="leads-table-body" class="divide-y divide-[#E5E7EB] text-gray-800">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= VIEW 3: BATTLECARDS VIEW ================= -->
+      <div id="view-battlecards" class="hidden flex-1 p-6 overflow-y-auto">
+        <div class="card-clean rounded-2xl p-6 space-y-5">
+          <div class="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
+            <div>
+              <h2 class="text-base font-extrabold text-gray-900">Raqobat Battlecards Repozitoriysi</h2>
+              <p class="text-xs text-gray-500">Raqobatchilar eslanganda agent agressiv bo'lmagan tarzda savolni o'z foydamizga buradi.</p>
+            </div>
+            <button onclick="openBattlecardModal()" class="px-4 py-2 bg-pistachio hover:bg-[#A8F06A] text-black text-xs font-bold rounded-xl border border-pistachio shadow-sm">
+              + Yangi Battlecard Qo'shish
+            </button>
+          </div>
+
+          <div id="battlecards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dynamically loaded -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= VIEW 4: SELF-IMPROVING AUDIT ================= -->
+      <div id="view-evaluator" class="hidden flex-1 p-6 overflow-y-auto">
+        <div class="space-y-6">
+          
+          <!-- Conversion Stats Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="card-clean p-4 rounded-2xl space-y-1">
+              <span class="text-[11px] font-bold text-gray-400">Jami Muloqotlar</span>
+              <div id="stat-total-chats" class="text-2xl font-extrabold text-gray-900">42 ta</div>
+              <span class="text-[10px] text-green-600 font-semibold">↑ O'tgan haftadan +15%</span>
+            </div>
+            <div class="card-clean p-4 rounded-2xl space-y-1">
+              <span class="text-[11px] font-bold text-gray-400">HOT Leadlar (100 ball)</span>
+              <div id="stat-hot-leads" class="text-2xl font-extrabold text-amber-600">18 ta</div>
+              <span class="text-[10px] text-amber-700 font-semibold">🔥 42.8% konversiya</span>
+            </div>
+            <div class="card-clean p-4 rounded-2xl space-y-1">
+              <span class="text-[11px] font-bold text-gray-400">Olingan Telefonlar</span>
+              <div id="stat-phones" class="text-2xl font-extrabold text-gray-900">21 ta</div>
+              <span class="text-[10px] text-green-600 font-semibold">✓ 100% haqiqiy raqamlar</span>
+            </div>
+            <div class="card-clean p-4 rounded-2xl space-y-1">
+              <span class="text-[11px] font-bold text-gray-400">O'rtacha Javob Vaqti</span>
+              <div class="text-2xl font-extrabold text-[#16A34A]">1.8 soniya</div>
+              <span class="text-[10px] text-gray-500">24/7 kutishsiz</span>
+            </div>
+          </div>
+
+          <!-- 3 Ready-to-Approve AI Recommendations -->
+          <div class="card-clean rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+              <div>
+                <span class="text-[10px] font-extrabold uppercase text-[#16A34A] tracking-wider">TUNGI TAHLIL • AUDIT XULOSASI</span>
+                <h3 class="text-base font-extrabold text-gray-900">Agentni kuchaytirish uchun 3 ta tavsiya</h3>
+              </div>
+              <span class="text-xs bg-pistachio text-black font-bold px-2.5 py-1 rounded-full border border-pistachio">
+                AI Tavsiyalari
+              </span>
+            </div>
+
+            <div id="recommendations-container" class="space-y-3">
+              <!-- Loaded dynamically via API -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ONBOARDING MODAL -->
+  <div id="onboarding-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-gray-200 space-y-5">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase text-[#16A34A] tracking-wider">TEZKOR SOZLASH • 2 DAQIQA</span>
+          <h3 class="text-base font-extrabold text-gray-900">Biznesingiz ma'lumotlarini kiriting</h3>
+        </div>
+        <button onclick="closeOnboardingModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Korxona / Biznes nomi:</label>
+          <input type="text" id="ob-biz-name" value="Mebel Fabrikasi" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5 text-xs text-gray-900">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Qisqa tavsifi va mahsulotlar:</label>
+          <input type="text" id="ob-biz-desc" value="Oshxona va uy mebellari ishlab chiqarish" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5 text-xs text-gray-900">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">O'rtacha xarid cheki:</label>
+          <input type="text" id="ob-avg-check" value="5 000 000 so'm" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5 text-xs text-gray-900">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+        <button onclick="closeOnboardingModal()" class="text-xs font-bold text-gray-500">Bekor qilish</button>
+        <button onclick="saveOnboarding()" class="px-5 py-2.5 bg-pistachio hover:bg-[#A8F06A] text-black font-extrabold text-xs rounded-full border border-pistachio shadow-sm">
+          Saqlash va Agentni O'qitish →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTLECARD MODAL -->
+  <div id="battlecard-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="text-base font-extrabold text-gray-900">Yangi Raqobat Battlecardi</h3>
+        <button onclick="closeBattlecardModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Raqobatchi / Yechim nomi:</label>
+          <input type="text" id="bc-name" placeholder="Masalan: Arzon Telegram Botlar" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Kalit so'zlar (vergul bilan):</label>
+          <input type="text" id="bc-keywords" placeholder="oddiy bot, arzon bot, tugmali bot" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Ularning zaif tomoni:</label>
+          <input type="text" id="bc-weakness" placeholder="Faqat tugmali menyu ko'rsatadi, sotuv yopolmaydi" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Challenger Reframe (Agent javobi):</label>
+          <textarea id="bc-reframe" rows="2" placeholder="Oddiy botlar faqat menyuni ko'rsatadi. VertaFlow esa e'tirozlarni yengib, mijoz raqamini oladi." class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5"></textarea>
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Landmine Savol (Tuzoq savol):</label>
+          <input type="text" id="bc-landmine" placeholder="Sizga shunchaki tugmali bot kerakmi yoki sotuvni yopadigan agentmi?" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5">
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+        <button onclick="closeBattlecardModal()" class="px-4 py-2 text-xs font-bold text-gray-500">Bekor qilish</button>
+        <button onclick="saveBattlecard()" class="px-5 py-2 bg-pistachio font-bold text-xs rounded-xl border border-pistachio">Saqlash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELEGRAM CONFIG MODAL -->
+  <div id="telegram-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="text-base font-extrabold text-gray-900">Telegram Bot Sozlamalari</h3>
+        <button onclick="closeTelegramModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Telegram Bot Token (BotFather'dan):</label>
+          <input type="text" id="tg-token-input" placeholder="123456789:ABCdef..." class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5 font-mono">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Menejer Chat ID (Hot Lead xabarnomalari uchun):</label>
+          <input type="text" id="tg-manager-input" placeholder="Masalan: 123456789" class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-2.5 font-mono">
+        </div>
+        <p class="text-[11px] text-gray-500">
+          Mijoz telefon raqamini bergach yoki 70+ ball to'plagach, agent zudlik bilan ushbu Chat ID'ga 3 qatorli <b>Lead Dossier</b> yuboradi.
+        </p>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+        <button onclick="closeTelegramModal()" class="px-4 py-2 text-xs font-bold text-gray-500">Yopish</button>
+        <button onclick="saveTelegramConfig()" class="px-5 py-2 bg-pistachio font-bold text-xs rounded-xl border border-pistachio">Saqlash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIDGET EMBED MODAL -->
+  <div id="widget-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="text-base font-extrabold text-gray-900">Saytingizga Chat Vidjetini O'rnatish</h3>
+        <button onclick="closeWidgetModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <p class="text-gray-600">
+          Ushbu 1 qator kodni saytingizning <code>&lt;/body&gt;</code> tegi oldiga qo'ysangiz, saytingizda VertaFlow AI avtomatik ishga tushadi:
+        </p>
+        <div class="p-3 bg-gray-900 text-green-400 rounded-xl font-mono text-[11px] overflow-x-auto relative group">
+          <code id="widget-code-snippet">&lt;script src="http://localhost:8000/static/widget.js"&gt;&lt;/script&gt;</code>
+        </div>
+        <button onclick="copyWidgetSnippet()" class="w-full py-2 bg-pistachio font-bold text-xs rounded-xl border border-pistachio text-black">
+          Nusxa olish (Copy Code) 📋
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Interaction Scripts -->
+  <script>
+    let activeSessionId = "sess_jamshid";
+
+    const preloadedChats = {
+      "sess_jamshid": {
+        name: "Jamshid aka (Mebel Fabrikasi)",
+        phone: "+998901234567",
+        pain: "30-40 ta buyurtmada menejerlar kechikmoqda",
+        timeline: "Shu hafta ichida",
+        score: 100,
+        tier: "HOT 🔥",
+        script: "Kirill",
+        stage: "SPIN: Closing",
+        messages: [
+          { role: "user", text: "Салом, мебел фабрикамиз учун crm тизими нархи қанча?", script: "Kirill", time: "14:40" },
+          { role: "agent", text: "Ассалому алайкум! Тизимимиз 1.5 млн сўмдан бошланади.\nСизга энг маъқулини ҳисоблашимиз учун: ҳозир кунига нечта буюртма қабул қиляпсиз?", stage: "Situation", time: "14:41" },
+          { role: "user", text: "Кунига 30-40 та буюртма тушади, лекин сотувчиларимиз улгурмай мижозларни совитиб қўйяпти.", script: "Kirill", time: "14:42" },
+          { role: "agent", text: "Тушунарли. Айнан шу ҳажмда кўп корхоналарда менежерлар кечикиши кузатилади.\nҲозирда савдо бўлимингизда энг кўп вақт ва мижоз йўқотилаётган жойи қаерда?", stage: "Problem", time: "14:43" },
+          { role: "user", text: "Шу ҳафта ўрнатмоқчимиз. Мана рақамим +998901234567", script: "Kirill", time: "14:44" },
+          { role: "agent", text: "Келинг, 10 дақиқалик қисқа консультацияда сизнинг корхонангиз учун ҳисоблаб берамиз.\nҚайси вақт маъқул: бугун 16:00 ми ёки эртага 11:00?", stage: "Closing", time: "14:45" }
+        ]
+      },
+      "sess_farhod": {
+        name: "Farhod Aliyev",
+        phone: "+998977654321",
+        pain: "5 ta operatorimiz bor, ulgurmayapti",
+        timeline: "Tez orada",
+        score: 85,
+        tier: "HOT 🔥",
+        script: "Lotin",
+        stage: "SPIN: Closing",
+        messages: [
+          { role: "user", text: "Assalomu alaykum, ulgurji savdo do'konimizga tizim joriy qilmoqchimiz.", script: "Lotin", time: "14:20" },
+          { role: "agent", text: "Assalomu alaykum! Tizimimiz 1.5 mln so'mdan boshlanadi.\nSizga eng ma'qulini hisoblashimiz uchun: hozir kuniga nechta buyurtma qabul qilyapsiz?", stage: "Situation", time: "14:21" },
+          { role: "user", text: "Hozir 5 ta operatorimiz bor, mijozlarga kech javob berib ulgurmayapti.", script: "Lotin", time: "14:22" },
+          { role: "user", text: "Tezroq joriy qilish kerak, telefonim 998977654321", script: "Lotin", time: "14:25" }
+        ]
+      },
+      "sess_anvar": {
+        name: "Anvar Rasulov",
+        phone: "Aniqlanmoqda",
+        pain: "O'quvchilar narxni bilib yo'qolib qoladi",
+        timeline: "Shu oy",
+        score: 55,
+        tier: "WARM ⚡",
+        script: "Lotin",
+        stage: "SPIN: Problem",
+        messages: [
+          { role: "user", text: "Salom, o'quv markazimiz uchun bot kerak edi.", script: "Lotin", time: "14:00" },
+          { role: "agent", text: "Assalomu alaykum! O'quv markazlari uchun eng ma'qul tarifni hisoblashimiz uchun: hozir kuniga nechta o'quvchi yozadi?", stage: "Situation", time: "14:01" },
+          { role: "user", text: "Kuniga 15 ta o'quvchi yozadi, lekin ko'pi narxni bilib yo'qolib qoladi.", script: "Lotin", time: "14:05" }
+        ]
+      }
+    };
+
+    function switchView(viewName) {
+      const views = ['closer', 'leads', 'battlecards', 'evaluator'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const nav = document.getElementById(`nav-${v}`);
+        if (el) el.classList.add('hidden');
+        if (nav) nav.className = "w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-lg";
+      });
+
+      const activeEl = document.getElementById(`view-${viewName}`);
+      const activeNav = document.getElementById(`nav-${viewName}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.className = "w-full flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl bg-pistachio text-black transition-all shadow-sm border border-pistachio";
+      }
+
+      if (viewName === 'leads') fetchLeads();
+      if (viewName === 'battlecards') fetchBattlecards();
+      if (viewName === 'evaluator') fetchEvaluatorInsights();
+    }
+
+    function renderThread() {
+      const data = preloadedChats[activeSessionId] || {
+        name: "Yangi Mijoz",
+        phone: "Aniqlanmoqda",
+        pain: "Aniqlanmoqda",
+        timeline: "Aniqlanmoqda",
+        score: 10,
+        tier: "Cold",
+        script: "Lotin",
+        stage: "Situation",
+        messages: []
+      };
+
+      document.getElementById('chat-header-name').innerText = data.name;
+      document.getElementById('dossier-name').innerText = data.name;
+      document.getElementById('dossier-phone').innerText = data.phone;
+      document.getElementById('dossier-pain').innerText = data.pain;
+      document.getElementById('dossier-timeline').innerText = data.timeline;
+      document.getElementById('chip-script').innerText = data.script + " Detektor";
+      document.getElementById('chip-stage').innerText = data.stage;
+      document.getElementById('live-lead-score-tag').innerHTML = `<span>🔥 Lead: ${data.tier} (${data.score}/100)</span>`;
+
+      const thread = document.getElementById('chat-thread');
+      thread.innerHTML = '';
+
+      data.messages.forEach(m => {
+        if (m.role === 'user') {
+          thread.innerHTML += `
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center font-bold text-[10px] shrink-0">
+                ${data.name.charAt(0)}
+              </div>
+              <div class="space-y-1 max-w-[75%]">
+                <div class="card-clean p-3 rounded-2xl rounded-tl-sm text-gray-800">
+                  ${m.text}
+                </div>
+                <div class="text-[10px] text-gray-400">Mijoz • ${m.script || data.script} • ${m.time || 'Hozir'}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          thread.innerHTML += `
+            <div class="flex items-start gap-3 justify-end">
+              <div class="space-y-1 max-w-[75%] text-right">
+                <div class="bg-pistachio text-black p-3 rounded-2xl rounded-tr-sm text-left font-medium shadow-sm border border-pistachio">
+                  ${m.text.replace(/\n/g, '<br>')}
+                </div>
+                <div class="text-[10px] text-gray-400">VertaFlow AI • ${m.stage || 'Closer'} • ${m.time || 'Hozir'}</div>
+              </div>
+              <div class="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                V
+              </div>
+            </div>
+          `;
+        }
+      });
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    function selectConversation(sid) {
+      activeSessionId = sid;
+      renderThread();
+    }
+
+    async function sendChatMessage(customText) {
+      const input = document.getElementById('chat-input');
+      const text = customText || input.value.trim();
+      if (!text) return;
+
+      if (!preloadedChats[activeSessionId]) {
+        preloadedChats[activeSessionId] = {
+          name: "Mijoz",
+          phone: "Aniqlanmoqda",
+          pain: "Aniqlanmoqda",
+          timeline: "Aniqlanmoqda",
+          score: 10,
+          tier: "Cold",
+          script: "Lotin",
+          stage: "Situation",
+          messages: []
+        };
+      }
+
+      preloadedChats[activeSessionId].messages.push({
+        role: "user",
+        text: text,
+        time: "Hozir"
+      });
+      if (!customText) input.value = '';
+      renderThread();
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: activeSessionId, message: text })
+        });
+        const data = await res.json();
+
+        preloadedChats[activeSessionId].messages.push({
+          role: "agent",
+          text: data.reply,
+          stage: data.stage,
+          time: "Hozir"
+        });
+        preloadedChats[activeSessionId].score = data.lead_score;
+        preloadedChats[activeSessionId].tier = data.lead_tier;
+        preloadedChats[activeSessionId].stage = data.stage;
+        preloadedChats[activeSessionId].script = data.script;
+
+        if (data.dossier) {
+          const lines = data.dossier.split('\n');
+          lines.forEach(l => {
+            if (l.includes('Telefon:')) preloadedChats[activeSessionId].phone = l.split('Telefon:')[1].trim();
+            if (l.includes('Og\'riq / Soha:')) preloadedChats[activeSessionId].pain = l.split('Og\'riq / Soha:')[1].trim();
+            if (l.includes('Xarid muddati:')) preloadedChats[activeSessionId].timeline = l.split('Xarid muddati:')[1].trim();
+          });
+        }
+
+        renderThread();
+      } catch (err) {
+        console.error("Chat error:", err);
+      }
+    }
+
+    function sendQuickPrompt(txt) {
+      sendChatMessage(txt);
+    }
+
+    document.getElementById('chat-input')?.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+
+    // CRM Leads Fetching
+    async function fetchLeads() {
+      try {
+        const res = await fetch('/api/leads');
+        const data = await res.json();
+        const tbody = document.getElementById('leads-table-body');
+        tbody.innerHTML = '';
+        data.leads.forEach(l => {
+          const tierBadge = l.tier === 'HOT 🔥' || l.score >= 70
+            ? '<span class="bg-[#FEF08A] text-amber-900 font-extrabold px-2 py-0.5 rounded">HOT 🔥</span>'
+            : (l.score >= 40 ? '<span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">WARM ⚡</span>' : '<span class="bg-gray-100 text-gray-700 font-medium px-2 py-0.5 rounded">COLD ❄️</span>');
+
+          tbody.innerHTML += `
+            <tr>
+              <td class="py-3 font-bold">
+                ${l.name}<br>
+                <span class="text-gray-400 font-normal text-[10px]">${l.channel} • ${l.script}</span>
+              </td>
+              <td class="font-mono font-semibold">${l.phone || '—'}</td>
+              <td>${l.pain || 'Aniqlanmoqda'}</td>
+              <td>${l.timeline || 'Aniqlanmoqda'}</td>
+              <td><span class="font-extrabold text-sm">${l.score}</span>/100</td>
+              <td>${tierBadge}</td>
+              <td>
+                <button onclick="selectConversation('${l.session_id}'); switchView('closer');" class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded-lg font-bold text-[11px]">
+                  Ochish →
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error("Fetch leads error:", err);
+      }
+    }
+
+    // Battlecards Fetching
+    async function fetchBattlecards() {
+      try {
+        const res = await fetch('/api/battlecards');
+        const data = await res.json();
+        const grid = document.getElementById('battlecards-grid');
+        grid.innerHTML = '';
+        data.battlecards.forEach(bc => {
+          grid.innerHTML += `
+            <div class="card-clean p-5 rounded-2xl space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold text-sm text-gray-900">⚔️ ${bc.name}</span>
+                <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded">Zaif tomoni</span>
+              </div>
+              <p class="text-xs text-gray-600"><strong>Zaif tomoni:</strong> ${bc.weakness}</p>
+              <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs space-y-1">
+                <span class="font-bold text-gray-800">Agent Talk Track (Reframe):</span>
+                <p class="text-gray-700">"${bc.reframe}"</p>
+              </div>
+              <div class="p-3 bg-[#F0FDF4] border border-[#DCFCE7] rounded-xl text-xs space-y-1">
+                <span class="font-bold text-[#16A34A]">Tuzoq Savol (Landmine):</span>
+                <p class="text-gray-800 font-medium">"${bc.landmine}"</p>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Fetch battlecards error:", err);
+      }
+    }
+
+    // Evaluator Insights Fetching
+    async function fetchEvaluatorInsights() {
+      try {
+        const res = await fetch('/api/evaluator/insights');
+        const data = await res.json();
+        
+        document.getElementById('stat-total-chats').innerText = data.total_conversations + " ta";
+        document.getElementById('stat-hot-leads').innerText = data.hot_leads + " ta";
+        document.getElementById('stat-phones').innerText = data.captured_phones + " ta";
+
+        const container = document.getElementById('recommendations-container');
+        container.innerHTML = '';
+        data.recommendations.forEach(rec => {
+          container.innerHTML += `
+            <div class="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div class="space-y-1 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] bg-gray-200 text-gray-800 font-bold px-2 py-0.5 rounded">${rec.category}</span>
+                  <span class="font-extrabold text-xs text-gray-900">${rec.title}</span>
+                </div>
+                <p class="text-xs text-gray-600">${rec.reason}</p>
+              </div>
+              <button onclick="applyRecommendation('${rec.id}')" class="px-4 py-2 bg-pistachio hover:bg-[#A8F06A] text-black font-extrabold text-xs rounded-xl border border-pistachio shrink-0 shadow-sm">
+                Qabul qilish (Tatbiq etish) ✓
+              </button>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Fetch evaluator error:", err);
+      }
+    }
+
+    async function applyRecommendation(id) {
+      try {
+        const res = await fetch('/api/evaluator/apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        });
+        const data = await res.json();
+        alert("✅ " + data.message);
+        fetchEvaluatorInsights();
+      } catch (err) {
+        alert("Xatolik yuz berdi");
+      }
+    }
+
+    // Modals
+    function openOnboardingModal() { document.getElementById('onboarding-modal').classList.remove('hidden'); }
+    function closeOnboardingModal() { document.getElementById('onboarding-modal').classList.add('hidden'); }
+    
+    function openBattlecardModal() { document.getElementById('battlecard-modal').classList.remove('hidden'); }
+    function closeBattlecardModal() { document.getElementById('battlecard-modal').classList.add('hidden'); }
+
+    function openTelegramModal() { document.getElementById('telegram-modal').classList.remove('hidden'); }
+    function closeTelegramModal() { document.getElementById('telegram-modal').classList.add('hidden'); }
+
+    function openWidgetModal() { document.getElementById('widget-modal').classList.remove('hidden'); }
+    function closeWidgetModal() { document.getElementById('widget-modal').classList.add('hidden'); }
+
+    async function saveOnboarding() {
+      const bizName = document.getElementById('ob-biz-name').value;
+      const bizDesc = document.getElementById('ob-biz-desc').value;
+      const avgCheck = document.getElementById('ob-avg-check').value;
+
+      await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_name: bizName, business_desc: bizDesc, avg_check: avgCheck })
+      });
+      document.getElementById('sidebar-biz-name').innerText = bizName;
+      alert("✅ Biznes ma'lumotlari saqlandi!");
+      closeOnboardingModal();
+    }
+
+    async function saveBattlecard() {
+      const name = document.getElementById('bc-name').value;
+      const keywords = document.getElementById('bc-keywords').value.split(',').map(s => s.trim());
+      const weakness = document.getElementById('bc-weakness').value;
+      const reframe = document.getElementById('bc-reframe').value;
+      const landmine = document.getElementById('bc-landmine').value;
+
+      await fetch('/api/battlecards/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          keywords: keywords,
+          their_weakness: weakness,
+          reframe_talk_track: reframe,
+          landmine_question: landmine
+        })
+      });
+      alert("✅ Yangi battlecard qo'shildi!");
+      closeBattlecardModal();
+      fetchBattlecards();
+    }
+
+    async function saveTelegramConfig() {
+      const token = document.getElementById('tg-token-input').value;
+      const manager = document.getElementById('tg-manager-input').value;
+
+      await fetch('/api/telegram/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: token, manager_chat_id: manager })
+      });
+      alert("✅ Telegram sozlamalari saqlandi!");
+      closeTelegramModal();
+    }
+
+    function copyWidgetSnippet() {
+      const code = document.getElementById('widget-code-snippet').innerText;
+      navigator.clipboard.writeText(code);
+      alert("📋 Nusxa olindi! Saytingizga qo'yishingiz mumkin.");
+    }
+
+    // Initial render
+    renderThread();
+  </script>
+
+  <!-- Embed VertaFlow widget live right on this page as well! -->
+  <script src="/static/widget.js"></script>
+</body>
+</html>
