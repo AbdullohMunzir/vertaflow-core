@@ -9,30 +9,22 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #0B0F17;
-      color: #F8FAFC;
+      background-color: #F7F9F6;
+      color: #111827;
     }
     .bg-pistachio {
       background-color: #B5F87B;
     }
-    .text-pistachio {
-      color: #B5F87B;
-    }
     .text-pistachio-dark {
-      color: #0B0F17;
+      color: #1A3E08;
     }
     .border-pistachio {
       border-color: #9DE959;
     }
     .card-clean {
-      background: #131A26;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.4);
-      color: #F8FAFC;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card-clean:hover {
-      border-color: rgba(181, 248, 123, 0.25);
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
@@ -42,11 +34,11 @@
       background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.12);
+      background: #E5E7EB;
       border-radius: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(181, 248, 123, 0.4);
+      background: #D1D5DB;
     }
     .tab-content {
       display: none;
@@ -54,53 +46,36 @@
     .tab-content.active {
       display: flex;
     }
-    .nav-btn {
-      color: #94A3B8;
-      transition: all 0.2s ease;
-    }
-    .nav-btn:hover {
-      color: #FFFFFF;
-      background-color: rgba(255, 255, 255, 0.05);
-    }
     .nav-btn.active {
       background-color: #B5F87B;
-      color: #0B0F17;
-      font-weight: 800;
-      box-shadow: 0 4px 14px 0 rgba(181, 248, 123, 0.25);
+      color: #1A3E08;
+      font-weight: 700;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       border: 1px solid #9DE959;
     }
     .period-btn {
       position: relative;
       cursor: pointer;
       font-weight: 700;
-      color: #94A3B8;
+      color: #64748B;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .period-btn:hover {
-      color: #FFFFFF;
+      color: #0F172A;
     }
     .period-btn.active {
-      background-color: #B5F87B;
-      color: #0B0F17;
-      font-weight: 800;
-      box-shadow: 0 2px 10px rgba(181, 248, 123, 0.3);
+      background-color: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
     .pricing-card-pro {
-      background: linear-gradient(180deg, #1A2333 0%, #0F172A 100%);
+      background: #0B0F17;
       color: #FFFFFF;
-      border: 2px solid #B5F87B;
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 30px -5px rgba(181, 248, 123, 0.25);
+      border: 1px solid #1E293B;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
     }
     .price-val-animate {
       transition: opacity 0.15s ease-out, transform 0.15s ease-out;
-    }
-    @keyframes pulseRadar {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-    }
-    .pulse-radar {
-      animation: pulseRadar 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
     }
   </style>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -108,36 +83,36 @@
 <body class="h-screen flex flex-col antialiased overflow-hidden select-none">
 
   <!-- Top Navigation Header -->
-  <header class="h-16 bg-[#0B0F17]/90 backdrop-blur-xl border-b border-white/10 px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
+  <header class="h-16 bg-white border-b border-[#E5E7EB] px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
     <div class="flex items-center space-x-3">
-      <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 text-slate-400 hover:bg-gray-100 rounded-lg focus:outline-none" title="Menyu">
+      <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg focus:outline-none" title="Menyu">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
       <div class="w-9 h-9 rounded-xl bg-pistachio flex items-center justify-center text-black shadow-sm border border-pistachio">
         <i data-lucide="zap" class="w-5 h-5 text-black"></i>
       </div>
       <div>
-        <div class="font-extrabold text-base tracking-tight text-white flex items-center gap-2">
-          VertaFlow <span class="bg-emerald-500/15 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold border border-emerald-500/30">PRO SAAS</span>
+        <div class="font-extrabold text-base tracking-tight text-gray-900 flex items-center gap-2">
+          VertaFlow <span class="bg-[#F0FDF4] text-[#16A34A] text-[10px] px-2 py-0.5 rounded-full font-bold border border-[#BBF7D0]">PRO SAAS</span>
         </div>
-        <div class="text-[11px] text-slate-400 font-medium">Ko'p Kanalli Sotuvchi Agent</div>
+        <div class="text-[11px] text-gray-500 font-medium">Ko'p Kanalli Sotuvchi Agent</div>
       </div>
     </div>
 
     <!-- Active Mode & Global Status -->
     <div class="hidden lg:flex items-center space-x-6 text-xs font-medium">
-      <div class="flex items-center gap-2 bg-[#131A26] px-3 py-1.5 rounded-full border border-white/10">
+      <div class="flex items-center gap-2 bg-[#F9FAFB] px-3 py-1.5 rounded-full border border-gray-200">
         <span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
-        <span class="text-slate-400">Holati:</span>
-        <span class="text-white font-bold" id="topbar-status">AI Avtopilot Faol (24/7)</span>
+        <span class="text-gray-500">Holati:</span>
+        <span class="text-gray-900 font-bold" id="topbar-status">AI Avtopilot Faol (24/7)</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <span class="text-slate-400">Korxona:</span>
-        <span class="font-bold text-slate-200" id="topbar-biz-name">Mebel Fabrikasi</span>
+        <span class="text-gray-400">Korxona:</span>
+        <span class="font-bold text-gray-800" id="topbar-biz-name">Mebel Fabrikasi</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <span class="text-slate-400">AI Agent:</span>
-        <span class="font-bold text-slate-200 flex items-center gap-1" id="topbar-agent-label">
+        <span class="text-gray-400">AI Agent:</span>
+        <span class="font-bold text-gray-800 flex items-center gap-1" id="topbar-agent-label">
           <span class="inline-flex items-center gap-1.5"><i data-lucide="bot" class="w-3.5 h-3.5 text-emerald-600"></i> Madina (Sotuv menejeri)</span>
         </span>
       </div>
@@ -147,41 +122,41 @@
     <div class="flex items-center space-x-2">
       <!-- Language Dropdown -->
       <div class="relative">
-        <button id="lang-btn" onclick="toggleLangMenu()" class="px-2.5 py-1.5 bg-[#131A26] hover:bg-[#1E293B] text-slate-200 rounded-full text-xs font-bold transition-all border border-white/10 flex items-center gap-1 cursor-pointer" title="Tilni tanlash">
-          <i data-lucide="globe" class="w-3.5 h-3.5 text-slate-400"></i>
+        <button id="lang-btn" onclick="toggleLangMenu()" class="px-2.5 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-full text-xs font-bold transition-all border border-gray-200 flex items-center gap-1 cursor-pointer" title="Tilni tanlash">
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-gray-600"></i>
           <span id="current-lang-label">UZ</span>
           <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
         </button>
-        <div id="lang-dropdown" class="hidden absolute right-0 mt-1.5 w-36 bg-[#131A26] border border-slate-700 rounded-xl shadow-2xl py-1 z-50 text-xs font-semibold text-slate-200">
-          <button onclick="setLanguage('uz')" class="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center justify-between text-slate-200">
+        <div id="lang-dropdown" class="hidden absolute right-0 mt-1.5 w-36 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50 text-xs font-semibold">
+          <button onclick="setLanguage('uz')" class="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between text-gray-800">
             <span>🇺🇿 O'zbekcha</span>
             <span id="check-lang-uz" class="text-emerald-600 font-bold">✓</span>
           </button>
-          <button onclick="setLanguage('ru')" class="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center justify-between text-slate-200">
+          <button onclick="setLanguage('ru')" class="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between text-gray-800">
             <span>🇷🇺 Русский</span>
             <span id="check-lang-ru" class="text-emerald-600 font-bold hidden">✓</span>
           </button>
-          <button onclick="setLanguage('en')" class="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center justify-between text-slate-200">
+          <button onclick="setLanguage('en')" class="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between text-gray-800">
             <span>🇬🇧 English</span>
             <span id="check-lang-en" class="text-emerald-600 font-bold hidden">✓</span>
           </button>
         </div>
       </div>
 
-      <a href="/" target="_blank" class="hidden sm:inline-flex px-3 py-1.5 bg-[#131A26] hover:bg-[#1E293B] text-slate-300 rounded-full text-xs font-semibold transition-all border border-white/10 items-center gap-1.5" title="Asosiy veb-saytni ko'rish">
+      <a href="/" target="_blank" class="hidden sm:inline-flex px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-full text-xs font-semibold transition-all border border-gray-200 items-center gap-1.5" title="Asosiy veb-saytni ko'rish">
         <span class="inline-flex items-center gap-1"><i data-lucide="globe" class="w-3.5 h-3.5"></i> <span data-i18n="site_btn">Sayt</span></span>
       </a>
-      <button onclick="switchTab('channels')" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold transition-all border border-emerald-500/30 flex items-center gap-1.5">
+      <button onclick="switchTab('channels')" class="px-3 py-1.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-full text-xs font-bold transition-all border border-[#BBF7D0] flex items-center gap-1.5">
         <span class="inline-flex items-center gap-1"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> <span data-i18n="nav_channels">Kanallar</span></span>
         <span id="topbar-channels-count" class="bg-[#16A34A] text-white text-[10px] px-1.5 py-0.2 rounded-full">3</span>
       </button>
-      <button onclick="switchTab('knowledge')" class="px-3 py-1.5 bg-[#131A26] hover:bg-[#1E293B] text-slate-300 rounded-full text-xs font-semibold transition-all border border-white/10 flex items-center gap-1.5">
+      <button onclick="switchTab('knowledge')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full text-xs font-semibold transition-all border border-gray-200 flex items-center gap-1.5">
         <span class="inline-flex items-center gap-1"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span data-i18n="nav_knowledge">Bilimlar Bazasi</span></span>
       </button>
-      <button onclick="switchTab('billing')" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold transition-all border border-emerald-500/30 flex items-center gap-1.5">
+      <button onclick="switchTab('billing')" class="px-3 py-1.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-full text-xs font-bold transition-all border border-[#BBF7D0] flex items-center gap-1.5">
         <span class="inline-flex items-center gap-1"><i data-lucide="credit-card" class="w-3.5 h-3.5"></i> <span data-i18n="nav_billing">Tariflar</span></span>
       </button>
-      <button onclick="switchTab('playground')" class="px-3.5 py-1.5 bg-pistachio hover:bg-[#a6ec6c] text-[#0B0F17] rounded-full text-xs font-extrabold transition-all border border-pistachio shadow-sm shadow-[#B5F87B]/20 flex items-center gap-1.5">
+      <button onclick="switchTab('playground')" class="px-3.5 py-1.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] rounded-full text-xs font-bold transition-all border border-pistachio flex items-center gap-1.5">
         <span class="inline-flex items-center gap-1"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> <span data-i18n="nav_playground">Jonli Sinov</span></span>
       </button>
     </div>
@@ -191,32 +166,32 @@
   <div class="flex-1 flex overflow-hidden relative">
     
     <!-- Sidebar Navigation -->
-    <aside id="main-sidebar" class="hidden md:flex w-64 bg-[#0F172A]/95 backdrop-blur-xl border-r border-white/10 flex-col justify-between p-4 shrink-0 transition-all z-30">
+    <aside id="main-sidebar" class="hidden md:flex w-64 bg-white border-r border-[#E5E7EB] flex-col justify-between p-4 shrink-0 transition-all z-30">
       <div class="space-y-4">
         
         <!-- Active Workspace Dropdown Selector -->
         <div class="relative">
           <div class="flex items-center gap-1.5">
-            <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl bg-[#131A26] hover:bg-[#1E293B] border border-white/10 text-xs font-bold text-white transition-all cursor-pointer">
+            <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl bg-[#F9FAFB] hover:bg-gray-100 border border-[#E5E7EB] text-xs font-bold text-gray-900 transition-all cursor-pointer">
               <div class="flex items-center gap-2 truncate">
                 <div id="ws-badge-icon" class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center shrink-0">D</div>
                 <span id="ws-active-name" class="truncate">Mebel Fabrikasi</span>
               </div>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 shrink-0"></i>
             </button>
-            <button onclick="openModal('modal-workspace-settings')" class="p-2.5 rounded-xl bg-[#131A26] hover:bg-[#1E293B] border border-white/10 text-slate-400 hover:text-white transition-all" title="Loyiha sozlamalari">
+            <button onclick="openModal('modal-workspace-settings')" class="p-2.5 rounded-xl bg-[#F9FAFB] hover:bg-gray-100 border border-[#E5E7EB] text-gray-500 hover:text-gray-800 transition-all" title="Loyiha sozlamalari">
               <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
           </div>
 
           <!-- Workspace Dropdown Menu -->
-          <div id="workspace-dropdown" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-[#131A26] border border-slate-700 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
+          <div id="workspace-dropdown" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl p-2 z-50 space-y-1">
             <div class="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider" data-i18n="workspaces_title">Loyihalar</div>
             <div id="workspace-list-container" class="space-y-0.5 max-h-48 overflow-y-auto custom-scrollbar">
               <!-- Dynamically populated via JS -->
             </div>
-            <div class="pt-1.5 border-t border-white/10">
-              <button onclick="openModal('modal-new-workspace'); toggleWorkspaceDropdown();" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-emerald-400 hover:bg-white/5 transition-all">
+            <div class="pt-1.5 border-t border-gray-100">
+              <button onclick="openModal('modal-new-workspace'); toggleWorkspaceDropdown();" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-emerald-700 hover:bg-emerald-50 transition-all">
                 <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
                 <span data-i18n="create_workspace_btn">+ Yangi loyiha</span>
               </button>
@@ -226,65 +201,65 @@
 
         <!-- Navigation items -->
         <nav class="space-y-1">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
-            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_dashboard">Boshqaruv Paneli</span>
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_dashboard">Boshqaruv Paneli</span>
           </button>
           
-          <button onclick="switchTab('channels')" id="nav-channels" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
+          <button onclick="switchTab('channels')" id="nav-channels" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
             <div class="flex items-center gap-3">
-              <i data-lucide="share-2" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_channels">Kanallar</span>
+              <i data-lucide="share-2" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_channels">Kanallar</span>
             </div>
-            <span id="badge-channels-active" class="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded-md">3 Faol</span>
+            <span id="badge-channels-active" class="text-[10px] font-bold bg-[#DCFCE7] text-[#16A34A] px-1.5 py-0.5 rounded-md">3 Faol</span>
           </button>
 
-          <button onclick="switchTab('knowledge')" id="nav-knowledge" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
+          <button onclick="switchTab('knowledge')" id="nav-knowledge" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
             <div class="flex items-center gap-3">
-              <i data-lucide="book-open" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_knowledge">Bilimlar Bazasi</span>
+              <i data-lucide="book-open" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_knowledge">Bilimlar Bazasi</span>
             </div>
-            <span id="badge-knowledge-count" class="text-[10px] font-bold bg-gray-100 text-slate-400 px-1.5 py-0.5 rounded-md">5 ta</span>
+            <span id="badge-knowledge-count" class="text-[10px] font-bold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md">5 ta</span>
           </button>
 
-          <button onclick="switchTab('agent')" id="nav-agent" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
-            <i data-lucide="bot" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_agent">Agent Sozlamalari</span>
+          <button onclick="switchTab('agent')" id="nav-agent" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+            <i data-lucide="bot" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_agent">Agent Sozlamalari</span>
           </button>
 
           <div class="pt-2 pb-1 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider" data-i18n="nav_section_operations">Muloqot va Sotuv</div>
 
-          <button onclick="switchTab('inbox')" id="nav-inbox" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
+          <button onclick="switchTab('inbox')" id="nav-inbox" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
             <div class="flex items-center gap-3">
-              <i data-lucide="message-square" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_inbox">Jonli Inbox</span>
+              <i data-lucide="message-square" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_inbox">Jonli Inbox</span>
             </div>
-            <span id="badge-unread-count" class="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.5 rounded-md">Jonli</span>
+            <span id="badge-unread-count" class="text-[10px] font-bold bg-[#FEF08A] text-amber-900 px-1.5 py-0.5 rounded-md">Jonli</span>
           </button>
 
-          <button onclick="switchTab('crm')" id="nav-crm" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
+          <button onclick="switchTab('crm')" id="nav-crm" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
             <div class="flex items-center gap-3">
-              <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_crm">Mijozlar (CRM)</span>
+              <i data-lucide="users" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_crm">Mijozlar (CRM)</span>
             </div>
-            <span id="badge-hot-count" class="text-[10px] bg-amber-500/20 font-extrabold px-1.5 py-0.5 rounded-md text-amber-300 border border-amber-500/40">HOT</span>
+            <span id="badge-hot-count" class="text-[10px] bg-[#FEF08A] font-extrabold px-1.5 py-0.5 rounded-md text-amber-900">HOT</span>
           </button>
 
-          <button onclick="switchTab('billing')" id="nav-billing" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
+          <button onclick="switchTab('billing')" id="nav-billing" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
             <div class="flex items-center gap-3">
-              <i data-lucide="credit-card" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_billing">To'lovlar va Tariflar</span>
+              <i data-lucide="credit-card" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_billing">To'lovlar va Tariflar</span>
             </div>
-            <span id="badge-nav-plan" class="text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded-md">Bepul</span>
+            <span id="badge-nav-plan" class="text-[10px] font-extrabold bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md">Bepul</span>
           </button>
 
-          <button onclick="switchTab('playground')" id="nav-playground" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/5 rounded-xl transition-all">
-            <i data-lucide="flask-conical" class="w-4 h-4 text-slate-400"></i> <span data-i18n="nav_playground">AI Sinov Maydoni</span>
+          <button onclick="switchTab('playground')" id="nav-playground" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+            <i data-lucide="flask-conical" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_playground">AI Sinov Maydoni</span>
           </button>
         </nav>
       </div>
 
       <!-- Current Plan & Profile Card -->
-      <div class="border-t border-white/10 pt-3 space-y-2.5">
+      <div class="border-t border-gray-100 pt-3 space-y-2.5">
         <!-- Plan Widget -->
-        <div class="p-2.5 rounded-xl bg-[#131A26] border border-white/10 text-xs">
+        <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-gray-500 font-medium" data-i18n="sidebar_plan_label">Tarif:</span>
-            <span id="sidebar-plan-name" class="font-bold text-white bg-[#1E293B] px-2 py-0.5 rounded-md border border-slate-700 text-[11px]">Bepul</span>
-            <button onclick="switchTab('billing')" class="px-2.5 py-0.5 bg-pistachio hover:bg-[#a6ec6c] text-[#0B0F17] font-extrabold rounded-lg text-[10px] transition-all shadow-xs cursor-pointer" data-i18n="sidebar_upgrade_btn">
+            <span id="sidebar-plan-name" class="font-bold text-gray-900 bg-white px-2 py-0.5 rounded-md border border-gray-200 text-[11px]">Bepul</span>
+            <button onclick="switchTab('billing')" class="px-2.5 py-0.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold rounded-lg text-[10px] transition-all shadow-xs cursor-pointer" data-i18n="sidebar_upgrade_btn">
               Kuchaytirish
             </button>
           </div>
@@ -295,13 +270,13 @@
         </div>
 
         <!-- User Profile Card -->
-        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer" onclick="openModal('modal-workspace-settings')">
+        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onclick="openModal('modal-workspace-settings')">
           <div class="flex items-center gap-2.5 truncate">
             <div class="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shrink-0">
               BS
             </div>
             <div class="truncate text-left">
-              <div class="font-bold text-white text-xs truncate">Bahodir Sharipov</div>
+              <div class="font-bold text-gray-900 text-xs truncate">Bahodir Sharipov</div>
               <div class="text-[10px] text-gray-500 truncate" id="sidebar-role-label"><span data-i18n="owner_role">Egasi</span> • <span id="sidebar-ws-subtitle">Default</span></div>
             </div>
           </div>
@@ -311,18 +286,18 @@
     </aside>
 
     <!-- Content Workspace -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-[#0B0F17]">
+    <main class="flex-1 flex flex-col overflow-hidden bg-[#F7F9F6]">
       
       <!-- ================= TAB 1: DASHBOARD ================= -->
       <div id="tab-dashboard" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         
         <!-- Welcome Banner -->
-        <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-[#131A26] via-[#131A26] to-[#0F2904]/40 border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-white via-white to-[#F0FDF4] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 class="text-xl font-black text-white tracking-tight flex items-center gap-2">
+            <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
               Xush kelibsiz! <span class="text-sm font-normal text-gray-500">Bugungi sotuvlar va muloqotlar hisoboti</span>
             </h1>
-            <p class="text-xs text-slate-400 mt-1">
+            <p class="text-xs text-gray-600 mt-1">
               AI Closer barcha ulangan kanallardan (Instagram, Telegram, WhatsApp, Web) kelgan mijozlarga avtomatik xizmat ko'rsatmoqda.
             </p>
           </div>
@@ -330,7 +305,7 @@
             <button onclick="switchTab('channels')" class="px-4 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio flex items-center gap-1.5">
               <span class="inline-flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Kanal Ulash</span>
             </button>
-            <button onclick="exportLeadsCSV()" class="px-4 py-2 bg-[#1E293B] hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all border border-slate-700 flex items-center gap-1.5">
+            <button onclick="exportLeadsCSV()" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-800 font-bold text-xs rounded-xl transition-all border border-gray-200 flex items-center gap-1.5">
               <span class="inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Excel Eksport</span>
             </button>
           </div>
@@ -341,10 +316,10 @@
           <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-gray-500">Jami Muloqotlar</span>
-              <span class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center"><i data-lucide="messages-square" class="w-4 h-4"></i></span>
+              <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="messages-square" class="w-4 h-4"></i></span>
             </div>
             <div class="mt-3">
-              <div id="kpi-conversations" class="text-2xl font-black text-white">0</div>
+              <div id="kpi-conversations" class="text-2xl font-black text-gray-900">0</div>
               <div class="text-[11px] text-emerald-600 font-bold mt-0.5">↑ 24/7 uzluksiz</div>
             </div>
           </div>
@@ -352,21 +327,21 @@
           <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-gray-500">Yig'ilgan Issiq Lidlar</span>
-              <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center"><i data-lucide="flame" class="w-4 h-4"></i></span>
+              <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="flame" class="w-4 h-4"></i></span>
             </div>
             <div class="mt-3">
               <div id="kpi-hot-leads" class="text-2xl font-black text-amber-600">0</div>
-              <div class="text-[11px] text-slate-400 font-medium mt-0.5">Sotib olishga tayyor mijozlar</div>
+              <div class="text-[11px] text-gray-500 font-medium mt-0.5">Sotib olishga tayyor mijozlar</div>
             </div>
           </div>
 
           <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-gray-500">O'rtacha Javob Vaqti</span>
-              <span class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4"></i></span>
+              <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4"></i></span>
             </div>
             <div class="mt-3">
-              <div id="kpi-response-time" class="text-2xl font-black text-emerald-400">1.1s</div>
+              <div id="kpi-response-time" class="text-2xl font-black text-emerald-700">1.1s</div>
               <div class="text-[11px] text-emerald-600 font-bold mt-0.5">Mijoz sovib ulgurmaydi</div>
             </div>
           </div>
@@ -374,11 +349,11 @@
           <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-gray-500">Konversiya Foizi</span>
-              <span class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
+              <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
             </div>
             <div class="mt-3">
-              <div id="kpi-conversion" class="text-2xl font-black text-purple-400">34.8%</div>
-              <div class="text-[11px] text-slate-400 font-medium mt-0.5">Oddiy botlardan 10x yuqori</div>
+              <div id="kpi-conversion" class="text-2xl font-black text-purple-700">34.8%</div>
+              <div class="text-[11px] text-gray-500 font-medium mt-0.5">Oddiy botlardan 10x yuqori</div>
             </div>
           </div>
         </div>
@@ -387,7 +362,7 @@
         <div class="card-clean rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-sm font-bold text-white">Ulangan Sotuv Kanallari</h2>
+              <h2 class="text-sm font-bold text-gray-900">Ulangan Sotuv Kanallari</h2>
               <p class="text-xs text-gray-500">Mijozlar qaysi kanaldan yozsa ham, AI birdek sotuv yopadi</p>
             </div>
             <button onclick="switchTab('channels')" class="text-xs text-emerald-700 font-bold hover:underline">
@@ -403,7 +378,7 @@
         <div class="card-clean rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-sm font-bold text-white">Eng So'nggi Lidlar (CRM)</h2>
+              <h2 class="text-sm font-bold text-gray-900">Eng So'nggi Lidlar (CRM)</h2>
               <p class="text-xs text-gray-500">AI tomonidan saralangan va telefon raqami olingan xaridorlar</p>
             </div>
             <button onclick="switchTab('crm')" class="text-xs text-emerald-700 font-bold hover:underline">
@@ -412,7 +387,7 @@
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-[#1E293B] text-slate-400 font-semibold border-b border-slate-800">
+              <thead class="bg-[#F9FAFB] text-gray-500 font-semibold border-b border-gray-200">
                 <tr>
                   <th class="py-2.5 px-3">Mijoz</th>
                   <th class="py-2.5 px-3">Kanal</th>
@@ -422,7 +397,7 @@
                   <th class="py-2.5 px-3">Holati</th>
                 </tr>
               </thead>
-              <tbody id="dashboard-recent-leads" class="divide-y divide-slate-800/80">
+              <tbody id="dashboard-recent-leads" class="divide-y divide-gray-100">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
@@ -434,7 +409,7 @@
       <!-- ================= TAB 2: CHANNELS ================= -->
       <div id="tab-channels" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         <div>
-          <h1 class="text-xl font-black text-white tracking-tight flex items-center gap-2">
+          <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
             📱 Kanallar va Integratsiyalar
           </h1>
           <p class="text-xs text-gray-500 mt-1">
@@ -457,36 +432,36 @@
                     </svg>
                   </div>
                   <div>
-                    <h3 class="font-extrabold text-base text-white">Instagram Direct</h3>
+                    <h3 class="font-extrabold text-base text-gray-900">Instagram Direct</h3>
                     <p class="text-xs text-gray-500">Meta Graph API & Reels/Post avto-javob</p>
                   </div>
                 </div>
-                <span id="chan-badge-instagram" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-slate-400">
+                <span id="chan-badge-instagram" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
                   Ulanmagan
                 </span>
               </div>
 
-              <div class="mt-4 space-y-2.5 text-xs text-slate-400 bg-[#0B0F17]/60 p-3.5 rounded-xl border border-white/5 text-slate-300">
+              <div class="mt-4 space-y-2.5 text-xs text-gray-600 bg-[#F9FAFB] p-3.5 rounded-xl border border-gray-200">
                 <div class="flex items-center justify-between">
                   <span>Direct xabarlariga javob:</span>
                   <span class="font-bold text-emerald-600">✓ 24/7 Faol</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Izohdan Directga yo'naltirish:</span>
-                  <span class="font-bold text-slate-300">✓ "Narx" so'raganlarga</span>
+                  <span class="font-bold text-gray-700">✓ "Narx" so'raganlarga</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Hisob:</span>
-                  <span id="chan-ig-acc" class="font-bold text-slate-200">@mebel_premium_uz</span>
+                  <span id="chan-ig-acc" class="font-bold text-gray-800">@mebel_premium_uz</span>
                 </div>
               </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-white/10">
+            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
               <button onclick="openInstagramModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 <span class="inline-flex items-center gap-1.5"><i data-lucide="settings" class="w-3.5 h-3.5"></i> Instagramni Sozlash</span>
               </button>
-              <button onclick="testChannelDirect('instagram')" class="px-3.5 py-2.5 bg-[#1E293B] hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition-all border border-slate-700">
+              <button onclick="testChannelDirect('instagram')" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs rounded-xl transition-all">
                 <span class="inline-flex items-center gap-1"><i data-lucide="flask-conical" class="w-3 h-3"></i> Sinash</span>
               </button>
             </div>
@@ -503,23 +478,23 @@
                     </svg>
                   </div>
                   <div>
-                    <h3 class="font-extrabold text-base text-white">Telegram Bot</h3>
+                    <h3 class="font-extrabold text-base text-gray-900">Telegram Bot</h3>
                     <p class="text-xs text-gray-500">BotFather tokeni & Rahbar dosyelari</p>
                   </div>
                 </div>
-                <span id="chan-badge-telegram" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-slate-400">
+                <span id="chan-badge-telegram" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
                   Ulanmagan
                 </span>
               </div>
 
-              <div class="mt-4 space-y-2.5 text-xs text-slate-400 bg-[#0B0F17]/60 p-3.5 rounded-xl border border-white/5 text-slate-300">
+              <div class="mt-4 space-y-2.5 text-xs text-gray-600 bg-[#F9FAFB] p-3.5 rounded-xl border border-gray-200">
                 <div class="flex items-center justify-between">
                   <span>Bot nomi:</span>
-                  <span id="chan-tg-botname" class="font-bold text-slate-200">@vertaflow_bot</span>
+                  <span id="chan-tg-botname" class="font-bold text-gray-800">@vertaflow_bot</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Rahbar Telegram ID:</span>
-                  <span id="chan-tg-manager" class="font-bold text-slate-200">Kiritilmagan</span>
+                  <span id="chan-tg-manager" class="font-bold text-gray-800">Kiritilmagan</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Issiq dosye bildirishnomalari:</span>
@@ -528,11 +503,11 @@
               </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-white/10">
+            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
               <button onclick="openTelegramModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 <span class="inline-flex items-center gap-1.5"><i data-lucide="settings" class="w-3.5 h-3.5"></i> Telegramni Sozlash</span>
               </button>
-              <button onclick="testChannelDirect('telegram')" class="px-3.5 py-2.5 bg-[#1E293B] hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition-all border border-slate-700">
+              <button onclick="testChannelDirect('telegram')" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs rounded-xl transition-all">
                 <span class="inline-flex items-center gap-1"><i data-lucide="flask-conical" class="w-3 h-3"></i> Sinash</span>
               </button>
             </div>
@@ -549,23 +524,23 @@
                     </svg>
                   </div>
                   <div>
-                    <h3 class="font-extrabold text-base text-white">WhatsApp Business</h3>
+                    <h3 class="font-extrabold text-base text-gray-900">WhatsApp Business</h3>
                     <p class="text-xs text-gray-500">QR-kod orqali yoki Cloud API</p>
                   </div>
                 </div>
-                <span id="chan-badge-whatsapp" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-slate-400">
+                <span id="chan-badge-whatsapp" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
                   Ulanmagan
                 </span>
               </div>
 
-              <div class="mt-4 space-y-2.5 text-xs text-slate-400 bg-[#0B0F17]/60 p-3.5 rounded-xl border border-white/5 text-slate-300">
+              <div class="mt-4 space-y-2.5 text-xs text-gray-600 bg-[#F9FAFB] p-3.5 rounded-xl border border-gray-200">
                 <div class="flex items-center justify-between">
                   <span>Bog'langan raqam:</span>
-                  <span id="chan-wa-phone" class="font-bold text-slate-200">+998 90 123 45 67</span>
+                  <span id="chan-wa-phone" class="font-bold text-gray-800">+998 90 123 45 67</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Ulanish usuli:</span>
-                  <span class="font-bold text-slate-300">QR-kod / Webhook</span>
+                  <span class="font-bold text-gray-700">QR-kod / Webhook</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Avto-javob:</span>
@@ -574,11 +549,11 @@
               </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-white/10">
+            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
               <button onclick="openWhatsAppModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 ⚙️ WhatsAppni Sozlash / QR Kod
               </button>
-              <button onclick="testChannelDirect('whatsapp')" class="px-3.5 py-2.5 bg-[#1E293B] hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition-all border border-slate-700">
+              <button onclick="testChannelDirect('whatsapp')" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs rounded-xl transition-all">
                 <span class="inline-flex items-center gap-1"><i data-lucide="flask-conical" class="w-3 h-3"></i> Sinash</span>
               </button>
             </div>
@@ -593,19 +568,19 @@
                     🌐
                   </div>
                   <div>
-                    <h3 class="font-extrabold text-base text-white">Web Chat Vidjet</h3>
+                    <h3 class="font-extrabold text-base text-gray-900">Web Chat Vidjet</h3>
                     <p class="text-xs text-gray-500">Istalgan veb-saytga 1 daqiqada o'rnatish</p>
                   </div>
                 </div>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#16A34A]">
                   ✓ Faol
                 </span>
               </div>
 
-              <div class="mt-4 space-y-2.5 text-xs text-slate-400 bg-[#0B0F17]/60 p-3.5 rounded-xl border border-white/5 text-slate-300">
+              <div class="mt-4 space-y-2.5 text-xs text-gray-600 bg-[#F9FAFB] p-3.5 rounded-xl border border-gray-200">
                 <div class="flex items-center justify-between">
                   <span>O'rnatish kodi:</span>
-                  <span class="font-bold text-slate-200">widget.js</span>
+                  <span class="font-bold text-gray-800">widget.js</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Vidjet rangi:</span>
@@ -620,11 +595,11 @@
               </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-white/10">
+            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
               <button onclick="openWidgetModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 📋 Kodni Olish & Sozlash
               </button>
-              <button onclick="testChannelDirect('web_widget')" class="px-3.5 py-2.5 bg-[#1E293B] hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition-all border border-slate-700">
+              <button onclick="testChannelDirect('web_widget')" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs rounded-xl transition-all">
                 <span class="inline-flex items-center gap-1"><i data-lucide="flask-conical" class="w-3 h-3"></i> Sinash</span>
               </button>
             </div>
@@ -637,7 +612,7 @@
       <div id="tab-knowledge" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 class="text-xl font-black text-white tracking-tight flex items-center gap-2">
+            <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
               📚 Korxona Bilimlar Bazasi (Knowledge Base)
             </h1>
             <p class="text-xs text-gray-500 mt-1">
@@ -645,10 +620,10 @@
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="openAddFaqModal()" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-slate-200 border border-gray-200 font-bold text-xs rounded-xl transition-all">
+            <button onclick="openAddFaqModal()" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold text-xs rounded-xl transition-all">
               + Yangi FAQ
             </button>
-            <button onclick="openAddUrlModal()" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-slate-200 border border-gray-200 font-bold text-xs rounded-xl transition-all">
+            <button onclick="openAddUrlModal()" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold text-xs rounded-xl transition-all">
               + Sayt Havolasi (URL)
             </button>
             <button onclick="openUploadModal()" class="px-3.5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
@@ -658,15 +633,15 @@
         </div>
 
         <!-- Quick Upload Dropzone -->
-        <div onclick="openUploadModal()" class="border-2 border-dashed border-slate-700 hover:border-pistachio bg-[#131A26] p-8 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all">
-          <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-3xl mb-3 border border-emerald-500/30">
+        <div onclick="openUploadModal()" class="border-2 border-dashed border-gray-300 hover:border-pistachio bg-white p-8 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all">
+          <div class="w-14 h-14 rounded-2xl bg-[#F0FDF4] text-emerald-600 flex items-center justify-center text-3xl mb-3 shadow-inner">
             📄
           </div>
-          <h3 class="font-extrabold text-sm text-white">Korxona narxlar jadvali, katalog yoki hujjatlarini yuklang</h3>
+          <h3 class="font-extrabold text-sm text-gray-900">Korxona narxlar jadvali, katalog yoki hujjatlarini yuklang</h3>
           <p class="text-xs text-gray-500 max-w-md mt-1">
             PDF, Word (DOCX), Excel/CSV narxlar preyskuranti yoki TXT fayllarni tashlang. AI bir necha soniyada matnlarni o'zlashtirib, mijozlarga taqdim etadi.
           </p>
-          <div class="mt-4 px-4 py-1.5 bg-gray-100 text-slate-300 text-xs font-semibold rounded-full border border-gray-200">
+          <div class="mt-4 px-4 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full border border-gray-200">
             Fayl tanlash uchun bosing
           </div>
         </div>
@@ -674,13 +649,13 @@
         <!-- Knowledge Items List -->
         <div class="card-clean rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-bold text-white">Yuklangan Bilimlar va Hujjatlar Ro'yxati</h2>
+            <h2 class="text-sm font-bold text-gray-900">Yuklangan Bilimlar va Hujjatlar Ro'yxati</h2>
             <span id="knowledge-total-label" class="text-xs text-gray-500 font-medium">Jami: 5 ta manba</span>
           </div>
 
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-[#1E293B] text-slate-400 font-semibold border-b border-slate-800">
+              <thead class="bg-[#F9FAFB] text-gray-500 font-semibold border-b border-gray-200">
                 <tr>
                   <th class="py-2.5 px-3">Turi</th>
                   <th class="py-2.5 px-3">Sarlavha / Manba</th>
@@ -689,7 +664,7 @@
                   <th class="py-2.5 px-3 text-right">Amallar</th>
                 </tr>
               </thead>
-              <tbody id="knowledge-table-body" class="divide-y divide-slate-800/80">
+              <tbody id="knowledge-table-body" class="divide-y divide-gray-100">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
@@ -701,7 +676,7 @@
       <!-- ================= TAB 4: AGENT PERSONA ================= -->
       <div id="tab-agent" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         <div>
-          <h1 class="text-xl font-black text-white tracking-tight flex items-center gap-2">
+          <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
             🤖 AI Agent Sozlamalari (Persona)
           </h1>
           <p class="text-xs text-gray-500 mt-1">
@@ -716,22 +691,22 @@
             
             <!-- Basic Info Card -->
             <div class="card-clean rounded-2xl p-5 space-y-4">
-              <h3 class="text-sm font-bold text-white">Asosiy Ma'lumotlar</h3>
+              <h3 class="text-sm font-bold text-gray-900">Asosiy Ma'lumotlar</h3>
               
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Agent Ismi</label>
-                  <input type="text" id="persona-name-input" value="Madina" class="w-full text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Agent Ismi</label>
+                  <input type="text" id="persona-name-input" value="Madina" class="w-full text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Lavozimi / Roli</label>
-                  <input type="text" id="persona-role-input" value="Sotuv bo'yicha bosh maslahatchi" class="w-full text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Lavozimi / Roli</label>
+                  <input type="text" id="persona-role-input" value="Sotuv bo'yicha bosh maslahatchi" class="w-full text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
                 </div>
               </div>
 
               <!-- Avatar Selection -->
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-2">Agent Avatari</label>
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Agent Avatari</label>
                 <div class="flex items-center gap-3" id="persona-avatar-picker">
                   <div onclick="selectAvatar('👩‍💼')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-pistachio bg-pistachio/20 flex items-center justify-center text-2xl cursor-pointer">👩‍💼</div>
                   <div onclick="selectAvatar('👨‍💼')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center text-2xl cursor-pointer">👨‍💼</div>
@@ -744,44 +719,44 @@
 
             <!-- Communication Tone Card -->
             <div class="card-clean rounded-2xl p-5 space-y-4">
-              <h3 class="text-sm font-bold text-white">Muloqot Uslubi va Ohangi</h3>
+              <h3 class="text-sm font-bold text-gray-900">Muloqot Uslubi va Ohangi</h3>
               <p class="text-xs text-gray-500">AI mijoz bilan qanday tilda va kayfiyatda gaplashishi kerak?</p>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="persona-tone-cards">
                 
-                <div onclick="selectTone('friendly_closer')" id="tone-card-friendly_closer" class="tone-card p-3.5 rounded-xl border-2 border-pistachio bg-[#0B290A]/60 cursor-pointer transition-all">
+                <div onclick="selectTone('friendly_closer')" id="tone-card-friendly_closer" class="tone-card p-3.5 rounded-xl border-2 border-pistachio bg-[#F0FDF4] cursor-pointer transition-all">
                   <div class="flex items-center justify-between">
                     <span class="font-extrabold text-xs text-gray-900">🌸 Samimiy & Savdo yopuvchi</span>
                     <span class="text-emerald-700 text-xs font-bold">✓ Tanlangan</span>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-1">
+                  <p class="text-[11px] text-gray-600 mt-1">
                     Mehmondo'st, mijozga yaqin, xushmuomala va e'tirozlarni chiroyli yopuvchi ohang.
                   </p>
                 </div>
 
-                <div onclick="selectTone('corporate_formal')" id="tone-card-corporate_formal" class="tone-card p-3.5 rounded-xl border-2 border-slate-700 hover:border-pistachio bg-[#0B0F17] cursor-pointer transition-all">
+                <div onclick="selectTone('corporate_formal')" id="tone-card-corporate_formal" class="tone-card p-3.5 rounded-xl border-2 border-gray-200 hover:border-pistachio bg-white cursor-pointer transition-all">
                   <div class="flex items-center justify-between">
                     <span class="font-extrabold text-xs text-gray-900">👔 Ishchan & Rasmiy</span>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-1">
+                  <p class="text-[11px] text-gray-600 mt-1">
                     B2B korporativ mijozlar uchun jiddiy, masofani saqlovchi va aniq faktlar bilan so'zlash.
                   </p>
                 </div>
 
-                <div onclick="selectTone('direct_closer')" id="tone-card-direct_closer" class="tone-card p-3.5 rounded-xl border-2 border-slate-700 hover:border-pistachio bg-[#0B0F17] cursor-pointer transition-all">
+                <div onclick="selectTone('direct_closer')" id="tone-card-direct_closer" class="tone-card p-3.5 rounded-xl border-2 border-gray-200 hover:border-pistachio bg-white cursor-pointer transition-all">
                   <div class="flex items-center justify-between">
                     <span class="font-extrabold text-xs text-gray-900">🎯 Faol Savdo Yopuvchi</span>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-1">
+                  <p class="text-[11px] text-gray-600 mt-1">
                     SPIN metodologiyasi asosida xaridorni tezroq qaror qabul qilishga undovchi agressiv uslub.
                   </p>
                 </div>
 
-                <div onclick="selectTone('concise')" id="tone-card-concise" class="tone-card p-3.5 rounded-xl border-2 border-slate-700 hover:border-pistachio bg-[#0B0F17] cursor-pointer transition-all">
+                <div onclick="selectTone('concise')" id="tone-card-concise" class="tone-card p-3.5 rounded-xl border-2 border-gray-200 hover:border-pistachio bg-white cursor-pointer transition-all">
                   <div class="flex items-center justify-between">
                     <span class="font-extrabold text-xs text-gray-900">⚡ Qisqa & Aniq</span>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-1">
+                  <p class="text-[11px] text-gray-600 mt-1">
                     Ortiqcha so'zlarsiz, faqat narx, o'lcham va muddatni 2 qatorda yetkazib berish.
                   </p>
                 </div>
@@ -791,16 +766,16 @@
 
             <!-- Greeting & Negotiation Rules -->
             <div class="card-clean rounded-2xl p-5 space-y-4">
-              <h3 class="text-sm font-bold text-white">Salomlashish va Savdo Qoidalari</h3>
+              <h3 class="text-sm font-bold text-gray-900">Salomlashish va Savdo Qoidalari</h3>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Mijoz birinchi yozganda yuboriladigan salomlashish xabari</label>
-                <textarea id="persona-greeting-input" rows="2" class="w-full text-xs p-3 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">Assalomu alaykum! Fabrikamizga xush kelibsiz. Sizga qaysi turdagi mebel kerak: oshxona, yotoqxona yoki shkaf-kupe?</textarea>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Mijoz birinchi yozganda yuboriladigan salomlashish xabari</label>
+                <textarea id="persona-greeting-input" rows="2" class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">Assalomu alaykum! Fabrikamizga xush kelibsiz. Sizga qaysi turdagi mebel kerak: oshxona, yotoqxona yoki shkaf-kupe?</textarea>
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Maksimal berilishi mumkin bo'lgan chegirma</label>
-                <select id="persona-discount-input" class="w-full text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Maksimal berilishi mumkin bo'lgan chegirma</label>
+                <select id="persona-discount-input" class="w-full text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
                   <option value="Chegirma berilmasin">Chegirma berilmasin (0%)</option>
                   <option value="5%">5% gacha chegirma taklif qilsin</option>
                   <option value="10%" selected>10% gacha chegirma taklif qilsin</option>
@@ -808,9 +783,9 @@
                 </select>
               </div>
 
-              <div class="pt-2 border-t border-white/10">
-                <label class="block text-xs font-semibold text-slate-300 mb-2">Inson Operatoriga Yo'naltirish Shartlari</label>
-                <div class="space-y-2 text-xs text-slate-300">
+              <div class="pt-2 border-t border-gray-100">
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Inson Operatoriga Yo'naltirish Shartlari</label>
+                <div class="space-y-2 text-xs text-gray-700">
                   <label class="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" id="rule-operator-request" checked class="rounded text-emerald-600 focus:ring-0">
                     <span>Mijoz inson-operatorni so'raganda darhol operatorga uzatilsin</span>
@@ -842,10 +817,10 @@
           <!-- Right 1 Col: Live Preview -->
           <div class="space-y-4">
             <div class="card-clean rounded-2xl p-5 sticky top-6">
-              <h3 class="text-sm font-bold text-white mb-3">Jonli Ko'rinish (Preview)</h3>
+              <h3 class="text-sm font-bold text-gray-900 mb-3">Jonli Ko'rinish (Preview)</h3>
               
               <!-- Simulated Chat Bubble -->
-              <div class="bg-[#0B0F17] rounded-2xl p-4 border border-slate-800 space-y-3">
+              <div class="bg-[#F9FAFB] rounded-2xl p-4 border border-gray-200 space-y-3">
                 <div class="flex items-center gap-2.5 pb-2 border-b border-gray-200">
                   <div id="preview-avatar" class="w-9 h-9 rounded-full bg-pistachio flex items-center justify-center text-xl">
                     👩‍💼
@@ -858,7 +833,7 @@
 
                 <div class="space-y-2 text-xs">
                   <div class="flex justify-end">
-                    <div class="bg-gray-200 text-slate-200 p-2.5 rounded-2xl rounded-tr-none max-w-[85%]">
+                    <div class="bg-gray-200 text-gray-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%]">
                       Assalomu alaykum, oshxona mebellari narxi qancha?
                     </div>
                   </div>
@@ -871,7 +846,7 @@
                 </div>
               </div>
 
-              <div class="mt-4 text-[11px] text-gray-500 bg-emerald-950/40 text-emerald-300 p-3 rounded-xl border border-emerald-800/60">
+              <div class="mt-4 text-[11px] text-gray-500 bg-emerald-50 text-emerald-800 p-3 rounded-xl border border-emerald-200">
                 💡 <b>Eslatma:</b> Agent javob berishda siz yuklagan barcha narxlar va bilimlardan to'liq foydalanadi.
               </div>
             </div>
@@ -884,28 +859,28 @@
       <div id="tab-inbox" class="tab-content flex-1 overflow-hidden relative">
         
         <!-- Left: Conversations List -->
-        <div id="inbox-sidebar-pane" class="w-full md:w-80 bg-[#0F172A] border-r border-white/10 flex flex-col shrink-0">
-          <div class="p-3.5 border-b border-white/10 flex items-center justify-between">
-            <h2 class="font-bold text-xs text-slate-200 flex items-center gap-1.5">
-              <i data-lucide="messages-square" class="w-4 h-4 text-slate-300"></i> Barcha Suhbatlar
+        <div id="inbox-sidebar-pane" class="w-full md:w-80 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0">
+          <div class="p-3.5 border-b border-[#E5E7EB] flex items-center justify-between">
+            <h2 class="font-bold text-xs text-gray-800 flex items-center gap-1.5">
+              <i data-lucide="messages-square" class="w-4 h-4 text-gray-700"></i> Barcha Suhbatlar
             </h2>
-            <button onclick="loadConversations()" class="text-xs text-gray-400 hover:text-slate-300 font-bold">
+            <button onclick="loadConversations()" class="text-xs text-gray-400 hover:text-gray-700 font-bold">
               <span class="inline-flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Yangilash</span>
             </button>
           </div>
 
-          <div id="inbox-convs-list" class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-slate-800/80">
+          <div id="inbox-convs-list" class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-gray-100">
             <!-- Dynamically populated -->
           </div>
         </div>
 
         <!-- Center: Chat Conversation View -->
-        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-[#0B0F17] border-r border-white/10">
+        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-[#F7F9F6] border-r border-[#E5E7EB]">
           
           <!-- Chat Header -->
-          <div class="h-14 bg-[#0F172A] border-b border-white/10 px-4 md:px-5 flex items-center justify-between shrink-0">
+          <div class="h-14 bg-white border-b border-[#E5E7EB] px-4 md:px-5 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-2 md:space-x-3">
-              <button onclick="backToInboxList()" class="md:hidden px-2 py-1 text-slate-300 hover:bg-gray-100 rounded-lg text-xs font-bold border border-gray-200 flex items-center gap-1">
+              <button onclick="backToInboxList()" class="md:hidden px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-lg text-xs font-bold border border-gray-200 flex items-center gap-1">
                 <span>←</span> Orqaga
               </button>
               <div id="active-chat-avatar" class="w-8 h-8 rounded-full bg-pistachio flex items-center justify-center font-bold text-xs text-black">
@@ -922,7 +897,7 @@
               <span id="active-chat-autopilot-badge" class="hidden sm:inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
                 AI Avtopilotda
               </span>
-              <button id="btn-takeover" onclick="toggleActiveAutopilot()" class="px-2.5 md:px-3 py-1 bg-white hover:bg-gray-50 text-slate-300 border border-gray-300 font-bold text-xs rounded-lg transition-all">
+              <button id="btn-takeover" onclick="toggleActiveAutopilot()" class="px-2.5 md:px-3 py-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold text-xs rounded-lg transition-all">
                 👨‍💼 Operator
               </button>
             </div>
@@ -937,9 +912,9 @@
           </div>
 
           <!-- Message Input Area -->
-          <div class="p-3 bg-[#0F172A] border-t border-white/10">
+          <div class="p-3 bg-white border-t border-[#E5E7EB]">
             <form onsubmit="sendOperatorReply(event)" class="flex items-center gap-2">
-              <input type="text" id="operator-reply-input" placeholder="Operator nomidan javob yozing (AI avtomatik to'xtaydi)..." class="flex-1 text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+              <input type="text" id="operator-reply-input" placeholder="Operator nomidan javob yozing (AI avtomatik to'xtaydi)..." class="flex-1 text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
               <button type="submit" class="px-3.5 md:px-4 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio shrink-0">
                 Yuborish
               </button>
@@ -949,10 +924,10 @@
         </div>
 
         <!-- Right: Lead Dossier Panel -->
-        <div class="hidden xl:flex w-80 bg-[#0F172A] border-l border-white/10 flex-col p-4 shrink-0 overflow-y-auto custom-scrollbar">
-          <h3 class="font-extrabold text-xs text-gray-900 mb-3 pb-2 border-b border-white/10 flex items-center justify-between">
-            <span class="inline-flex items-center gap-1.5"><i data-lucide="contact" class="w-4 h-4 text-slate-300"></i> Mijoz Profili (Dosye)</span>
-            <span id="dossier-tier-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-slate-400">HOT</span>
+        <div class="hidden xl:flex w-80 bg-white flex-col p-4 shrink-0 overflow-y-auto custom-scrollbar">
+          <h3 class="font-extrabold text-xs text-gray-900 mb-3 pb-2 border-b border-gray-100 flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5"><i data-lucide="contact" class="w-4 h-4 text-gray-700"></i> Mijoz Profili (Dosye)</span>
+            <span id="dossier-tier-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-600">HOT</span>
           </h3>
 
           <div class="space-y-3 text-xs">
@@ -968,22 +943,22 @@
 
             <div>
               <span class="text-gray-400 block text-[10px]">Kanal:</span>
-              <span id="dossier-channel" class="font-bold text-slate-200">-</span>
+              <span id="dossier-channel" class="font-bold text-gray-800">-</span>
             </div>
 
             <div>
               <span class="text-gray-400 block text-[10px]">Qiziqqan Mahsulot / Og'riq:</span>
-              <span id="dossier-pain" class="font-medium text-slate-200 bg-gray-50 p-2 rounded-lg block border border-gray-200 mt-1">-</span>
+              <span id="dossier-pain" class="font-medium text-gray-800 bg-gray-50 p-2 rounded-lg block border border-gray-200 mt-1">-</span>
             </div>
 
             <div>
               <span class="text-gray-400 block text-[10px]">Hajm / Ko'lam:</span>
-              <span id="dossier-volume" class="font-bold text-slate-200">-</span>
+              <span id="dossier-volume" class="font-bold text-gray-800">-</span>
             </div>
 
             <div>
               <span class="text-gray-400 block text-[10px]">Xarid Muddati:</span>
-              <span id="dossier-timeline" class="font-bold text-slate-200">-</span>
+              <span id="dossier-timeline" class="font-bold text-gray-800">-</span>
             </div>
 
             <div>
@@ -996,9 +971,9 @@
               </div>
             </div>
 
-            <div class="pt-3 border-t border-white/10">
+            <div class="pt-3 border-t border-gray-100">
               <span class="text-gray-400 block text-[10px] mb-1">To'liq AI Tavsiyasi:</span>
-              <div id="dossier-full-text" class="text-[11px] text-slate-400 bg-[#F9FAFB] p-2.5 rounded-xl border border-gray-200 whitespace-pre-line">
+              <div id="dossier-full-text" class="text-[11px] text-gray-600 bg-[#F9FAFB] p-2.5 rounded-xl border border-gray-200 whitespace-pre-line">
                 Mijoz tanlanganda to'liq dosye ko'rinadi.
               </div>
             </div>
@@ -1011,7 +986,7 @@
       <div id="tab-crm" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 class="text-xl font-black text-white tracking-tight flex items-center gap-2">
+            <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
               👥 Mijozlar Bazasi (Lead CRM)
             </h1>
             <p class="text-xs text-gray-500 mt-1">
@@ -1025,15 +1000,15 @@
 
         <!-- Filter Bar -->
         <div class="card-clean rounded-2xl p-4 flex flex-wrap items-center gap-3">
-          <input type="text" id="crm-search-input" onkeyup="filterLeads()" placeholder="Ism, telefon yoki soha bo'yicha qidirish..." class="flex-1 min-w-[200px] text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
-          <select id="crm-channel-filter" onchange="filterLeads()" class="text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+          <input type="text" id="crm-search-input" onkeyup="filterLeads()" placeholder="Ism, telefon yoki soha bo'yicha qidirish..." class="flex-1 min-w-[200px] text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
+          <select id="crm-channel-filter" onchange="filterLeads()" class="text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
             <option value="all">Barcha Kanallar</option>
             <option value="instagram">Instagram Direct</option>
             <option value="telegram">Telegram</option>
             <option value="whatsapp">WhatsApp</option>
             <option value="web_widget">Web Vidjet</option>
           </select>
-          <select id="crm-tier-filter" onchange="filterLeads()" class="text-xs p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+          <select id="crm-tier-filter" onchange="filterLeads()" class="text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
             <option value="all">Barcha Holatlar</option>
             <option value="HOT">Faqat HOT</option>
             <option value="WARM ⚡">Faqat WARM ⚡</option>
@@ -1045,7 +1020,7 @@
         <div class="card-clean rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-[#1E293B] text-slate-400 font-semibold border-b border-slate-800">
+              <thead class="bg-[#F9FAFB] text-gray-500 font-semibold border-b border-gray-200">
                 <tr>
                   <th class="py-3 px-4">Mijoz</th>
                   <th class="py-3 px-4">Kanal</th>
@@ -1058,7 +1033,7 @@
                   <th class="py-3 px-4 text-right">Sana</th>
                 </tr>
               </thead>
-              <tbody id="crm-leads-table-body" class="divide-y divide-slate-800/80">
+              <tbody id="crm-leads-table-body" class="divide-y divide-gray-100">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
@@ -1070,7 +1045,7 @@
       <!-- ================= TAB 7: PLAYGROUND ================= -->
       <div id="tab-playground" class="tab-content flex-1 flex-col p-6 overflow-hidden">
         <div class="mb-4">
-          <h1 class="text-xl font-black text-white tracking-tight flex items-center gap-2">
+          <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
             🧪 AI Sinov Maydonchasi (Playground)
           </h1>
           <p class="text-xs text-gray-500 mt-1">
@@ -1079,23 +1054,23 @@
         </div>
 
         <div class="flex-1 card-clean rounded-2xl flex flex-col overflow-hidden">
-          <div class="p-3.5 border-b border-white/10 bg-[#0F172A] flex items-center justify-between">
+          <div class="p-3.5 border-b border-gray-200 bg-[#F9FAFB] flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-xs font-bold text-slate-200">Jonli Test Rejimi (Xaridor Simulyatori)</span>
+              <span class="text-xs font-bold text-gray-800">Jonli Test Rejimi (Xaridor Simulyatori)</span>
             </div>
-            <button onclick="resetPlaygroundChat()" class="text-xs text-gray-500 hover:text-slate-200 font-semibold">
+            <button onclick="resetPlaygroundChat()" class="text-xs text-gray-500 hover:text-gray-800 font-semibold">
               🗑️ Chatni Tozalash
             </button>
           </div>
 
-          <div id="playground-messages" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3 bg-[#0B0F17]">
+          <div id="playground-messages" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3 bg-[#F7F9F6]">
             <!-- Messages will appear here -->
           </div>
 
-          <div class="p-3.5 bg-white border-t border-white/10">
+          <div class="p-3.5 bg-white border-t border-gray-200">
             <form onsubmit="sendPlaygroundMessage(event)" class="flex items-center gap-2">
-              <input type="text" id="playground-input" placeholder="Xaridor sifatida savol bering (masalan: 'Oshxona mebeli narxi qancha?', 'Yetkazib berish bormi?')..." class="flex-1 text-xs p-3 bg-[#0B0F17] text-white border border-slate-700 rounded-xl focus:border-pistachio focus:ring-1 focus:ring-[#B5F87B] placeholder-slate-500 focus:outline-none">
+              <input type="text" id="playground-input" placeholder="Xaridor sifatida savol bering (masalan: 'Oshxona mebeli narxi qancha?', 'Yetkazib berish bormi?')..." class="flex-1 text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
               <button type="submit" class="px-5 py-3 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 Yuborish
               </button>
@@ -1108,7 +1083,7 @@
       <div id="tab-billing" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         
         <!-- Top Alert Banner -->
-        <div id="billing-top-alert" class="card-clean rounded-2xl p-4 bg-white border border-gray-200 text-xs text-slate-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
+        <div id="billing-top-alert" class="card-clean rounded-2xl p-4 bg-white border border-gray-200 text-xs text-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span class="font-bold text-gray-900" id="billing-alert-plan-badge">Bepul tarif.</span>
@@ -1121,16 +1096,16 @@
 
         <!-- Hero Header -->
         <div class="text-center max-w-2xl mx-auto pt-2 pb-1 space-y-2">
-          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight" data-i18n="billing_hero_title">
+          <h1 class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight" data-i18n="billing_hero_title">
             VertaFlow'ni to'liq quvvatda ishlating
           </h1>
-          <p class="text-xs sm:text-sm text-slate-400" data-i18n="billing_hero_subtitle">
+          <p class="text-xs sm:text-sm text-gray-500" data-i18n="billing_hero_subtitle">
             Tarif to'lovdan keyin darhol yoqiladi. Payme yoki Click orqali to'lanadi, karta ma'lumotlari VertaFlow'da saqlanmaydi.
           </p>
 
           <!-- Duration Cycle Switcher with animated pills -->
           <div class="flex justify-center pt-3 pb-2">
-            <div class="bg-[#1E293B] p-1.5 rounded-2xl inline-flex items-center text-xs font-bold border border-slate-700 shadow-inner">
+            <div class="bg-gray-200/80 p-1.5 rounded-2xl inline-flex items-center text-xs font-bold shadow-inner">
               <button onclick="setBillingPeriod(1)" id="period-btn-1" class="period-btn px-4 py-2 rounded-xl">
                 1 oy
               </button>
@@ -1158,48 +1133,44 @@
                 VertaFlow va mijozlar bazasi — qo'lda ishlash uchun.
               </div>
               <div class="mt-6">
-                <div class="text-3xl font-black text-white">0 <span class="text-sm font-semibold text-gray-400">so'm / oy</span></div>
+                <div class="text-3xl font-black text-gray-900">0 <span class="text-sm font-semibold text-gray-400">so'm / oy</span></div>
                 <div class="text-xs text-gray-400 mt-1">Har doim bepul</div>
               </div>
             </div>
 
-            <button disabled class="w-full py-3 bg-[#1E293B] text-slate-500 text-xs font-bold rounded-2xl cursor-default text-center border border-slate-800">
+            <button disabled class="w-full py-3 bg-gray-100 text-gray-500 text-xs font-bold rounded-2xl cursor-default text-center">
               Tarif tugasa avtomatik shu tarifga qaytadi
             </button>
 
-            <div class="space-y-2.5 pt-4 border-t border-white/10 text-xs text-slate-300">
-              <div class="font-bold text-gray-900 text-[11px] uppercase tracking-wider mb-2">Nima kiradi</div>
+            <div class="space-y-2.5 pt-4 border-t border-gray-100 text-xs text-gray-700">
+              <div class="font-bold text-gray-900 text-[11px] uppercase tracking-wider mb-2">Tarif imkoniyatlari</div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">AI javoblari / oy</span>
-                <span class="text-gray-400 font-medium">—</span>
+                <span class="text-gray-500">AI Sotuvchi Agent</span>
+                <span class="font-bold text-gray-900">1 ta asosiy agent</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Rassilka (bir yuborishda)</span>
-                <span class="text-gray-400 font-medium">—</span>
+                <span class="text-gray-500">Ulangan Kanallar</span>
+                <span class="font-bold text-gray-900">Web Vidjet</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Bilim manbalari</span>
-                <span class="font-bold text-gray-900">3 ta</span>
+                <span class="text-gray-500">E'tirozlarni Yopish</span>
+                <span class="font-bold text-gray-900">Standart javoblar</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Katalog</span>
-                <span class="font-bold text-gray-900">10 ta</span>
+                <span class="text-gray-500">RAG Bilimlar Bazasi</span>
+                <span class="font-bold text-gray-900">3 ta manba (10 mahsulot)</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Claude va ChatGPT ulanishi</span>
-                <span class="text-gray-400 font-medium">—</span>
+                <span class="text-gray-500">Lidlar CRM & Scoring</span>
+                <span class="font-bold text-gray-900">Baza ko'rish</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">AI-sifat hisoboti</span>
-                <span class="text-gray-400 font-medium">—</span>
+                <span class="text-gray-500">Xavfsizlik & HMAC</span>
+                <span class="font-bold text-gray-900">Standart himoya</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Reels izohlari tahlili</span>
-                <span class="text-gray-400 font-medium">—</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-gray-500">«Aqlli» AI darajasi</span>
-                <span class="text-gray-400 font-medium">—</span>
+                <span class="text-gray-500">Javob Tezligi</span>
+                <span class="font-bold text-emerald-600">24/7 (0-1 soniya)</span>
               </div>
             </div>
           </div>
@@ -1236,42 +1207,38 @@
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
 
-            <div class="space-y-2.5 pt-4 border-t border-slate-800 text-xs text-gray-300">
-              <div class="font-bold text-gray-400 text-[11px] uppercase tracking-wider mb-2">Bepul'dan farqi</div>
+            <div class="space-y-2.5 pt-4 border-t border-slate-800 text-xs text-gray-200">
+              <div class="font-bold text-pistachio text-[11px] uppercase tracking-wider mb-2">⚡ Pro AI Closer Imkoniyatlari</div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">AI javoblari / oy</span>
-                <span class="font-black text-white bg-slate-800 px-2 py-0.5 rounded-md text-[11px]">1 000 ta</span>
+                <span class="text-gray-400">AI Multi-Agent Tizimi</span>
+                <span class="font-black text-white bg-slate-800 px-2 py-0.5 rounded-md text-[11px]">3 ta ixtisoslashgan agent</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Rassilka (bir yuborishda)</span>
-                <span class="font-black text-white bg-slate-800 px-2 py-0.5 rounded-md text-[11px]">200 ta</span>
+                <span class="text-gray-400">Ulangan Kanallar</span>
+                <span class="font-black text-pistachio text-[11px]">Instagram + Telegram + Web</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Bilim manbalari</span>
-                <span class="font-black text-pistachio bg-emerald-950 px-2 py-0.5 rounded-md text-[11px] border border-emerald-800">25 ta</span>
+                <span class="text-gray-400">Few-Shot E'tiroz Yopish</span>
+                <span class="font-black text-pistachio bg-emerald-950 px-2 py-0.5 rounded-md text-[11px] border border-emerald-800">Professional Sotuvchi</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Katalog</span>
-                <span class="font-black text-pistachio bg-emerald-950 px-2 py-0.5 rounded-md text-[11px] border border-emerald-800">50 ta</span>
+                <span class="text-gray-400">RAG Bilimlar Bazasi</span>
+                <span class="font-black text-white bg-slate-800 px-2 py-0.5 rounded-md text-[11px]">25 manba / 500 mahsulot</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Claude va ChatGPT ulanishi</span>
-                <span class="font-black text-pistachio text-[11px]">✔ kiradi</span>
+                <span class="text-gray-400">Lidlar CRM & Scoring</span>
+                <span class="font-black text-amber-300 text-[11px]">HOT / WARM / COLD Saralash</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">AI-sifat hisoboti</span>
-                <span class="text-slate-400">—</span>
+                <span class="text-gray-400">Rahbarga Telegram Dosye</span>
+                <span class="font-black text-pistachio text-[11px]">✔ 0 soniyada jo'natiladi</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Reels izohlari tahlili</span>
-                <span class="text-slate-400">—</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-gray-400">«Aqlli» AI darajasi</span>
-                <span class="text-slate-400">—</span>
+                <span class="text-gray-400">HMAC Webhook Xavfsizligi</span>
+                <span class="font-black text-emerald-400 text-[11px]">✔ Kiberhujumdan 100% himoya</span>
               </div>
               <div class="pt-2 text-[10px] text-gray-400 leading-relaxed border-t border-slate-800/80">
-                Shuningdek: 1 Instagram akkaunt • 1 Telegram bot • cheksiz Reels avtomatizatsiyasi
+                Shuningdek: Post va Reels izohlaridagi "narxi qancha?" yozganlarni avtomatik Directga olib o'tish
               </div>
             </div>
           </div>
@@ -1290,7 +1257,7 @@
               </div>
 
               <div class="mt-2">
-                <div class="text-3xl font-black text-white flex items-baseline gap-1">
+                <div class="text-3xl font-black text-gray-900 flex items-baseline gap-1">
                   <span id="biz-monthly-price">374 250</span>
                   <span class="text-sm font-semibold text-gray-400">so'm / oy</span>
                 </div>
@@ -1298,12 +1265,12 @@
               </div>
             </div>
 
-            <button onclick="openCheckout('business')" class="w-full py-3 bg-white hover:bg-slate-100 text-[#0B0F17] text-xs font-black rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
+            <button onclick="openCheckout('business')" class="w-full py-3 bg-gray-900 hover:bg-black text-white text-xs font-black rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5">
               <span>Biznes'ni tanlash</span>
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
 
-            <div class="space-y-2.5 pt-4 border-t border-white/10 text-xs text-slate-300">
+            <div class="space-y-2.5 pt-4 border-t border-gray-100 text-xs text-gray-700">
               <div class="font-bold text-gray-900 text-[11px] uppercase tracking-wider mb-2">Pro'dan farqi</div>
               <div class="flex items-center justify-between">
                 <span class="text-gray-500">AI javoblari / oy</span>
@@ -1337,7 +1304,7 @@
                 <span class="text-gray-500">«Aqlli» AI darajasi</span>
                 <span class="font-black text-emerald-600 text-[11px]">✔ kiradi</span>
               </div>
-              <div class="pt-2 text-[10px] text-gray-500 leading-relaxed border-t border-white/10">
+              <div class="pt-2 text-[10px] text-gray-500 leading-relaxed border-t border-gray-100">
                 Shuningdek: 3 Instagram akkaunt • 3 Telegram bot • cheksiz Reels avtomatizatsiyasi
               </div>
             </div>
@@ -1346,7 +1313,7 @@
         </div>
 
         <!-- Trust Badges Line -->
-        <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-8 py-3 text-xs text-slate-400 font-semibold border-y border-white/10 my-2 text-slate-400">
+        <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-8 py-3 text-xs text-gray-600 font-semibold border-y border-gray-200/60 my-2">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span data-i18n="trust_no_card">Karta VertaFlow'da saqlanmaydi</span>
@@ -1373,58 +1340,58 @@
           </h2>
           <div class="space-y-3 text-xs">
             <div>
-              <div class="flex justify-between font-semibold text-slate-300 mb-1">
+              <div class="flex justify-between font-semibold text-gray-700 mb-1">
                 <span>Bilim manbalari</span>
                 <span id="quota-knowledge-text">0 / 3</span>
               </div>
-              <div class="w-full bg-[#0B0F17] rounded-full h-2 overflow-hidden border border-slate-800">
+              <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                 <div id="quota-knowledge-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
             <div>
-              <div class="flex justify-between font-semibold text-slate-300 mb-1">
+              <div class="flex justify-between font-semibold text-gray-700 mb-1">
                 <span>Katalog</span>
                 <span id="quota-catalog-text">0 / 10</span>
               </div>
-              <div class="w-full bg-[#0B0F17] rounded-full h-2 overflow-hidden border border-slate-800">
+              <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                 <div id="quota-catalog-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
             <div>
-              <div class="flex justify-between font-semibold text-slate-300 mb-1">
+              <div class="flex justify-between font-semibold text-gray-700 mb-1">
                 <span>Instagram akkaunt</span>
                 <span id="quota-ig-text">0 / 1</span>
               </div>
-              <div class="w-full bg-[#0B0F17] rounded-full h-2 overflow-hidden border border-slate-800">
+              <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                 <div id="quota-ig-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
             <div>
-              <div class="flex justify-between font-semibold text-slate-300 mb-1">
+              <div class="flex justify-between font-semibold text-gray-700 mb-1">
                 <span>Telegram bot</span>
                 <span id="quota-tg-text">0 / 1</span>
               </div>
-              <div class="w-full bg-[#0B0F17] rounded-full h-2 overflow-hidden border border-slate-800">
+              <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                 <div id="quota-tg-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
             <div class="flex items-center justify-between pt-1">
-              <span class="font-semibold text-slate-300">Reels avtomatizatsiyasi</span>
+              <span class="font-semibold text-gray-700">Reels avtomatizatsiyasi</span>
               <span id="quota-reels-text" class="text-gray-500 font-bold">0 ta</span>
             </div>
           </div>
 
           <!-- Modullar -->
-          <div class="pt-4 border-t border-white/10 space-y-2">
+          <div class="pt-4 border-t border-gray-100 space-y-2">
             <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Modullar</div>
             <div class="flex flex-wrap gap-2">
-              <span class="px-3 py-1 bg-gray-100 text-slate-400 rounded-full text-xs font-medium flex items-center gap-1.5" id="mod-claude">
+              <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium flex items-center gap-1.5" id="mod-claude">
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Claude va ChatGPT ulanishi
               </span>
-              <span class="px-3 py-1 bg-gray-100 text-slate-400 rounded-full text-xs font-medium flex items-center gap-1.5" id="mod-quality">
+              <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium flex items-center gap-1.5" id="mod-quality">
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> AI-sifat hisoboti
               </span>
-              <span class="px-3 py-1 bg-gray-100 text-slate-400 rounded-full text-xs font-medium flex items-center gap-1.5" id="mod-reels">
+              <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium flex items-center gap-1.5" id="mod-reels">
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Reels izohlari tahlili
               </span>
             </div>
@@ -1441,19 +1408,19 @@
           </div>
         </div>
 
-        <!-- VertaFlow Official Brand Footer -->
-        <div class="max-w-6xl mx-auto pt-8 pb-12 text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10">
-          <div class="flex items-center gap-3">
-            <div class="w-7 h-7 rounded-xl bg-pistachio flex items-center justify-center text-[#0B0F17] font-black text-xs shadow-sm shadow-[#B5F87B]/20">V</div>
+        <!-- VertaFlow Official Footer -->
+        <div class="max-w-6xl mx-auto pt-8 pb-10 text-[11px] text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-xl bg-pistachio flex items-center justify-center text-black font-extrabold text-xs shadow-sm border border-pistachio">V</div>
             <div>
-              <div class="font-bold text-slate-200">© 2026 VertaFlow AI Technologies LLC. Barcha huquqlar himoyalangan.</div>
-              <div class="text-slate-400">O'zbekistondagi 1-Raqamli Ko'p Kanalli AI Sotuvchi Agent Platformasi</div>
+              <div class="font-bold text-gray-800">© 2026 VertaFlow AI Technologies LLC. Barcha huquqlar himoyalangan.</div>
+              <div class="text-gray-400">O'zbekistondagi 1-Raqamli Ko'p Kanalli AI Closer Platformasi</div>
             </div>
           </div>
-          <div class="flex items-center gap-5 text-slate-400">
-            <a href="/" target="_blank" class="hover:text-pistachio transition-colors">Bosh sahifa</a>
-            <a href="/#tariflar" target="_blank" class="hover:text-pistachio transition-colors">Tariflar</a>
-            <a href="https://t.me/vertaflow_bot" target="_blank" class="hover:text-pistachio transition-colors flex items-center gap-1">
+          <div class="flex items-center gap-4 text-gray-600 font-medium">
+            <a href="/" target="_blank" class="hover:text-black transition-colors">Bosh sahifa</a>
+            <a href="/#tariflar" target="_blank" class="hover:text-black transition-colors">Tariflar</a>
+            <a href="https://t.me/vertaflow_bot" target="_blank" class="hover:text-black transition-colors flex items-center gap-1">
               <span>✈️ Telegram Bot</span>
             </a>
           </div>
@@ -1467,23 +1434,23 @@
   <!-- ================= MODALS ================= -->
 
   <!-- Modal: Yangi Loyiha Yaratish (Workspace) -->
-  <div id="modal-new-workspace" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-new-workspace" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
           <span>Yangi Loyiha Yaratish</span>
         </h3>
-        <button onclick="closeModal('modal-new-workspace')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-new-workspace')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <form onsubmit="handleCreateWorkspace(event)" class="space-y-3.5 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Loyiha Nomi *</label>
-          <input type="text" id="new-ws-name" required placeholder="Masalan: Parfyumeriya Do'koni, Auto Detailing..." class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs focus:border-pistachio focus:outline-none placeholder-slate-500">
+          <label class="block font-semibold text-gray-700 mb-1">Loyiha Nomi *</label>
+          <input type="text" id="new-ws-name" required placeholder="Masalan: Parfyumeriya Do'koni, Auto Detailing..." class="w-full p-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Faoliyat Sohasi / Niche</label>
-          <select id="new-ws-niche" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Faoliyat Sohasi / Niche</label>
+          <select id="new-ws-niche" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs bg-white">
             <option value="Chakana savdo (E-commerce)">Chakana savdo (E-commerce)</option>
             <option value="Mebel va Interyer">Mebel va Interyer</option>
             <option value="Kiyim va Aksessuarlar">Kiyim va Aksessuarlar</option>
@@ -1495,15 +1462,15 @@
           </select>
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">O'rtacha Chek</label>
-          <input type="text" id="new-ws-avgcheck" placeholder="500 000 so'm" value="1 000 000 so'm" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">O'rtacha Chek</label>
+          <input type="text" id="new-ws-avgcheck" placeholder="500 000 so'm" value="1 000 000 so'm" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Tavsif (AI uchun)</label>
-          <textarea id="new-ws-desc" rows="2" placeholder="Korxonaning asosiy mahsulotlari va afzalliklari..." class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs"></textarea>
+          <label class="block font-semibold text-gray-700 mb-1">Tavsif (AI uchun)</label>
+          <textarea id="new-ws-desc" rows="2" placeholder="Korxonaning asosiy mahsulotlari va afzalliklari..." class="w-full p-2.5 border border-gray-300 rounded-xl text-xs"></textarea>
         </div>
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
-          <button type="button" onclick="closeModal('modal-new-workspace')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold hover:bg-gray-50">Bekor qilish</button>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+          <button type="button" onclick="closeModal('modal-new-workspace')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-50">Bekor qilish</button>
           <button type="submit" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl shadow-sm">Loyiha Yaratish</button>
         </div>
       </form>
@@ -1511,20 +1478,20 @@
   </div>
 
   <!-- Modal: Loyiha Sozlamalari (Workspace Settings) -->
-  <div id="modal-workspace-settings" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-workspace-settings" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
-          <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
+          <i data-lucide="settings" class="w-4 h-4 text-gray-600"></i>
           <span>Loyiha Sozlamalari</span>
         </h3>
-        <button onclick="closeModal('modal-workspace-settings')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-workspace-settings')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
-        <div class="bg-[#0B0F17] p-3 rounded-2xl border border-slate-700 space-y-1.5">
+        <div class="bg-gray-50 p-3 rounded-2xl border border-gray-200 space-y-1.5">
           <div class="flex justify-between">
             <span class="text-gray-500">Loyiha ID:</span>
-            <code class="font-mono font-bold text-slate-200" id="ws-settings-id">default</code>
+            <code class="font-mono font-bold text-gray-800" id="ws-settings-id">default</code>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500">Joriy Tarif:</span>
@@ -1532,18 +1499,18 @@
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500">Muddati:</span>
-            <span class="font-medium text-slate-300" id="ws-settings-expires">Cheksiz</span>
+            <span class="font-medium text-gray-700" id="ws-settings-expires">Cheksiz</span>
           </div>
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Loyiha Nomi</label>
-          <input type="text" id="ws-settings-name" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs font-bold">
+          <label class="block font-semibold text-gray-700 mb-1">Loyiha Nomi</label>
+          <input type="text" id="ws-settings-name" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-bold text-gray-900">
         </div>
       </div>
-      <div class="flex items-center justify-between pt-3 border-t border-white/10">
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
         <button onclick="handleDeleteWorkspace()" id="btn-delete-ws" class="px-3 py-2 text-red-600 hover:bg-red-50 rounded-xl text-xs font-bold">Loyihani o'chirish</button>
         <div class="flex items-center gap-2">
-          <button onclick="closeModal('modal-workspace-settings')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Yopish</button>
+          <button onclick="closeModal('modal-workspace-settings')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Yopish</button>
           <button onclick="switchTab('billing'); closeModal('modal-workspace-settings');" class="px-4 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Tarifni Ko'tarish</button>
         </div>
       </div>
@@ -1551,14 +1518,14 @@
   </div>
 
   <!-- Modal: To'lov (Payme & Click Checkout) -->
-  <div id="modal-checkout" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-checkout" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
           <span>Xavfsiz To'lov Oynasi</span>
         </h3>
-        <button onclick="closeModal('modal-checkout')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-checkout')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
 
       <!-- Plan Details Summary -->
@@ -1576,13 +1543,13 @@
 
       <!-- Payment Method Selector -->
       <div class="space-y-2 text-xs">
-        <label class="block font-bold text-slate-300">To'lov tizimini tanlang:</label>
+        <label class="block font-bold text-gray-700">To'lov tizimini tanlang:</label>
         <div class="grid grid-cols-2 gap-3">
-          <button type="button" onclick="selectPaymentMethod('payme')" id="pay-method-payme" class="p-3 rounded-2xl border-2 border-pistachio bg-emerald-950/40 flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+          <button type="button" onclick="selectPaymentMethod('payme')" id="pay-method-payme" class="p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 flex flex-col items-center gap-1.5 transition-all cursor-pointer">
             <span class="font-black text-sm text-[#00CCCC]">Payme</span>
             <span class="text-[10px] text-gray-500 font-medium">Uzcard / Humo / Visa</span>
           </button>
-          <button type="button" onclick="selectPaymentMethod('click')" id="pay-method-click" class="p-3 rounded-2xl border-2 border-slate-700 bg-[#0B0F17] hover:border-slate-500 flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+          <button type="button" onclick="selectPaymentMethod('click')" id="pay-method-click" class="p-3 rounded-2xl border-2 border-gray-200 bg-white hover:border-gray-300 flex flex-col items-center gap-1.5 transition-all cursor-pointer">
             <span class="font-black text-sm text-[#0073FF]">Click Up</span>
             <span class="text-[10px] text-gray-500 font-medium">Barcha kartalar</span>
           </button>
@@ -1591,15 +1558,15 @@
 
       <!-- Card / Phone mock input -->
       <div class="space-y-2 text-xs">
-        <label class="block font-semibold text-slate-300">Karta raqami (yoki Telefon raqam)</label>
-        <input type="text" id="checkout-card-num" placeholder="8600 •••• •••• 1234" value="8600 0024 5589 4412" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs font-mono">
+        <label class="block font-semibold text-gray-700">Karta raqami (yoki Telefon raqam)</label>
+        <input type="text" id="checkout-card-num" placeholder="8600 •••• •••• 1234" value="8600 0024 5589 4412" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono">
         <span class="text-[10px] text-gray-400 flex items-center gap-1">
           <i data-lucide="lock" class="w-3 h-3"></i> Karta ma'lumotlari VertaFlow serverida saqlanmaydi
         </span>
       </div>
 
-      <div class="flex items-center justify-between pt-3 border-t border-white/10">
-        <button onclick="closeModal('modal-checkout')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Bekor qilish</button>
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+        <button onclick="closeModal('modal-checkout')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Bekor qilish</button>
         <button onclick="submitCheckoutPayment()" id="btn-submit-pay" class="px-5 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-black text-xs rounded-xl shadow-lg flex items-center gap-2 cursor-pointer">
           <span>To'lovni Tasdiqlash</span>
           <i data-lucide="check-circle" class="w-4 h-4"></i>
@@ -1609,36 +1576,36 @@
   </div>
 
   <!-- Modal: Instagram Config -->
-  <div id="modal-instagram" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-instagram" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>📷</span> Instagram Directni Ulash (Meta Graph API)
         </h3>
-        <button onclick="closeModal('modal-instagram')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-instagram')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Instagram Business Profil Nomi</label>
-          <input type="text" id="ig-account-input" value="@mebel_premium_uz" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Instagram Business Profil Nomi</label>
+          <input type="text" id="ig-account-input" value="@mebel_premium_uz" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Facebook Page ID</label>
-          <input type="text" id="ig-pageid-input" placeholder="102938475610293" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Facebook Page ID</label>
+          <input type="text" id="ig-pageid-input" placeholder="102938475610293" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Meta Access Token (Graph API)</label>
-          <input type="password" id="ig-token-input" placeholder="EAAK..." class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Meta Access Token (Graph API)</label>
+          <input type="password" id="ig-token-input" placeholder="EAAK..." class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
-        <div class="bg-[#0B0F17] p-3 rounded-xl border border-slate-700 space-y-2">
-          <div class="text-[11px] font-bold text-slate-300">Webhook Sozlamasi:</div>
+        <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
+          <div class="text-[11px] font-bold text-gray-700">Webhook Sozlamasi:</div>
           <div>
             <span class="text-[10px] text-gray-500 block">Callback URL:</span>
             <code class="text-[11px] text-emerald-700 break-all select-all font-mono" id="ig-webhook-url">http://127.0.0.1:8000/api/webhooks/instagram</code>
           </div>
           <div>
             <span class="text-[10px] text-gray-500 block">Verify Token:</span>
-            <code class="text-[11px] text-slate-200 font-mono select-all">verta_ig_token_99</code>
+            <code class="text-[11px] text-gray-800 font-mono select-all">verta_ig_token_99</code>
           </div>
         </div>
         <div class="space-y-1.5 pt-1">
@@ -1652,41 +1619,41 @@
           </label>
         </div>
       </div>
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
-        <button onclick="closeModal('modal-instagram')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Bekor qilish</button>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+        <button onclick="closeModal('modal-instagram')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Bekor qilish</button>
         <button onclick="saveInstagramSettings()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Ulash va Saqlash</button>
       </div>
     </div>
   </div>
 
   <!-- Modal: Telegram Config -->
-  <div id="modal-telegram" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-telegram" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>✈️</span> Telegram Botni Ulash
         </h3>
-        <button onclick="closeModal('modal-telegram')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-telegram')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">BotFather Tokeni</label>
-          <input type="text" id="tg-token-input" placeholder="7123456789:AAH..." class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs font-mono">
+          <label class="block font-semibold text-gray-700 mb-1">BotFather Tokeni</label>
+          <input type="text" id="tg-token-input" placeholder="7123456789:AAH..." class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Bot Username</label>
-          <input type="text" id="tg-username-input" placeholder="@sizning_bot" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Bot Username</label>
+          <input type="text" id="tg-username-input" placeholder="@sizning_bot" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Sotuv Rahbari Telegram Chat ID (Dosyelar uchun)</label>
-          <input type="text" id="tg-chatid-input" placeholder="12345678" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Sotuv Rahbari Telegram Chat ID (Dosyelar uchun)</label>
+          <input type="text" id="tg-chatid-input" placeholder="12345678" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
           <span class="text-[10px] text-gray-400">@userinfobot orqali ID raqamingizni bilishingiz mumkin</span>
         </div>
       </div>
-      <div class="flex items-center justify-between pt-3 border-t border-white/10">
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
         <button onclick="stopTelegramBot()" class="px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-xl text-xs font-bold">To'xtatish</button>
         <div class="flex items-center gap-2">
-          <button onclick="closeModal('modal-telegram')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Bekor qilish</button>
+          <button onclick="closeModal('modal-telegram')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Bekor qilish</button>
           <button onclick="saveTelegramSettings()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Ishga Tushirish</button>
         </div>
       </div>
@@ -1694,17 +1661,17 @@
   </div>
 
   <!-- Modal: WhatsApp QR Config -->
-  <div id="modal-whatsapp" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white text-center">
+  <div id="modal-whatsapp" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-gray-100 text-center">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>💬</span> WhatsApp Business Ulash
         </h3>
-        <button onclick="closeModal('modal-whatsapp')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-whatsapp')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       
       <div class="space-y-3">
-        <p class="text-xs text-slate-400">
+        <p class="text-xs text-gray-600">
           Telefoningizdagi WhatsApp ilovasi orqali <b>Bog'langan qurilmalar (Linked devices)</b> bo'limiga kiring va ushbu QR-kodni skanerlang:
         </p>
 
@@ -1716,29 +1683,29 @@
         </div>
 
         <div class="text-left text-xs">
-          <label class="block font-semibold text-slate-300 mb-1">WhatsApp Telefon Raqam</label>
-          <input type="text" id="wa-phone-input" value="+998 90 123 45 67" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">WhatsApp Telefon Raqam</label>
+          <input type="text" id="wa-phone-input" value="+998 90 123 45 67" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
-        <button onclick="closeModal('modal-whatsapp')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Yopish</button>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+        <button onclick="closeModal('modal-whatsapp')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Yopish</button>
         <button onclick="saveWhatsAppSettings()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">✓ Ulangan deb Tasdiqlash</button>
       </div>
     </div>
   </div>
 
   <!-- Modal: Web Widget Code -->
-  <div id="modal-widget" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-widget" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>🌐</span> Saytga Vidjet O'rnatish Kodi
         </h3>
-        <button onclick="closeModal('modal-widget')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-widget')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
-        <p class="text-slate-400">
+        <p class="text-gray-600">
           Ushbu 1 qatorlik kodni veb-saytingizning `&lt;body&gt;` tegining eng oxiriga joylashtiring:
         </p>
         <div class="relative bg-gray-900 text-gray-100 p-3.5 rounded-xl font-mono text-[11px] break-all">
@@ -1748,89 +1715,89 @@
           </button>
         </div>
       </div>
-      <div class="flex items-center justify-end pt-3 border-t border-white/10">
+      <div class="flex items-center justify-end pt-3 border-t border-gray-100">
         <button onclick="closeModal('modal-widget')" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Tushunarli</button>
       </div>
     </div>
   </div>
 
   <!-- Modal: Upload Knowledge File -->
-  <div id="modal-upload" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-upload" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>📂</span> Fayl Yuklash (PDF, Excel, Word, TXT)
         </h3>
-        <button onclick="closeModal('modal-upload')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-upload')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Fayl Kategoriya Nomi</label>
-          <input type="text" id="upload-category-input" value="Katalog va Narxlar" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Fayl Kategoriya Nomi</label>
+          <input type="text" id="upload-category-input" value="Katalog va Narxlar" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Faylni Tanlang</label>
+          <label class="block font-semibold text-gray-700 mb-1">Faylni Tanlang</label>
           <input type="file" id="upload-file-input" accept=".pdf,.doc,.docx,.txt,.csv,.json" class="w-full p-2 border border-gray-300 rounded-xl text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-pistachio file:text-[#1A3E08]">
         </div>
       </div>
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
-        <button onclick="closeModal('modal-upload')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Bekor qilish</button>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+        <button onclick="closeModal('modal-upload')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Bekor qilish</button>
         <button onclick="submitUploadFile()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Yuklash va Saqlash</button>
       </div>
     </div>
   </div>
 
   <!-- Modal: Add FAQ -->
-  <div id="modal-faq" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-faq" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>❓</span> Yangi Savol-Javob (FAQ) Qo'shish
         </h3>
-        <button onclick="closeModal('modal-faq')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-faq')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Mijozlar Ko'p Beradigan Savol</label>
-          <input type="text" id="faq-question-input" placeholder="Yetkazib berish xizmati qancha?" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Mijozlar Ko'p Beradigan Savol</label>
+          <input type="text" id="faq-question-input" placeholder="Yetkazib berish xizmati qancha?" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Agent Berishi Kerak Bo'lgan Qat'iy Javob</label>
-          <textarea id="faq-answer-input" rows="3" placeholder="Toshkent shahri bo'ylab bepul, viloyatlarga kelishilgan narxda yetkaziladi." class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs"></textarea>
+          <label class="block font-semibold text-gray-700 mb-1">Agent Berishi Kerak Bo'lgan Qat'iy Javob</label>
+          <textarea id="faq-answer-input" rows="3" placeholder="Toshkent shahri bo'ylab bepul, viloyatlarga kelishilgan narxda yetkaziladi." class="w-full p-2.5 border border-gray-300 rounded-xl text-xs"></textarea>
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Kategoriya</label>
-          <input type="text" id="faq-category-input" value="Yetkazib berish" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Kategoriya</label>
+          <input type="text" id="faq-category-input" value="Yetkazib berish" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
       </div>
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
-        <button onclick="closeModal('modal-faq')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Bekor qilish</button>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+        <button onclick="closeModal('modal-faq')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Bekor qilish</button>
         <button onclick="submitAddFaq()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Saqlash</button>
       </div>
     </div>
   </div>
 
   <!-- Modal: Add URL -->
-  <div id="modal-url" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-[#131A26] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700 text-white">
+  <div id="modal-url" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-gray-100">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+        <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
           <span>🌐</span> Sayt Havolasi (URL) Qo'shish
         </h3>
-        <button onclick="closeModal('modal-url')" class="text-gray-400 hover:text-slate-300 text-lg">✕</button>
+        <button onclick="closeModal('modal-url')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Veb-sayt Manzili (URL)</label>
-          <input type="url" id="url-address-input" placeholder="https://mebelfabrika.uz" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Veb-sayt Manzili (URL)</label>
+          <input type="url" id="url-address-input" placeholder="https://mebelfabrika.uz" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Sayt Nomi / Tavsifi</label>
-          <input type="text" id="url-title-input" placeholder="Rasmiy Veb-Saytimiz" class="w-full p-2.5 bg-[#0B0F17] text-white border border-slate-700 rounded-xl text-xs">
+          <label class="block font-semibold text-gray-700 mb-1">Sayt Nomi / Tavsifi</label>
+          <input type="text" id="url-title-input" placeholder="Rasmiy Veb-Saytimiz" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
         </div>
       </div>
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
-        <button onclick="closeModal('modal-url')" class="px-4 py-2 border border-gray-200 text-slate-300 rounded-xl text-xs font-semibold">Bekor qilish</button>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+        <button onclick="closeModal('modal-url')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Bekor qilish</button>
         <button onclick="submitAddUrl()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">Yuklash</button>
       </div>
     </div>
@@ -1981,10 +1948,10 @@
           if (badge) {
             if (c.is_connected) {
               badge.textContent = '✓ Ulangan';
-              badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+              badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#16A34A]';
             } else {
               badge.textContent = 'Ulanmagan';
-              badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-slate-400';
+              badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600';
             }
           }
           if (c.channel_id === 'instagram' && c.config.account_name) {
@@ -2031,7 +1998,7 @@
               <div class="text-[10px] text-gray-400">24/7 AI javob</div>
             </div>
           </div>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${c.is_connected ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gray-100 text-gray-500'}">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${c.is_connected ? 'bg-[#DCFCE7] text-[#16A34A]' : 'bg-gray-100 text-gray-500'}">
             ${c.is_connected ? 'Faol' : 'Oflayn'}
           </span>
         </div>
@@ -2160,7 +2127,7 @@
             <td class="py-3 px-3">${typeBadges[it.item_type] || it.item_type}</td>
             <td class="py-3 px-3 font-bold text-gray-900">${it.title}</td>
             <td class="py-3 px-3 text-gray-500">${it.metadata?.file_size || it.metadata?.category || it.metadata?.status || '-'}</td>
-            <td class="py-3 px-3 text-slate-400 max-w-xs truncate">${it.content}</td>
+            <td class="py-3 px-3 text-gray-600 max-w-xs truncate">${it.content}</td>
             <td class="py-3 px-3 text-right">
               <button onclick="deleteKnowledgeItem(${it.id})" class="text-red-500 hover:text-red-700 font-bold">
                 O'chirish
@@ -2284,9 +2251,9 @@
       selectedTone = tone;
       document.querySelectorAll('.tone-card').forEach(el => {
         if (el.id === `tone-card-${tone}`) {
-          el.className = 'tone-card p-3.5 rounded-xl border-2 border-pistachio bg-[#0B290A]/60 cursor-pointer transition-all';
+          el.className = 'tone-card p-3.5 rounded-xl border-2 border-pistachio bg-[#F0FDF4] cursor-pointer transition-all';
         } else {
-          el.className = 'tone-card p-3.5 rounded-xl border-2 border-slate-700 hover:border-pistachio bg-[#0B0F17] cursor-pointer transition-all';
+          el.className = 'tone-card p-3.5 rounded-xl border-2 border-gray-200 hover:border-pistachio bg-white cursor-pointer transition-all';
         }
       });
       updatePersonaPreview();
@@ -2435,7 +2402,7 @@
           const isOperator = m.sender === 'operator';
           return `
             <div class="flex ${isUser ? 'justify-start' : 'justify-end'}">
-              <div class="max-w-[75%] p-3 rounded-2xl ${isUser ? 'bg-[#1E293B] text-slate-100 border border-slate-700 rounded-tl-none' : (isOperator ? 'bg-amber-500/20 text-amber-200 border border-amber-500/40 rounded-tr-none' : 'bg-pistachio text-[#0B0F17] font-medium rounded-tr-none shadow-sm shadow-[#B5F87B]/20')} text-xs">
+              <div class="max-w-[75%] p-3 rounded-2xl ${isUser ? 'bg-white text-gray-900 border border-gray-200 rounded-tl-none' : (isOperator ? 'bg-amber-100 text-amber-950 border border-amber-300 rounded-tr-none' : 'bg-pistachio text-[#1A3E08] rounded-tr-none')} shadow-sm text-xs">
                 ${isOperator ? '<div class="text-[9px] font-bold text-amber-700 mb-0.5">👨‍💼 Operator</div>' : ''}
                 <div class="whitespace-pre-line">${m.text}</div>
                 <div class="text-[9px] text-gray-400 mt-1 text-right">${m.timestamp ? m.timestamp.slice(11, 16) : ''}</div>
@@ -2503,14 +2470,14 @@
       tbody.innerHTML = leads.map(l => `
         <tr class="hover:bg-gray-50/50">
           <td class="py-3 px-4 font-bold text-gray-900">${l.name}</td>
-          <td class="py-3 px-4 font-semibold text-slate-400">${l.channel}</td>
+          <td class="py-3 px-4 font-semibold text-gray-600">${l.channel}</td>
           <td class="py-3 px-4 font-bold text-emerald-700">${l.phone || '-'}</td>
-          <td class="py-3 px-4 text-slate-300 max-w-xs truncate">${l.pain || '-'}</td>
-          <td class="py-3 px-4 text-slate-400">${l.volume || '-'}</td>
-          <td class="py-3 px-4 text-slate-400">${l.timeline || '-'}</td>
+          <td class="py-3 px-4 text-gray-700 max-w-xs truncate">${l.pain || '-'}</td>
+          <td class="py-3 px-4 text-gray-600">${l.volume || '-'}</td>
+          <td class="py-3 px-4 text-gray-600">${l.timeline || '-'}</td>
           <td class="py-3 px-4 font-black">${l.score}/100</td>
           <td class="py-3 px-4">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-gray-100 text-slate-400'}">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-[#FEF08A] text-amber-900' : 'bg-gray-100 text-gray-600'}">
               ${l.tier || 'COLD ❄️'}
             </span>
           </td>
@@ -2528,10 +2495,10 @@
           <td class="py-2.5 px-3 font-bold text-gray-900">${l.name}</td>
           <td class="py-2.5 px-3 text-gray-500">${l.channel}</td>
           <td class="py-2.5 px-3 font-bold text-emerald-700">${l.phone || '-'}</td>
-          <td class="py-2.5 px-3 text-slate-300 truncate max-w-xs">${l.pain || '-'}</td>
+          <td class="py-2.5 px-3 text-gray-700 truncate max-w-xs">${l.pain || '-'}</td>
           <td class="py-2.5 px-3 font-bold">${l.score}/100</td>
           <td class="py-2.5 px-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-gray-100 text-slate-400'}">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-[#FEF08A] text-amber-900' : 'bg-gray-100 text-gray-600'}">
               ${l.tier || 'COLD ❄️'}
             </span>
           </td>
@@ -2830,7 +2797,7 @@
             return `
               <div onclick="switchWorkspace('${w.id}')" class="p-2 rounded-xl flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors ${isActive ? 'bg-emerald-50/70 border border-emerald-200/60' : ''}">
                 <div class="flex items-center gap-2 truncate">
-                  <div class="w-6 h-6 rounded-lg ${isActive ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-slate-300'} text-[10px] font-black flex items-center justify-center shrink-0">
+                  <div class="w-6 h-6 rounded-lg ${isActive ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'} text-[10px] font-black flex items-center justify-center shrink-0">
                     ${initial}
                   </div>
                   <div class="truncate text-left">
@@ -2839,7 +2806,7 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
-                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded ${w.plan_id === 'business' ? 'bg-purple-100 text-purple-700' : (w.plan_id === 'pro' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-slate-400')}">
+                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded ${w.plan_id === 'business' ? 'bg-purple-100 text-purple-700' : (w.plan_id === 'pro' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600')}">
                     ${planBadge}
                   </span>
                   ${isActive ? '<span class="text-emerald-600 font-bold text-xs">✓</span>' : ''}
@@ -3073,12 +3040,12 @@
                       <th class="py-2.5 px-3">Holati</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800/80">
+                  <tbody class="divide-y divide-gray-100">
                     ${data.payments.map(p => `
                       <tr>
-                        <td class="py-2.5 px-3 text-slate-300 font-medium">${p.created_at.slice(0, 16)}</td>
+                        <td class="py-2.5 px-3 text-gray-700 font-medium">${p.created_at.slice(0, 16)}</td>
                         <td class="py-2.5 px-3 font-bold text-gray-900">${(p.plan_id || '').toUpperCase()}</td>
-                        <td class="py-2.5 px-3 text-slate-400">${p.period_months} oy</td>
+                        <td class="py-2.5 px-3 text-gray-600">${p.period_months} oy</td>
                         <td class="py-2.5 px-3 font-extrabold text-emerald-700">${Number(p.amount).toLocaleString()} so'm</td>
                         <td class="py-2.5 px-3">
                           <span class="px-2 py-0.5 rounded font-bold text-[10px] ${p.payment_method === 'payme' ? 'bg-[#E0FBFB] text-[#008080]' : 'bg-[#E5F1FF] text-[#0066CC]'}">
@@ -3147,11 +3114,11 @@
       const paymeBtn = document.getElementById('pay-method-payme');
       const clickBtn = document.getElementById('pay-method-click');
       if (method === 'payme') {
-        paymeBtn.className = 'p-3 rounded-2xl border-2 border-pistachio bg-emerald-950/40 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
-        clickBtn.className = 'p-3 rounded-2xl border-2 border-slate-700 bg-[#0B0F17] hover:border-slate-500 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
+        paymeBtn.className = 'p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
+        clickBtn.className = 'p-3 rounded-2xl border-2 border-gray-200 bg-white hover:border-gray-300 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
       } else {
         clickBtn.className = 'p-3 rounded-2xl border-2 border-blue-500 bg-blue-50/50 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
-        paymeBtn.className = 'p-3 rounded-2xl border-2 border-slate-700 bg-[#0B0F17] hover:border-slate-500 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
+        paymeBtn.className = 'p-3 rounded-2xl border-2 border-gray-200 bg-white hover:border-gray-300 flex flex-col items-center gap-1.5 transition-all cursor-pointer';
       }
     }
 
