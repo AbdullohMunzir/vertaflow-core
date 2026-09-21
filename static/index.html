@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VertaFlow AI — Ko'p Kanalli Sotuvchi Agent Platformasi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #F7F9F6;
-      color: #111827;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+      letter-spacing: -0.015em;
     }
     .bg-pistachio {
       background-color: #B5F87B;
@@ -222,28 +225,28 @@
   <!-- Main Application Body -->
   <div class="flex-1 flex overflow-hidden relative">
     
-    <!-- Sidebar Navigation -->
-    <aside id="main-sidebar" class="hidden md:flex w-64 bg-white border-r border-[#E5E7EB] flex-col justify-between p-4 shrink-0 transition-all z-30">
+    <!-- Sidebar Navigation (Sleek Modern Obsidian Shell) -->
+    <aside id="main-sidebar" class="hidden md:flex w-64 bg-[#0A0D14] border-r border-slate-800/80 flex-col justify-between p-4 shrink-0 transition-all z-30 shadow-2xl">
       <div class="space-y-4">
         
         <!-- Active Workspace Dropdown Selector -->
         <div class="relative">
           <div class="flex items-center gap-1.5">
-            <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl bg-[#F9FAFB] hover:bg-gray-100 border border-[#E5E7EB] text-xs font-bold text-gray-900 transition-all cursor-pointer">
+            <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all cursor-pointer">
               <div class="flex items-center gap-2 truncate">
                 <div id="ws-badge-icon" class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center shrink-0">D</div>
                 <span id="ws-active-name" class="truncate">Mebel Fabrikasi</span>
               </div>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 shrink-0"></i>
             </button>
-            <button onclick="openModal('modal-workspace-settings')" class="p-2.5 rounded-xl bg-[#F9FAFB] hover:bg-gray-100 border border-[#E5E7EB] text-gray-500 hover:text-gray-800 transition-all" title="Loyiha sozlamalari">
+            <button onclick="openModal('modal-workspace-settings')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all" title="Loyiha sozlamalari">
               <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
           </div>
 
           <!-- Workspace Dropdown Menu -->
           <div id="workspace-dropdown" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl p-2 z-50 space-y-1">
-            <div class="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider" data-i18n="workspaces_title">Loyihalar</div>
+            <div class="px-2 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="workspaces_title">Loyihalar</div>
             <div id="workspace-list-container" class="space-y-0.5 max-h-48 overflow-y-auto custom-scrollbar">
               <!-- Dynamically populated via JS -->
             </div>
@@ -258,92 +261,92 @@
 
         <!-- Navigation items -->
         <nav class="space-y-1">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <i data-lucide="layout-dashboard" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_dashboard">Boshqaruv Paneli</span>
           </button>
           
-          <button onclick="switchTab('channels')" id="nav-channels" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('channels')" id="nav-channels" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <div class="flex items-center gap-3">
               <i data-lucide="share-2" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_channels">Kanallar</span>
             </div>
             <span id="badge-channels-active" class="text-[10px] font-bold bg-[#DCFCE7] text-[#16A34A] px-1.5 py-0.5 rounded-md">3 Faol</span>
           </button>
 
-          <button onclick="switchTab('knowledge')" id="nav-knowledge" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('knowledge')" id="nav-knowledge" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <div class="flex items-center gap-3">
               <i data-lucide="book-open" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_knowledge">Bilimlar Bazasi</span>
             </div>
             <span id="badge-knowledge-count" class="text-[10px] font-bold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md">5 ta</span>
           </button>
 
-          <button onclick="switchTab('agent')" id="nav-agent" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('agent')" id="nav-agent" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <i data-lucide="bot" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_agent">Agent Sozlamalari</span>
           </button>
 
-          <div class="pt-2 pb-1 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider" data-i18n="nav_section_operations">Muloqot va Sotuv</div>
+          <div class="pt-2 pb-1 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="nav_section_operations">Muloqot va Sotuv</div>
 
-          <button onclick="switchTab('inbox')" id="nav-inbox" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('inbox')" id="nav-inbox" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <div class="flex items-center gap-3">
               <i data-lucide="message-square" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_inbox">Jonli Inbox</span>
             </div>
             <span id="badge-unread-count" class="text-[10px] font-bold bg-[#FEF08A] text-amber-900 px-1.5 py-0.5 rounded-md">Jonli</span>
           </button>
 
-          <button onclick="switchTab('crm')" id="nav-crm" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('crm')" id="nav-crm" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <div class="flex items-center gap-3">
               <i data-lucide="users" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_crm">Mijozlar (CRM)</span>
             </div>
             <span id="badge-hot-count" class="text-[10px] bg-[#FEF08A] font-extrabold px-1.5 py-0.5 rounded-md text-amber-900">HOT</span>
           </button>
 
-          <button onclick="switchTab('billing')" id="nav-billing" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('billing')" id="nav-billing" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <div class="flex items-center gap-3">
               <i data-lucide="credit-card" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_billing">To'lovlar va Tariflar</span>
             </div>
             <span id="badge-nav-plan" class="text-[10px] font-extrabold bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0] px-1.5 py-0.5 rounded-md">Bepul</span>
           </button>
 
-          <button onclick="switchTab('playground')" id="nav-playground" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-all">
+          <button onclick="switchTab('playground')" id="nav-playground" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <i data-lucide="flask-conical" class="w-4 h-4 text-gray-600"></i> <span data-i18n="nav_playground">AI Sinov Maydoni</span>
           </button>
         </nav>
       </div>
 
       <!-- Current Plan & Profile Card -->
-      <div class="border-t border-gray-100 pt-3 space-y-2.5">
-        <!-- Plan Widget -->
-        <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs">
+      <div class="border-t border-white/10 pt-3 space-y-2.5">
+        <!-- Plan Widget (Dark Glass) -->
+        <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-gray-500 font-medium" data-i18n="sidebar_plan_label">Tarif:</span>
-            <span id="sidebar-plan-name" class="font-bold text-gray-900 bg-white px-2 py-0.5 rounded-md border border-gray-200 text-[11px]">Bepul</span>
-            <button onclick="switchTab('billing')" class="px-2.5 py-0.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold rounded-lg text-[10px] transition-all shadow-xs cursor-pointer" data-i18n="sidebar_upgrade_btn">
+            <span class="text-slate-400 font-medium" data-i18n="sidebar_plan_label">Tarif:</span>
+            <span id="sidebar-plan-name" class="font-black text-white bg-slate-800 px-2 py-0.5 rounded-md border border-white/10 text-[11px]">Bepul</span>
+            <button onclick="switchTab('billing')" class="px-2.5 py-0.5 bg-pistachio hover:bg-[#c2ff87] text-[#0B0F17] font-black rounded-lg text-[10px] transition-all shadow-xs cursor-pointer" data-i18n="sidebar_upgrade_btn">
               Kuchaytirish
             </button>
           </div>
-          <div class="flex items-center justify-between text-[11px] text-gray-500">
-            <span data-i18n="sidebar_automation_label">Avtomatizatsiya:</span>
-            <span class="font-bold text-emerald-600" data-i18n="sidebar_unlimited">Cheksiz</span>
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span data-i18n="sidebar_automation_label">AI Closer:</span>
+            <span class="font-bold text-pistachio" data-i18n="sidebar_unlimited">24/7 Faol</span>
           </div>
         </div>
 
-        <!-- User Profile Card -->
-        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onclick="openModal('modal-workspace-settings')">
+        <!-- User Profile Card (Dark Glass) -->
+        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer" onclick="openModal('modal-workspace-settings')">
           <div class="flex items-center gap-2.5 truncate">
-            <div class="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shrink-0">
-              BS
+            <div class="w-8 h-8 rounded-full bg-pistachio text-[#0B0F17] font-black text-xs flex items-center justify-center shrink-0 shadow-sm">
+              VA
             </div>
             <div class="truncate text-left">
-              <div class="font-bold text-gray-900 text-xs truncate">Bahodir Sharipov</div>
-              <div class="text-[10px] text-gray-500 truncate" id="sidebar-role-label"><span data-i18n="owner_role">Egasi</span> • <span id="sidebar-ws-subtitle">Default</span></div>
+              <div class="font-bold text-white text-xs truncate">VertaFlow Admin</div>
+              <div class="text-[10px] text-slate-400 truncate" id="sidebar-role-label"><span data-i18n="owner_role">Egasi</span> • <span id="sidebar-ws-subtitle">Default</span></div>
             </div>
           </div>
-          <i data-lucide="more-vertical" class="w-3.5 h-3.5 text-gray-400"></i>
+          <i data-lucide="more-vertical" class="w-3.5 h-3.5 text-slate-400"></i>
         </div>
       </div>
     </aside>
 
     <!-- Content Workspace -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-[#F7F9F6]">
+    <main class="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
       
       <!-- ================= TAB 1: DASHBOARD ================= -->
       <div id="tab-dashboard" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
@@ -932,7 +935,7 @@
         </div>
 
         <!-- Center: Chat Conversation View -->
-        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-[#F7F9F6] border-r border-[#E5E7EB]">
+        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-[#F8FAFC] border-r border-[#E5E7EB]">
           
           <!-- Chat Header -->
           <div class="h-14 bg-white border-b border-[#E5E7EB] px-4 md:px-5 flex items-center justify-between shrink-0">
@@ -1121,7 +1124,7 @@
             </button>
           </div>
 
-          <div id="playground-messages" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3 bg-[#F7F9F6]">
+          <div id="playground-messages" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3 bg-[#F8FAFC]">
             <!-- Messages will appear here -->
           </div>
 
@@ -1346,23 +1349,23 @@
                 <span class="font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md text-[11px]">300 ta</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Claude va ChatGPT ulanishi</span>
-                <span class="font-black text-emerald-600 text-[11px]">✔ kiradi</span>
+                <span class="text-gray-500">3-Agentli Quvur Arxitekturasi</span>
+                <span class="font-black text-emerald-600 text-[11px]">✔ To'liq quvvatda</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">AI-sifat hisoboti</span>
-                <span class="font-black text-emerald-600 text-[11px]">✔ kiradi</span>
+                <span class="text-gray-500">Maxsus Korporativ AI Persona</span>
+                <span class="font-black text-emerald-600 text-[11px]">✔ Cheksiz sozlash</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">Reels izohlari tahlili</span>
-                <span class="font-black text-emerald-600 text-[11px]">✔ kiradi</span>
+                <span class="text-gray-500">1C & Bitrix24 Sinkronizatsiya</span>
+                <span class="font-black text-emerald-600 text-[11px]">✔ To'g'ridan-to'g'ri API</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-500">«Aqlli» AI darajasi</span>
-                <span class="font-black text-emerald-600 text-[11px]">✔ kiradi</span>
+                <span class="text-gray-500">Shaxsiy Server & VIP Qo'llab-quvvatlash</span>
+                <span class="font-black text-emerald-600 text-[11px]">✔ 24/7 SLA</span>
               </div>
               <div class="pt-2 text-[10px] text-gray-500 leading-relaxed border-t border-gray-100">
-                Shuningdek: 3 Instagram akkaunt • 3 Telegram bot • cheksiz Reels avtomatizatsiyasi
+                Shuningdek: Cheksiz kanallar • Ko'p sonli filiallar • Maxsus shartnoma va hisob-faktura
               </div>
             </div>
           </div>
