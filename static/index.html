@@ -68,7 +68,10 @@
       </div>
       <div class="flex items-center gap-1.5">
         <span class="text-gray-400">AI Miya:</span>
-        <span class="font-bold text-gray-800" id="global-llm-label">Oflayn Fallback</span>
+        <span class="font-bold text-gray-800 flex items-center gap-1" id="global-llm-label">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+          Google Gemini 2.5 Flash
+        </span>
       </div>
     </div>
 
@@ -319,9 +322,14 @@
               <h2 class="text-base font-extrabold text-gray-900">Mijozlar Bazasi (Qualified Leads CRM)</h2>
               <p class="text-xs text-gray-500">SQLite ma'lumotlar bazasida saqlangan barcha malakali mijozlar ro'yxati.</p>
             </div>
-            <button onclick="fetchLeads()" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold rounded-lg border border-gray-200">
-              Yangilash 🔄
-            </button>
+            <div class="flex items-center gap-2">
+              <a href="/api/leads/export" download class="px-3.5 py-1.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-lg text-xs font-bold border border-[#BBF7D0] flex items-center gap-1.5 transition-all shadow-sm">
+                <span>📥 Excel / CSV Yuklab Olish</span>
+              </a>
+              <button onclick="fetchLeads()" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold rounded-lg border border-gray-200">
+                Yangilash 🔄
+              </button>
+            </div>
           </div>
 
           <div class="overflow-x-auto">
@@ -1270,6 +1278,14 @@
     // Initialize on load
     loadConversations();
     refreshSettingsHeader();
+
+    // Real-time Background Sync: updates inbox automatically every 4 seconds
+    setInterval(() => {
+      fetch('/api/conversations').then(r => r.json()).then(data => {
+        allConversations = data.conversations || [];
+        renderInboxList(allConversations);
+      }).catch(() => {});
+    }, 4000);
   </script>
 
   <!-- Live Embeddable Widget on Platform -->

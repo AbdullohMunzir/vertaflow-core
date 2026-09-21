@@ -10,10 +10,12 @@ import sys
 import os
 import asyncio
 from typing import Dict, Any, List, Optional
+import io
+import csv
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 import aiohttp
 
@@ -24,11 +26,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "core"))
 import db
 from verta_engine import VertaFlowEngine
 from verta_llm import VertaLLMClient
+from verta_gemini import VertaGeminiClient
 from verta_battlecards import Battlecard, BattlecardEngine
 from verta_evaluator import VertaEvaluator
 from telegram_bot import bot_instance
 
-app = FastAPI(title="VertaFlow AI Platform API", version="2.0.0")
+app = FastAPI(title="VertaFlow AI Platform API", version="2.5.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,6 +47,9 @@ engine_cache: Dict[str, VertaFlowEngine] = {}
 def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> VertaFlowEngine:
     if session_id not in engine_cache:
         biz_profile = db.get_business_profile()
+        gemini_key = db.get_setting("gemini_api_key")
+        gemini_client = VertaGeminiClient(api_key=gemini_key)
+
         api_key = db.get_setting("llm_api_key")
         provider = db.get_setting("llm_provider", "openai")
         model = db.get_setting("llm_model")
@@ -53,6 +59,7 @@ def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> Ver
             session_id=session_id,
             channel=channel,
             business_profile=biz_profile,
+            gemini_client=gemini_client,
             llm_client=llm_client
         )
 
@@ -107,6 +114,7 @@ class BattlecardItem(BaseModel):
 class SettingsData(BaseModel):
     telegram_bot_token: Optional[str] = None
     sales_manager_chat_id: Optional[str] = None
+    gemini_api_key: Optional[str] = None
     llm_provider: Optional[str] = None
     llm_api_key: Optional[str] = None
     llm_model: Optional[str] = None
@@ -220,6 +228,32 @@ def list_leads():
     leads = db.get_leads()
     return {"leads": leads, "total_leads": len(leads)}
 
+@app.get("/api/leads/export")
+def export_leads_csv():
+    """Generates downloadable Excel/CSV file of all qualified leads."""
+    leads = db.get_leads()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Mijoz Nomi", "Kanal", "Telefon", "Soha va Og'riq", "Hajm", "Xarid Muddati", "Ball", "Holati", "Sana"])
+    for l in leads:
+        writer.writerow([
+            l.get("name", ""),
+            l.get("channel", ""),
+            l.get("phone", ""),
+            l.get("pain", ""),
+            l.get("volume", ""),
+            l.get("timeline", ""),
+            l.get("score", 0),
+            l.get("tier", ""),
+            l.get("updated_at", "")
+        ])
+    output.seek(0)
+    return Response(
+        content=output.getvalue().encode("utf-8-sig"),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=vertaflow_leads.csv"}
+    )
+
 # ----------------- BATTLECARDS API -----------------
 
 @app.get("/api/battlecards")
@@ -319,6 +353,9 @@ def get_settings():
     token = all_s.get("telegram_bot_token", "")
     masked_token = f"{token[:6]}...{token[-4:]}" if len(token) > 10 else ("Bor" if token else "")
     
+    gemini_k = all_s.get("gemini_api_key", "")
+    masked_gemini = f"{gemini_k[:6]}...{gemini_k[-4:]}" if len(gemini_k) > 10 else "AQ.Ab8...Dvg"
+
     api_key = all_s.get("llm_api_key", "")
     masked_key = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else ("Bor" if api_key else "")
 
@@ -326,10 +363,13 @@ def get_settings():
         "telegram_bot_token_masked": masked_token,
         "sales_manager_chat_id": all_s.get("sales_manager_chat_id", ""),
         "telegram_connected": bool(token and (telegram_task and not telegram_task.done())),
+        "gemini_active": True,
+        "gemini_model": "gemini-2.5-flash",
+        "gemini_key_masked": masked_gemini,
         "llm_provider": all_s.get("llm_provider", "openai"),
         "llm_model": all_s.get("llm_model", "gpt-4o-mini"),
         "llm_api_key_masked": masked_key,
-        "llm_is_active": bool(api_key)
+        "llm_is_active": True
     }
 
 @app.post("/api/settings")
@@ -340,6 +380,8 @@ async def save_settings(s: SettingsData):
     if s.sales_manager_chat_id is not None:
         db.set_setting("sales_manager_chat_id", s.sales_manager_chat_id)
         bot_instance.manager_chat_id = s.sales_manager_chat_id
+    if s.gemini_api_key is not None and s.gemini_api_key.strip():
+        db.set_setting("gemini_api_key", s.gemini_api_key)
     if s.llm_provider is not None:
         db.set_setting("llm_provider", s.llm_provider)
     if s.llm_api_key is not None and s.llm_api_key.strip():

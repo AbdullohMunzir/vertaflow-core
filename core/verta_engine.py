@@ -4,7 +4,7 @@ VertaFlow — Unified Master Core Engine
 Orchestrates:
 - VertaStage state machine (SPIN + Challenger)
 - VertaLeadState (Attribute tracking & Lead Scoring)
-- Hybrid LLM Generation (OpenAI / Groq / OpenRouter) with deterministic fallback
+- Native Google Gemini 2.5 Flash Engine with OpenAI/Groq and deterministic fallback
 - Uzbek Linguistic & Script Mirroring
 - Battlecard Landmine Injection
 """
@@ -17,6 +17,7 @@ from verta_state import VertaLeadState
 from verta_uzbek_engine import detect_script, process_agent_output, to_cyrillic
 from verta_battlecards import BattlecardEngine, Battlecard
 from verta_prompt import build_sales_closer_prompt
+from verta_gemini import VertaGeminiClient
 from verta_llm import VertaLLMClient
 
 class VertaFlowEngine:
@@ -25,6 +26,7 @@ class VertaFlowEngine:
         session_id: str,
         channel: str = "telegram",
         business_profile: Optional[Dict[str, Any]] = None,
+        gemini_client: Optional[VertaGeminiClient] = None,
         llm_client: Optional[VertaLLMClient] = None
     ):
         self.state = VertaLeadState(session_id=session_id, channel=channel)
@@ -35,6 +37,7 @@ class VertaFlowEngine:
             "avg_check": "5 000 000 so'm",
             "faq_list": []
         }
+        self.gemini_client = gemini_client or VertaGeminiClient()
         self.llm_client = llm_client or VertaLLMClient()
 
     def process_message(self, user_message: str) -> Dict[str, Any]:
@@ -73,22 +76,33 @@ class VertaFlowEngine:
         self.state.current_stage = next_stage
         self.state.questions_asked += 1
 
-        # 6. Response Construction: Try LLM First, Fallback to Rules
+        # 6. Response Construction:
+        # Step A: Try Google Gemini 2.5 Flash
         response_text = None
-        if self.llm_client:
-            prompt = build_sales_closer_prompt(
-                business_profile=self.business_profile,
-                stage_name=next_stage.value,
-                collected_attributes=self.state.collected_attributes,
-                detected_script=detected_script,
-                battlecard=battlecard
+        prompt = build_sales_closer_prompt(
+            business_profile=self.business_profile,
+            stage_name=next_stage.value,
+            collected_attributes=self.state.collected_attributes,
+            detected_script=detected_script,
+            battlecard=battlecard
+        )
+
+        if self.gemini_client:
+            response_text = self.gemini_client.generate_response(
+                system_prompt=prompt,
+                user_message=raw_msg,
+                recent_history=self.state.history
             )
+
+        # Step B: Try Alternative LLM (OpenAI/Groq) if Gemini is not available
+        if not response_text and self.llm_client:
             response_text = self.llm_client.generate_response(
                 system_prompt=prompt,
                 user_message=raw_msg,
                 recent_history=self.state.history
             )
 
+        # Step C: Deterministic Rule Fallback if external APIs fail
         if not response_text:
             response_text = self._generate_stage_response(next_stage, battlecard, raw_msg)
 
