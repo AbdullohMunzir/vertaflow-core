@@ -286,7 +286,7 @@
           </div>
 
           <div class="pt-4 mt-3">
-            <div class="w-full py-2 rounded-xl text-center text-xs font-bold bg-white text-emerald-700 border border-emerald-300">
+            <div id="plan-btn-free" class="w-full py-2 rounded-xl text-center text-xs font-bold bg-white text-emerald-700 border border-emerald-300">
               Tanlangan
             </div>
           </div>
@@ -339,7 +339,7 @@
           </div>
 
           <div class="pt-4 mt-3">
-            <div class="w-full py-2 rounded-xl text-center text-xs font-bold bg-gray-50 text-gray-800 border border-gray-200">
+            <div id="plan-btn-pro" class="w-full py-2 rounded-xl text-center text-xs font-bold bg-gray-50 text-gray-800 border border-gray-200">
               Tanlash
             </div>
           </div>
@@ -392,7 +392,7 @@
           </div>
 
           <div class="pt-4 mt-3">
-            <div class="w-full py-2 rounded-xl text-center text-xs font-bold bg-gray-50 text-gray-800 border border-gray-200">
+            <div id="plan-btn-business" class="w-full py-2 rounded-xl text-center text-xs font-bold bg-gray-50 text-gray-800 border border-gray-200">
               Tanlash
             </div>
           </div>
@@ -689,7 +689,9 @@
       ['free', 'pro', 'business'].forEach(p => {
         const card = document.getElementById('plan-card-' + p);
         const check = document.getElementById('plan-check-' + p);
-        const btn = card.querySelector('div:last-child div');
+        const btn = document.getElementById('plan-btn-' + p);
+
+        if (!card || !check || !btn) return;
 
         if (p === planId) {
           card.className = 'plan-card plan-card-selected p-5 rounded-2xl border-2 border-emerald-500 bg-[#F0FDF4] transition-all cursor-pointer flex flex-col justify-between relative shadow-xs hover:shadow-md';
