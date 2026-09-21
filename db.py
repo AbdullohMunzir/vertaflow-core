@@ -143,6 +143,10 @@ def init_db():
     );
     """)
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_chunks_parent ON knowledge_chunks(parent_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_session_time ON messages(session_id, timestamp ASC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_conversations_channel_time ON conversations(channel, updated_at DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_leads_tier_score ON leads(tier, score DESC, created_at DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_items(item_type);")
 
     conn.commit()
 

@@ -58,8 +58,11 @@
 <body class="h-screen flex flex-col antialiased overflow-hidden select-none">
 
   <!-- Top Navigation Header -->
-  <header class="h-16 bg-white border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0 z-20">
+  <header class="h-16 bg-white border-b border-[#E5E7EB] px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
     <div class="flex items-center space-x-3">
+      <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg focus:outline-none" title="Menyu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
       <div class="w-9 h-9 rounded-xl bg-pistachio flex items-center justify-center font-black text-sm text-black shadow-sm border border-pistachio">
         V
       </div>
@@ -106,10 +109,10 @@
   </header>
 
   <!-- Main Application Body -->
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex-1 flex overflow-hidden relative">
     
     <!-- Sidebar Navigation -->
-    <aside class="w-64 bg-white border-r border-[#E5E7EB] flex flex-col justify-between p-4 shrink-0">
+    <aside id="main-sidebar" class="hidden md:flex w-64 bg-white border-r border-[#E5E7EB] flex-col justify-between p-4 shrink-0 transition-all z-30">
       <div class="space-y-4">
         
         <!-- Active Workspace Card -->
@@ -748,10 +751,10 @@
       </div>
 
       <!-- ================= TAB 5: INBOX (CHATS) ================= -->
-      <div id="tab-inbox" class="tab-content flex-1 overflow-hidden">
+      <div id="tab-inbox" class="tab-content flex-1 overflow-hidden relative">
         
         <!-- Left: Conversations List -->
-        <div class="w-80 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0">
+        <div id="inbox-sidebar-pane" class="w-full md:w-80 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0">
           <div class="p-3.5 border-b border-[#E5E7EB] flex items-center justify-between">
             <h2 class="font-bold text-xs text-gray-800 flex items-center gap-1.5">
               <span>💬</span> Barcha Suhbatlar
@@ -767,44 +770,47 @@
         </div>
 
         <!-- Center: Chat Conversation View -->
-        <div class="flex-1 flex flex-col bg-[#F7F9F6] border-r border-[#E5E7EB]">
+        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-[#F7F9F6] border-r border-[#E5E7EB]">
           
           <!-- Chat Header -->
-          <div class="h-14 bg-white border-b border-[#E5E7EB] px-5 flex items-center justify-between shrink-0">
-            <div class="flex items-center space-x-3">
+          <div class="h-14 bg-white border-b border-[#E5E7EB] px-4 md:px-5 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-2 md:space-x-3">
+              <button onclick="backToInboxList()" class="md:hidden px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-lg text-xs font-bold border border-gray-200 flex items-center gap-1">
+                <span>←</span> Orqaga
+              </button>
               <div id="active-chat-avatar" class="w-8 h-8 rounded-full bg-pistachio flex items-center justify-center font-bold text-xs text-black">
                 M
               </div>
               <div>
-                <div id="active-chat-name" class="font-bold text-xs text-gray-900">Mijoz tanlanmagan</div>
+                <div id="active-chat-name" class="font-bold text-xs text-gray-900 truncate max-w-[130px] sm:max-w-none">Mijoz tanlanmagan</div>
                 <div id="active-chat-channel" class="text-[10px] text-gray-500">Kanal: Tanlang</div>
               </div>
             </div>
 
             <!-- Operator Takeover Controls -->
-            <div class="flex items-center space-x-2">
-              <span id="active-chat-autopilot-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+            <div class="flex items-center space-x-1.5 md:space-x-2">
+              <span id="active-chat-autopilot-badge" class="hidden sm:inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
                 AI Avtopilotda
               </span>
-              <button id="btn-takeover" onclick="toggleActiveAutopilot()" class="px-3 py-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold text-xs rounded-lg transition-all">
-                👨‍💼 Operator Chatga Kirishi
+              <button id="btn-takeover" onclick="toggleActiveAutopilot()" class="px-2.5 md:px-3 py-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold text-xs rounded-lg transition-all">
+                👨‍💼 Operator
               </button>
             </div>
           </div>
 
           <!-- Chat Messages Area -->
-          <div id="inbox-messages-container" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3">
+          <div id="inbox-messages-container" class="flex-1 p-3 md:p-5 overflow-y-auto custom-scrollbar space-y-3">
             <div class="h-full flex flex-col items-center justify-center text-gray-400 text-xs text-center">
               <span class="text-4xl mb-2">💬</span>
-              Suhbatni ko'rish uchun chap tomondan muloqotni tanlang
+              Suhbatni ko'rish uchun muloqotni tanlang
             </div>
           </div>
 
           <!-- Message Input Area -->
-          <div class="p-3.5 bg-white border-t border-[#E5E7EB]">
+          <div class="p-3 bg-white border-t border-[#E5E7EB]">
             <form onsubmit="sendOperatorReply(event)" class="flex items-center gap-2">
               <input type="text" id="operator-reply-input" placeholder="Operator nomidan javob yozing (AI avtomatik to'xtaydi)..." class="flex-1 text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5F87B] focus:outline-none">
-              <button type="submit" class="px-4 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
+              <button type="submit" class="px-3.5 md:px-4 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio shrink-0">
                 Yuborish
               </button>
             </form>
@@ -813,7 +819,7 @@
         </div>
 
         <!-- Right: Lead Dossier Panel -->
-        <div class="w-80 bg-white flex flex-col p-4 shrink-0 overflow-y-auto custom-scrollbar">
+        <div class="hidden xl:flex w-80 bg-white flex-col p-4 shrink-0 overflow-y-auto custom-scrollbar">
           <h3 class="font-extrabold text-xs text-gray-900 mb-3 pb-2 border-b border-gray-100 flex items-center justify-between">
             <span>📋 Mijoz Profili (Dosye)</span>
             <span id="dossier-tier-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-600">HOT 🔥</span>
@@ -1233,9 +1239,39 @@
       }, 4000);
     });
 
+    // Mobile Sidebar & Navigation
+    function toggleMobileSidebar() {
+      const aside = document.getElementById('main-sidebar');
+      if (aside) {
+        aside.classList.toggle('hidden');
+        aside.classList.toggle('absolute');
+        aside.classList.toggle('z-40');
+        aside.classList.toggle('h-full');
+        aside.classList.toggle('shadow-2xl');
+      }
+    }
+
+    function backToInboxList() {
+      const sb = document.getElementById('inbox-sidebar-pane');
+      const chat = document.getElementById('inbox-chat-pane');
+      if (sb && chat) {
+        sb.classList.remove('hidden');
+        chat.classList.add('hidden');
+        chat.classList.remove('flex');
+      }
+    }
+
     // Tab Navigation
     function switchTab(tabId) {
       activeTab = tabId;
+      if (window.innerWidth < 768) {
+        const aside = document.getElementById('main-sidebar');
+        if (aside && !aside.classList.contains('hidden')) {
+          aside.classList.add('hidden');
+          aside.classList.remove('absolute', 'z-40', 'h-full', 'shadow-2xl');
+        }
+      }
+
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
 
@@ -1248,7 +1284,10 @@
       if (tabId === 'channels') loadChannels();
       if (tabId === 'knowledge') loadKnowledge();
       if (tabId === 'agent') loadPersona();
-      if (tabId === 'inbox') loadConversations();
+      if (tabId === 'inbox') {
+        loadConversations();
+        if (window.innerWidth < 768) backToInboxList();
+      }
       if (tabId === 'crm') loadLeads();
     }
 
@@ -1726,7 +1765,14 @@
       document.getElementById('dossier-channel').textContent = conv.channel;
       document.getElementById('dossier-tier-badge').textContent = conv.tier || 'COLD ❄️';
       document.getElementById('dossier-score').textContent = `${conv.score || 0}/100`;
-      document.getElementById('dossier-progress').style.width = `${conv.score || 0}%`;
+      // Mobile responsive pane switch
+      const sb = document.getElementById('inbox-sidebar-pane');
+      const chat = document.getElementById('inbox-chat-pane');
+      if (window.innerWidth < 768 && sb && chat) {
+        sb.classList.add('hidden');
+        chat.classList.remove('hidden');
+        chat.classList.add('flex');
+      }
 
       loadMessages(sessionId, true);
     }

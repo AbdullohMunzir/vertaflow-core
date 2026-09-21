@@ -14,6 +14,9 @@ import json
 from typing import Dict, Any, List, Optional
 import io
 import csv
+import time
+import hmac
+import hashlib
 from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -54,10 +57,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory runtime cache for engine states
-engine_cache: Dict[str, VertaFlowEngine] = {}
+# In-memory runtime cache for engine states with TTL eviction
+ENGINE_CACHE_TTL_SECONDS = 7200  # 2 hours
+MAX_ENGINE_CACHE_SIZE = 1000
+engine_cache: Dict[str, Dict[str, Any]] = {}
+
+def cleanup_engine_cache():
+    """Evicts idle sessions older than TTL and bounds memory to MAX_ENGINE_CACHE_SIZE."""
+    now = time.time()
+    expired = [sid for sid, item in engine_cache.items() if (now - item.get("last_accessed", 0)) > ENGINE_CACHE_TTL_SECONDS]
+    for sid in expired:
+        del engine_cache[sid]
+    if len(engine_cache) > MAX_ENGINE_CACHE_SIZE:
+        sorted_sids = sorted(engine_cache.keys(), key=lambda s: engine_cache[s].get("last_accessed", 0))
+        for sid in sorted_sids[:len(engine_cache) - MAX_ENGINE_CACHE_SIZE]:
+            del engine_cache[sid]
+
+def verify_meta_signature(raw_body: bytes, signature_header: Optional[str], secret: Optional[str]) -> bool:
+    """Verifies X-Hub-Signature-256 for Meta Webhooks (Instagram / WhatsApp)."""
+    if not secret:
+        return True  # Bypass in dev/test if secret is not set yet
+    if not signature_header or not signature_header.startswith("sha256="):
+        return False
+    signature = signature_header[len("sha256="):]
+    expected = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)
 
 def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> VertaFlowEngine:
+    cleanup_engine_cache()
+    now = time.time()
     if session_id not in engine_cache:
         biz_profile = db.get_business_profile()
         gemini_key = db.get_setting("gemini_api_key")
@@ -96,13 +124,19 @@ def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> Ver
         if cards_list:
             engine.battlecards = BattlecardEngine(cards_list)
 
-        engine_cache[session_id] = engine
+        engine_cache[session_id] = {
+            "engine": engine,
+            "last_accessed": now
+        }
+    else:
+        engine_cache[session_id]["last_accessed"] = now
 
+    engine_obj = engine_cache[session_id]["engine"]
     # Always ensure business profile, knowledge, and persona are up-to-date
-    engine_cache[session_id].business_profile = db.get_business_profile()
-    engine_cache[session_id].knowledge_text = db.get_all_knowledge_text()
-    engine_cache[session_id].persona = db.get_agent_persona()
-    return engine_cache[session_id]
+    engine_obj.business_profile = db.get_business_profile()
+    engine_obj.knowledge_text = db.get_all_knowledge_text()
+    engine_obj.persona = db.get_agent_persona()
+    return engine_obj
 
 # Request Models
 class ChatMessage(BaseModel):
@@ -581,9 +615,18 @@ def verify_instagram_webhook(request: Request):
 
 @app.post("/api/webhooks/instagram")
 async def receive_instagram_webhook(request: Request):
-    """Receives Instagram Direct messages and Reels/Post comments from Meta Graph API."""
+    """Receives Instagram Direct messages and Reels/Post comments from Meta Graph API with HMAC validation."""
+    raw_body = await request.body()
+    chan = db.get_channel("instagram")
+    app_secret = chan["config"].get("app_secret") if chan and chan.get("config") else None
+    
+    if app_secret:
+        sig = request.headers.get("X-Hub-Signature-256")
+        if not verify_meta_signature(raw_body, sig, app_secret):
+            raise HTTPException(status_code=403, detail="X-Hub-Signature-256 HMAC verification failed")
+
     try:
-        data = await request.json()
+        data = json.loads(raw_body.decode("utf-8")) if raw_body else {}
         for entry in data.get("entry", []):
             for messaging in entry.get("messaging", []):
                 sender_id = messaging.get("sender", {}).get("id")
@@ -600,8 +643,8 @@ async def receive_instagram_webhook(request: Request):
                     sid = f"ig_comm_{user_id}"
                     msg = ChatMessage(session_id=sid, message=comment_text, channel="instagram", user_name=f"Instagram Comment ({val.get('from', {}).get('username', 'Mijoz')})")
                     process_chat(msg)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[Webhook IG Error]: {e}")
     return {"status": "received"}
 
 @app.get("/api/webhooks/whatsapp")
@@ -614,8 +657,17 @@ def verify_whatsapp_webhook(request: Request):
 
 @app.post("/api/webhooks/whatsapp")
 async def receive_whatsapp_webhook(request: Request):
+    raw_body = await request.body()
+    chan = db.get_channel("whatsapp")
+    app_secret = chan["config"].get("app_secret") if chan and chan.get("config") else None
+    
+    if app_secret:
+        sig = request.headers.get("X-Hub-Signature-256")
+        if not verify_meta_signature(raw_body, sig, app_secret):
+            raise HTTPException(status_code=403, detail="X-Hub-Signature-256 HMAC verification failed")
+
     try:
-        data = await request.json()
+        data = json.loads(raw_body.decode("utf-8")) if raw_body else {}
         for entry in data.get("entry", []):
             for change in entry.get("changes", []):
                 val = change.get("value", {})
@@ -626,8 +678,8 @@ async def receive_whatsapp_webhook(request: Request):
                         sid = f"wa_{from_num}"
                         chat_msg = ChatMessage(session_id=sid, message=text, channel="whatsapp", user_name=f"WhatsApp ({from_num})")
                         process_chat(chat_msg)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[Webhook WA Error]: {e}")
     return {"status": "received"}
 
 # ----------------- SETTINGS & TELEGRAM LIFECYCLE -----------------
