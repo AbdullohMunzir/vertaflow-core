@@ -821,8 +821,8 @@ def checkout_plan(req: BillingCheckout):
     """Processes plan purchase via Payme or Click, upgrades workspace, and generates payment record."""
     prices_per_month = {
         "free": 0,
-        "pro": 490000,
-        "business": 990000
+        "pro": 249000,
+        "business": 590000
     }
     discounts = {
         1: 0.0,

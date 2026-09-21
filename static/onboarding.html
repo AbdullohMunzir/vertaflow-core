@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VertaFlow — Sozlash va Ishga Tushirish</title>
+  <title>VertaFlow — Sozlash va Kanal Ulash</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,7 @@
 </head>
 <body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row bg-white">
 
-  <!-- ================= LEFT SIDEBAR (Unified Clean Light Mode) ================= -->
+  <!-- ================= LEFT SIDEBAR ================= -->
   <aside class="w-full md:w-72 lg:w-80 bg-[#FAFAFC] border-r border-[#E2E8F0] flex flex-col justify-between p-6 shrink-0 z-20">
     <div class="space-y-8">
       
@@ -72,21 +72,21 @@
           <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Onboarding</span>
         </div>
         <p class="text-gray-500 text-xs mt-3 leading-relaxed">
-          3 daqiqada hisob oching, tarif tanlang va AI sotuvchingizni biznesingizga moslang.
+          Kanalni ulang (Instagram, Telegram yoki WhatsApp), tarif tanlang va AI sotuvchingizni ishga tushiring.
         </p>
       </div>
 
       <!-- Vertical Timeline Steps -->
       <nav class="space-y-2.5" id="steps-nav-container">
         
-        <!-- Step 1: Ro'yxatdan o'tish (Active by default) -->
+        <!-- Step 1: Kanal ulash (Active by default) -->
         <div onclick="goToStep(1)" id="step-nav-1" class="step-nav-item step-sidebar-active flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all">
           <div id="step-circle-1" class="w-6 h-6 rounded-full bg-[#B5F87B] text-[#0A1128] text-xs font-black flex items-center justify-center shrink-0 shadow-xs border border-[#9DE959]">
             1
           </div>
           <div>
-            <div id="step-title-1" class="text-xs font-bold text-gray-900">Ro'yxatdan o'tish</div>
-            <div class="text-[11px] text-emerald-700 font-semibold">Email • Telegram • Instagram</div>
+            <div id="step-title-1" class="text-xs font-bold text-gray-900">Kanal ulash</div>
+            <div class="text-[11px] text-emerald-700 font-semibold">Instagram • Telegram • WhatsApp</div>
           </div>
         </div>
 
@@ -116,7 +116,7 @@
 
     </div>
 
-    <!-- Bottom Skip / Back Button -->
+    <!-- Bottom Skip / Direct App Button -->
     <div class="pt-6 border-t border-gray-200">
       <button onclick="skipToApp()" class="w-full py-2.5 px-4 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 hover:text-black text-xs font-bold transition-all text-center block cursor-pointer shadow-xs">
         Platformaga to'g'ridan-to'g'ri o'tish →
@@ -127,32 +127,45 @@
   <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
   <main class="flex-1 h-full overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 flex flex-col justify-between max-w-4xl mx-auto w-full">
 
-    <!-- ================= STEP 1 PANE: RO'YXATDAN O'TISH (Email, Telegram, Instagram) ================= -->
+    <!-- ================= STEP 1 PANE: KANAL ULASH VA RO'YXATDAN O'TISH ================= -->
     <div id="step-content-1" class="step-pane space-y-6">
       <div>
-        <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">1-QADAM • RO'YXATDAN O'TISH</span>
+        <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">1-QADAM • KANALNI ULASH</span>
         <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight mt-1">
-          Hisobingizni oching
+          Kanal orqali hisob oching
         </h1>
         <p class="text-xs text-gray-500 mt-1">
-          O'zingizga qulay usulni tanlang: Email, Telegram yoki Instagram orqali 10 soniyada ro'yxatdan o'ting.
+          VertaFlow AI Closer mijozlar bilan muloqot qilishi uchun <b>Instagram</b>, <b>Telegram</b> yoki <b>WhatsApp</b> kanalini ulang.
         </p>
       </div>
 
-      <!-- Auth Method Switcher Tabs -->
-      <div class="grid grid-cols-3 gap-2.5 max-w-md pt-1">
-        <button type="button" onclick="setAuthMethod('email')" id="auth-tab-btn-email" class="auth-tab-btn auth-tab-active py-2.5 px-3 rounded-xl border border-gray-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <span>Email</span>
-        </button>
-        <button type="button" onclick="setAuthMethod('telegram')" id="auth-tab-btn-telegram" class="auth-tab-btn py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-          <svg class="w-4 h-4 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          <span>Telegram</span>
-        </button>
-        <button type="button" onclick="setAuthMethod('instagram')" id="auth-tab-btn-instagram" class="auth-tab-btn py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+      <!-- 4 Switcher Tabs -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+        
+        <!-- Tab 1: Instagram -->
+        <button type="button" onclick="setAuthChannel('instagram')" id="auth-tab-btn-instagram" class="auth-tab-btn auth-tab-active py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
           <svg class="w-4 h-4 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
           <span>Instagram</span>
         </button>
+
+        <!-- Tab 2: Telegram -->
+        <button type="button" onclick="setAuthChannel('telegram')" id="auth-tab-btn-telegram" class="auth-tab-btn py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <svg class="w-4 h-4 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span>Telegram</span>
+        </button>
+
+        <!-- Tab 3: WhatsApp -->
+        <button type="button" onclick="setAuthChannel('whatsapp')" id="auth-tab-btn-whatsapp" class="auth-tab-btn py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span>WhatsApp</span>
+        </button>
+
+        <!-- Tab 4: Gmail -->
+        <button type="button" onclick="setAuthChannel('email')" id="auth-tab-btn-email" class="auth-tab-btn py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Gmail</span>
+        </button>
+
       </div>
 
       <!-- Auth Form Card -->
@@ -161,26 +174,34 @@
         <!-- Field 1: Identifier -->
         <div>
           <label id="auth-identifier-label" class="text-xs font-semibold text-gray-700 block mb-1.5">
-            Email manzilingiz
+            Instagram akkaunt yoki profil nomi
           </label>
-          <input type="text" id="auth-identifier" placeholder="sizning@kompaniya.uz" class="w-full text-xs p-3.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-gray-900 font-medium">
-          <p id="auth-identifier-hint" class="text-[11px] text-gray-400 mt-1">Platformaga kirish uchun asosiy identifikator.</p>
+          <input type="text" id="auth-identifier" placeholder="@sizning_brendingiz" class="w-full text-xs p-3.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-gray-900 font-medium">
+          <p id="auth-identifier-hint" class="text-[11px] text-gray-400 mt-1">Direct va postlar ostidagi barcha savollarga AI ulanadi.</p>
         </div>
 
-        <!-- Field 2: Password -->
+        <!-- Field 2: Password / PIN -->
         <div>
           <label class="text-xs font-semibold text-gray-700 block mb-1.5">
-            Parol
+            Parol yoki maxfiy so'z
           </label>
           <input type="password" id="auth-password" placeholder="Kamida 6 ta belgi" class="w-full text-xs p-3.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-gray-900 font-medium">
         </div>
 
-        <!-- Field 3: Full Name or Brand Name -->
+        <!-- Field 3: Brand or Person Name -->
         <div>
           <label id="auth-fullname-label" class="text-xs font-semibold text-gray-700 block mb-1.5">
-            Ismingiz yoki Biznes nomi
+            Biznes yoki do'kon nomi
           </label>
-          <input type="text" id="auth-fullname" placeholder="Masalan: Dilshod yoki Modiy Kiyimlar" class="w-full text-xs p-3.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-gray-900 font-medium">
+          <input type="text" id="auth-fullname" placeholder="Masalan: Modiy Kiyimlar yoki Mebel Fabrikasi" class="w-full text-xs p-3.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-gray-900 font-medium">
+        </div>
+
+        <!-- Gmail Notice Warning (Shows only when Gmail tab is active) -->
+        <div id="gmail-lock-warning" class="hidden p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2.5">
+          <span class="text-base">⚠️</span>
+          <div class="leading-relaxed">
+            <span class="font-bold">Eslatma:</span> Agar Gmail bilan kirsangiz, platforma ichida baribir <b>Instagram</b>, <b>Telegram</b> yoki <b>WhatsApp</b> ulashingiz kerak bo'ladi, aks holda barcha bo'limlar yopiq turadi.
+          </div>
         </div>
 
         <!-- Feedback Alert box -->
@@ -207,7 +228,7 @@
       </div>
     </div>
 
-    <!-- ================= STEP 2 PANE: TARIF REJASI (Free Plan va yana 2 ta plan) ================= -->
+    <!-- ================= STEP 2 PANE: TARIF REJASI (Free, Pro 249K, Business 590K) ================= -->
     <div id="step-content-2" class="step-pane hidden space-y-6">
       <div>
         <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">2-QADAM • TARIFNI TANLASH</span>
@@ -219,7 +240,7 @@
         </p>
       </div>
 
-      <!-- 3 Plans Grid (Free, Pro, Business) -->
+      <!-- 3 Plans Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-1">
         
         <!-- PLAN 1: FREE PLAN (Selected by default) -->
@@ -271,7 +292,7 @@
           </div>
         </div>
 
-        <!-- PLAN 2: PRO PLAN -->
+        <!-- PLAN 2: PRO PLAN (249 ming so'm / oy) -->
         <div onclick="selectPlan('pro')" id="plan-card-pro" class="plan-card p-5 rounded-2xl border-2 border-gray-200 bg-white transition-all cursor-pointer flex flex-col justify-between relative shadow-xs hover:border-black hover:shadow-md">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
@@ -289,7 +310,7 @@
             </div>
 
             <div class="pt-1">
-              <div class="text-2xl font-black text-gray-900">490 000 <span class="text-xs font-semibold text-gray-500">so'm/oy</span></div>
+              <div class="text-2xl font-black text-gray-900">249 000 <span class="text-xs font-semibold text-gray-500">so'm/oy</span></div>
               <div class="text-[11px] text-gray-500">Oyma-oy yoki yillik to'lov</div>
             </div>
 
@@ -300,7 +321,7 @@
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-emerald-600 font-bold">✓</span>
-                <span>Barcha kanallar (Instagram + TG + Web)</span>
+                <span>Barcha kanallar (Instagram + TG + WhatsApp)</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-emerald-600 font-bold">✓</span>
@@ -324,7 +345,7 @@
           </div>
         </div>
 
-        <!-- PLAN 3: BUSINESS PLAN -->
+        <!-- PLAN 3: BUSINESS PLAN (590 ming so'm / oy) -->
         <div onclick="selectPlan('business')" id="plan-card-business" class="plan-card p-5 rounded-2xl border-2 border-gray-200 bg-white transition-all cursor-pointer flex flex-col justify-between relative shadow-xs hover:border-black hover:shadow-md">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
@@ -342,7 +363,7 @@
             </div>
 
             <div class="pt-1">
-              <div class="text-2xl font-black text-gray-900">990 000 <span class="text-xs font-semibold text-gray-500">so'm/oy</span></div>
+              <div class="text-2xl font-black text-gray-900">590 000 <span class="text-xs font-semibold text-gray-500">so'm/oy</span></div>
               <div class="text-[11px] text-gray-500">Maxsus VIP imkoniyatlar</div>
             </div>
 
@@ -392,7 +413,7 @@
       </div>
     </div>
 
-    <!-- ================= STEP 3 PANE: BIZNES VA BILIMLAR (Zero mock data, clean inputs) ================= -->
+    <!-- ================= STEP 3 PANE: BIZNES VA BILIMLAR (Clean, zero dummy data) ================= -->
     <div id="step-content-3" class="step-pane hidden space-y-6">
       <div>
         <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">3-QADAM • BIZNES VA FAQ</span>
@@ -404,7 +425,7 @@
         </p>
       </div>
 
-      <!-- Business in One Sentence (Clean empty input) -->
+      <!-- Business in One Sentence -->
       <div>
         <label class="text-xs font-semibold text-gray-700 block mb-1.5">
           Biznesingiz haqida bir jumlada
@@ -412,7 +433,7 @@
         <input type="text" id="onboard-biz-desc" value="" placeholder="Masalan: Ayollar kiyimlari do'koni, Mebel ishlab chiqarish yoki Stomatologiya klinikasi" class="w-full text-xs p-3.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-gray-900 font-medium">
       </div>
 
-      <!-- Quick Chips Suggestion (Click to insert into empty fields) -->
+      <!-- Quick Chips Suggestion -->
       <div>
         <div class="text-[11px] text-gray-500 font-medium mb-2.5">
           Tez-tez so'raladigan savollar — chip bosing yoki o'zingiz yozing
@@ -439,10 +460,8 @@
         </div>
       </div>
 
-      <!-- FAQ Question & Answer Rows (Clean empty inputs with clear placeholders) -->
+      <!-- FAQ Question & Answer Rows -->
       <div class="space-y-3" id="faq-rows-container">
-        
-        <!-- Row 1 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 faq-row">
           <div>
             <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block mb-1">Savol 1</label>
@@ -454,7 +473,6 @@
           </div>
         </div>
 
-        <!-- Row 2 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 faq-row">
           <div>
             <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block mb-1">Savol 2</label>
@@ -466,7 +484,6 @@
           </div>
         </div>
 
-        <!-- Row 3 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 faq-row">
           <div>
             <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block mb-1">Savol 3</label>
@@ -477,17 +494,14 @@
             <input type="text" class="faq-a-input w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black outline-none" value="" placeholder="Masalan: Toshkent shahri, Chilonzor 9-mavze...">
           </div>
         </div>
-
       </div>
 
-      <!-- Add more FAQ button -->
       <div>
         <button type="button" onclick="addNewFaqRow()" class="text-xs font-bold text-gray-800 hover:text-black transition-colors inline-flex items-center gap-1 cursor-pointer">
           <span>+ yana savol qo'shish</span>
         </button>
       </div>
 
-      <!-- Light Green Tip Banner -->
       <div class="p-3.5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-xs text-gray-700 flex items-start gap-2.5">
         <span class="text-emerald-600 text-sm">💡</span>
         <span class="leading-relaxed">
@@ -510,16 +524,15 @@
 
   <script>
     let currentStep = 1;
-    let selectedAuthMethod = 'email';
+    let selectedAuthChannel = 'instagram';
     let isLoginMode = false;
     let selectedPlanId = 'free';
 
-    // Set auth method tabs
-    function setAuthMethod(method) {
-      selectedAuthMethod = method;
-      ['email', 'telegram', 'instagram'].forEach(m => {
-        const btn = document.getElementById('auth-tab-btn-' + m);
-        if (m === method) {
+    function setAuthChannel(channel) {
+      selectedAuthChannel = channel;
+      ['instagram', 'telegram', 'whatsapp', 'email'].forEach(c => {
+        const btn = document.getElementById('auth-tab-btn-' + c);
+        if (c === channel) {
           btn.className = 'auth-tab-btn auth-tab-active py-2.5 px-3 rounded-xl border border-gray-900 bg-gray-900 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer';
         } else {
           btn.className = 'auth-tab-btn py-2.5 px-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer';
@@ -529,19 +542,28 @@
       const label = document.getElementById('auth-identifier-label');
       const input = document.getElementById('auth-identifier');
       const hint = document.getElementById('auth-identifier-hint');
+      const gmailWarning = document.getElementById('gmail-lock-warning');
 
-      if (method === 'email') {
-        label.textContent = "Email manzilingiz";
-        input.placeholder = "sizning@kompaniya.uz";
-        hint.textContent = "Platformaga kirish va hisob xabarlari uchun asosiy email.";
-      } else if (method === 'telegram') {
-        label.textContent = "Telegram username yoki raqamingiz";
-        input.placeholder = "@dilshod_biznes yoki +998901234567";
-        hint.textContent = "Telegram botimiz orqali bildirishnomalar olishingiz mumkin.";
-      } else if (method === 'instagram') {
-        label.textContent = "Instagram akkauntingiz";
-        input.placeholder = "@brendingiz yoki @profil_nomi";
-        hint.textContent = "Direct va postlar ostidagi xabarlar uchun AI ulanadi.";
+      if (channel === 'instagram') {
+        label.textContent = "Instagram akkaunt yoki profil nomi";
+        input.placeholder = "@sizning_brendingiz yoki @profil";
+        hint.textContent = "Direct va postlar ostidagi izohlarga AI agent avtomatik ulanadi.";
+        gmailWarning.classList.add('hidden');
+      } else if (channel === 'telegram') {
+        label.textContent = "Telegram bot username yoki nomi";
+        input.placeholder = "@dokon_savdo_bot yoki Bot nomi";
+        hint.textContent = "Telegram orqali xaridorlarni qabul qiluvchi 24/7 savdo boti.";
+        gmailWarning.classList.add('hidden');
+      } else if (channel === 'whatsapp') {
+        label.textContent = "WhatsApp Business telefon raqami";
+        input.placeholder = "+998 90 123 45 67";
+        hint.textContent = "WhatsApp Business orqali savdolarni avtomatlashtirish.";
+        gmailWarning.classList.add('hidden');
+      } else if (channel === 'email') {
+        label.textContent = "Gmail manzilingiz";
+        input.placeholder = "sizning@gmail.com";
+        hint.textContent = "Hisobga kirish uchun Gmail manzilingiz.";
+        gmailWarning.classList.remove('hidden');
       }
     }
 
@@ -562,8 +584,8 @@
         submitBtn.innerHTML = "<span>Tizimga kirish</span> <span>→</span>";
         nameGroup.classList.add('hidden');
       } else {
-        title.textContent = "Hisobingizni oching";
-        subtitle.textContent = "O'zingizga qulay usulni tanlang: Email, Telegram yoki Instagram orqali 10 soniyada ro'yxatdan o'ting.";
+        title.textContent = "Kanal orqali hisob oching";
+        subtitle.textContent = "VertaFlow AI Closer mijozlar bilan muloqot qilishi uchun Instagram, Telegram yoki WhatsApp kanalini ulang.";
         modeText.textContent = "Akkauntingiz bormi?";
         modeBtn.textContent = "Tizimga kirish";
         submitBtn.innerHTML = "<span>Davom etish — Tarif tanlash</span> <span>→</span>";
@@ -575,10 +597,9 @@
       const identifier = document.getElementById('auth-identifier').value.trim();
       const password = document.getElementById('auth-password').value.trim();
       const fullName = document.getElementById('auth-fullname').value.trim();
-      const alertBox = document.getElementById('auth-alert');
 
       if (!identifier) {
-        showAlert('Iltimos, email yoki foydalanuvchi nomini kiriting.', 'error');
+        showAlert('Iltimos, identifikator (akkaunt, bot yoki email)ni kiriting.', 'error');
         return;
       }
 
@@ -587,11 +608,11 @@
       try {
         const url = isLoginMode ? '/api/auth/login' : '/api/auth/register';
         const payload = isLoginMode ? {
-          auth_method: selectedAuthMethod,
+          auth_method: selectedAuthChannel,
           identifier: identifier,
           password: password
         } : {
-          auth_method: selectedAuthMethod,
+          auth_method: selectedAuthChannel,
           identifier: identifier,
           password: password,
           full_name: fullName,
@@ -611,22 +632,38 @@
         }
 
         const user = data.user || {
-          auth_method: selectedAuthMethod,
+          auth_method: selectedAuthChannel,
           identifier: identifier,
           full_name: fullName || identifier
         };
 
         localStorage.setItem('vertaflow_user', JSON.stringify(user));
-        showAlert(isLoginMode ? 'Muvaffaqiyatli kirdingiz!' : 'Akkaunt yaratildi!', 'success');
+
+        // Connect channel immediately if it's instagram, telegram, or whatsapp
+        if (selectedAuthChannel !== 'email') {
+          let conf = {};
+          if (selectedAuthChannel === 'instagram') conf = { account_name: identifier };
+          if (selectedAuthChannel === 'telegram') conf = { bot_username: identifier.startsWith('@') ? identifier : '@' + identifier };
+          if (selectedAuthChannel === 'whatsapp') conf = { phone_number: identifier };
+
+          try {
+            await fetch(`/api/channels/${selectedAuthChannel}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ is_connected: 1, config: conf })
+            });
+          } catch(e) {}
+        }
+
+        showAlert(isLoginMode ? 'Muvaffaqiyatli kirdingiz!' : 'Kanal ulandi va hisob yaratildi!', 'success');
 
         setTimeout(() => {
           goToStep(2);
         }, 500);
 
       } catch (err) {
-        // Fallback for seamless offline/fast transition
         localStorage.setItem('vertaflow_user', JSON.stringify({
-          auth_method: selectedAuthMethod,
+          auth_method: selectedAuthChannel,
           identifier: identifier,
           full_name: fullName || identifier
         }));
@@ -682,16 +719,13 @@
             payment_method: selectedPlanId === 'free' ? 'free' : 'payme'
           })
         });
-      } catch (e) {
-        console.warn('Checkout note:', e);
-      }
+      } catch (e) {}
       goToStep(3);
     }
 
     function goToStep(stepNumber) {
       currentStep = stepNumber;
       
-      // Update panes
       document.querySelectorAll('.step-pane').forEach(el => el.classList.add('hidden'));
       const targetPane = document.getElementById('step-content-' + stepNumber);
       if (targetPane) {
@@ -699,7 +733,6 @@
         targetPane.classList.add('step-pane-animate');
       }
 
-      // Update sidebar nav items
       [1, 2, 3].forEach(num => {
         const navItem = document.getElementById('step-nav-' + num);
         const circle = document.getElementById('step-circle-' + num);
@@ -778,9 +811,7 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ question: q, answer: a, category: 'onboarding' })
             });
-          } catch (e) {
-            console.warn('FAQ save failed', e);
-          }
+          } catch (e) {}
         }
       }
 
@@ -795,9 +826,7 @@
               system_prompt: `Siz ${bizDesc} bo'yicha professional savdo maslahatchisisiz. Mijozlarga xushmuomala, aniq va savdoni yopuvchi uslubda javob bering.`
             })
           });
-        } catch (e) {
-          console.warn('Persona save failed', e);
-        }
+        } catch (e) {}
       }
 
       window.location.href = '/app';
@@ -807,7 +836,6 @@
       window.location.href = '/app';
     }
 
-    // Initialize to step 1
     document.addEventListener('DOMContentLoaded', () => {
       goToStep(1);
     });
