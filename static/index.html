@@ -40,19 +40,76 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #D1D5DB;
     }
+    /* Ultra-smooth Tab Transition Animation */
+    @keyframes tabGlissade {
+      0% {
+        opacity: 0;
+        transform: translateY(12px) scale(0.995);
+        filter: blur(1px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
     .tab-content {
       display: none;
     }
     .tab-content.active {
       display: flex;
+      animation: tabGlissade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    /* Modal Animation */
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes modalPopUp {
+      0% { opacity: 0; transform: scale(0.94) translateY(14px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-backdrop-animate {
+      animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .modal-dialog-animate {
+      animation: modalPopUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Dropdown Animation */
+    @keyframes dropdownFade {
+      0% { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .dropdown-animate {
+      animation: dropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* High-contrast Nav Button & Cards */
+    .nav-btn {
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-btn:hover {
+      transform: translateX(2px);
     }
     .nav-btn.active {
-      background-color: #B5F87B;
-      color: #1A3E08;
-      font-weight: 700;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      background-color: #B5F87B !important;
+      color: #0B0F17 !important;
+      font-weight: 800;
+      box-shadow: 0 4px 14px -2px rgba(181, 248, 123, 0.45);
       border: 1px solid #9DE959;
+      transform: translateX(4px);
     }
+    .card-clean {
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+    }
+    .card-clean:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.05);
+    }
+
     .period-btn {
       position: relative;
       cursor: pointer;
@@ -1901,14 +1958,20 @@
       const m = document.getElementById(id);
       if (m) {
         m.classList.remove('hidden');
-        m.classList.add('flex');
+        m.classList.add('flex', 'modal-backdrop-animate');
+        const dialog = m.firstElementChild;
+        if (dialog) {
+          dialog.classList.remove('modal-dialog-animate');
+          void dialog.offsetWidth;
+          dialog.classList.add('modal-dialog-animate');
+        }
       }
     }
     function closeModal(id) {
       const m = document.getElementById(id);
       if (m) {
         m.classList.add('hidden');
-        m.classList.remove('flex');
+        m.classList.remove('flex', 'modal-backdrop-animate');
       }
     }
     function openInstagramModal() { openModal('modal-instagram'); }
