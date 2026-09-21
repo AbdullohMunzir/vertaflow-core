@@ -17,10 +17,10 @@ import csv
 import time
 import hmac
 import hashlib
-from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form, Request
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form, Request, Response, Cookie
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, Response, RedirectResponse, JSONResponse
 from pydantic import BaseModel
 import aiohttp
 
@@ -851,12 +851,12 @@ def checkout_plan(req: BillingCheckout):
 # ----------------- AUTHENTICATION & USERS API -----------------
 
 @app.post("/api/auth/register")
-def auth_register(req: RegisterRequest):
-    """Register user using Email, Telegram, or Instagram with selected plan."""
+def auth_register(req: RegisterRequest, response: Response):
+    """Real registration supporting Email, Telegram, Instagram, and WhatsApp with session creation."""
     if not req.identifier or not req.identifier.strip():
-        raise HTTPException(status_code=400, detail="Identifikator (email/username) kiritilishi shart")
+        raise HTTPException(status_code=400, detail="Identifikator (email, akkaunt, bot yoki telefon) kiritilishi shart")
     
-    valid_methods = ["email", "telegram", "instagram"]
+    valid_methods = ["email", "telegram", "instagram", "whatsapp"]
     method = req.auth_method.lower().strip()
     if method not in valid_methods:
         method = "email"
@@ -868,11 +868,26 @@ def auth_register(req: RegisterRequest):
         password=req.password or "",
         selected_plan=req.selected_plan or "free"
     )
-    return res
+    user = res["user"]
+    token = db.create_session(user["id"])
+    response.set_cookie(
+        key="vertaflow_session",
+        value=token,
+        max_age=30 * 86400,
+        httponly=False,
+        samesite="lax",
+        path="/"
+    )
+    return {
+        "status": res.get("status", "created"),
+        "user": user,
+        "token": token,
+        "has_primary_channel": db.has_connected_primary_channel()
+    }
 
 @app.post("/api/auth/login")
-def auth_login(req: LoginRequest):
-    """Authenticate user with identifier and password."""
+def auth_login(req: LoginRequest, response: Response):
+    """Real authentication with identifier and password verifying against SQLite database."""
     if not req.identifier or not req.identifier.strip():
         raise HTTPException(status_code=400, detail="Identifikator kiritilishi shart")
         
@@ -882,28 +897,54 @@ def auth_login(req: LoginRequest):
         password=req.password or ""
     )
     if not user:
-        raise HTTPException(status_code=401, detail="Akkaunt topilmadi yoki parol noto'g'ri")
-    return {"status": "success", "user": user}
+        raise HTTPException(status_code=401, detail="Akkaunt topilmadi yoki parol noto'g'ri. Iltimos, ma'lumotlarni tekshiring.")
+        
+    token = db.create_session(user["id"])
+    response.set_cookie(
+        key="vertaflow_session",
+        value=token,
+        max_age=30 * 86400,
+        httponly=False,
+        samesite="lax",
+        path="/"
+    )
+    return {
+        "status": "success",
+        "user": user,
+        "token": token,
+        "has_primary_channel": db.has_connected_primary_channel()
+    }
+
+@app.post("/api/auth/logout")
+def auth_logout(response: Response, vertaflow_session: Optional[str] = Cookie(None)):
+    """Logs out user and destroys session token."""
+    if vertaflow_session:
+        db.delete_session(vertaflow_session)
+    response.delete_cookie(key="vertaflow_session", path="/")
+    return {"status": "logged_out", "message": "Muvaffaqiyatli tizimdan chiqildi"}
 
 @app.get("/api/auth/me")
-def auth_me(user_id: Optional[str] = None):
-    """Returns currently authenticated user profile and active plan."""
-    if user_id:
-        user = db.get_user_by_id(user_id)
-        if user:
-            return {"authenticated": True, "user": user}
+def auth_me(request: Request, vertaflow_session: Optional[str] = Cookie(None), token: Optional[str] = None):
+    """Returns currently authenticated user profile and whether any primary communication channel is connected."""
+    auth_token = vertaflow_session or token
+    if not auth_token:
+        auth_hdr = request.headers.get("Authorization")
+        if auth_hdr and auth_hdr.startswith("Bearer "):
+            auth_token = auth_hdr[7:].strip()
             
-    billing = db.get_billing_info()
+    if auth_token:
+        user = db.get_user_by_session(auth_token)
+        if user:
+            return {
+                "authenticated": True,
+                "user": user,
+                "has_primary_channel": db.has_connected_primary_channel()
+            }
+            
     return {
-        "authenticated": True,
-        "user": {
-            "id": "usr_default",
-            "auth_method": "direct",
-            "identifier": "foydalanuvchi@vertaflow.uz",
-            "full_name": "Faol Foydalanuvchi",
-            "selected_plan": billing.get("plan_id", "free"),
-            "active_workspace_id": "default"
-        }
+        "authenticated": False,
+        "user": None,
+        "has_primary_channel": False
     }
 
 # ----------------- STATIC ASSETS & FRONTEND -----------------
@@ -928,8 +969,10 @@ def serve_landing():
 @app.head("/onboarding")
 @app.get("/setup")
 @app.head("/setup")
+@app.get("/login")
+@app.head("/login")
 def serve_onboarding():
-    """Interactive Onboarding Wizard for configuring AI Closer before platform access."""
+    """Interactive Onboarding & Auth Wizard before platform access."""
     onboard_file = os.path.join(static_dir, "onboarding.html")
     if os.path.exists(onboard_file):
         return FileResponse(onboard_file)
@@ -944,8 +987,17 @@ def serve_onboarding():
 @app.head("/dashboard")
 @app.get("/platform")
 @app.head("/platform")
-def serve_app():
-    """VertaFlow Core SaaS Platform Dashboard."""
+def serve_app(request: Request, vertaflow_session: Optional[str] = Cookie(None)):
+    """VertaFlow Core SaaS Platform Dashboard with strict real session authentication guard."""
+    token = vertaflow_session
+    if not token:
+        token = request.query_params.get("token")
+        
+    user = db.get_user_by_session(token) if token else None
+    if not user:
+        # User is not authenticated -> redirect to login/onboarding
+        return RedirectResponse(url="/onboarding", status_code=303)
+
     index_file = os.path.join(static_dir, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)

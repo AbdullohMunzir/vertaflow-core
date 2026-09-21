@@ -61,7 +61,7 @@ def init_db():
     );
     """)
 
-    # Users Table (Email, Telegram, Instagram registration)
+    # Users Table (Email, Telegram, Instagram, WhatsApp registration)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
@@ -72,6 +72,16 @@ def init_db():
         selected_plan TEXT DEFAULT 'free',
         active_workspace_id TEXT DEFAULT 'default',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # Real User Sessions Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP
     );
     """)
 
@@ -1019,13 +1029,13 @@ def authenticate_user(auth_method: str, identifier: str, password: str = "") -> 
     row = cursor.fetchone()
     conn.close()
     if not row:
-        res = register_user(auth_method, clean_id, password=password)
-        return res.get("user")
+        return None
     
     user = dict(row)
     if password and user.get("password_hash"):
         if hash_password(password) != user["password_hash"]:
             return None
+    user.pop("password_hash", None)
     return user
 
 def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
@@ -1035,6 +1045,54 @@ def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
     row = cursor.fetchone()
     conn.close()
     return dict(row) if row else None
+
+def create_session(user_id: str, days: int = 30) -> str:
+    conn = get_connection()
+    cursor = conn.cursor()
+    token = "sess_" + uuid.uuid4().hex
+    expires = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute("""
+        INSERT INTO sessions (token, user_id, expires_at)
+        VALUES (?, ?, ?);
+    """, (token, user_id, expires))
+    conn.commit()
+    conn.close()
+    return token
+
+def get_user_by_session(token: str) -> Optional[Dict[str, Any]]:
+    if not token:
+        return None
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT u.id, u.auth_method, u.identifier, u.full_name, u.selected_plan, u.active_workspace_id, u.created_at
+        FROM sessions s
+        JOIN users u ON s.user_id = u.id
+        WHERE s.token = ? AND (s.expires_at IS NULL OR s.expires_at > CURRENT_TIMESTAMP);
+    """, (token,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def delete_session(token: str):
+    if not token:
+        return
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM sessions WHERE token = ?;", (token,))
+    conn.commit()
+    conn.close()
+
+def has_connected_primary_channel() -> bool:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT COUNT(*) FROM channels 
+        WHERE channel_id IN ('instagram', 'telegram', 'whatsapp') AND is_connected = 1;
+    """)
+    count = cursor.fetchone()[0]
+    conn.close()
+    return count > 0
 
 # Initialize database on module import
 init_db()

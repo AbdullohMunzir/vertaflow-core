@@ -655,19 +655,18 @@
           } catch(e) {}
         }
 
-        showAlert(isLoginMode ? 'Muvaffaqiyatli kirdingiz!' : 'Kanal ulandi va hisob yaratildi!', 'success');
+        showAlert(isLoginMode ? 'Muvaffaqiyatli kirdingiz! Yo\'naltirilmoqda...' : 'Kanal ulandi va hisob yaratildi!', 'success');
 
         setTimeout(() => {
-          goToStep(2);
-        }, 500);
+          if (isLoginMode) {
+            window.location.href = '/app';
+          } else {
+            goToStep(2);
+          }
+        }, 600);
 
       } catch (err) {
-        localStorage.setItem('vertaflow_user', JSON.stringify({
-          auth_method: selectedAuthChannel,
-          identifier: identifier,
-          full_name: fullName || identifier
-        }));
-        goToStep(2);
+        showAlert('Tarmoq yoki server bilan aloqada xatolik yuz berdi. Iltimos qaytadan urining.', 'error');
       }
     }
 

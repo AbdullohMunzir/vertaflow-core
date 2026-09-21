@@ -416,8 +416,8 @@
         </div>
 
         <!-- User Profile Card -->
-        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" onclick="openModal('modal-workspace-settings')">
-          <div class="flex items-center gap-2.5 truncate">
+        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-gray-100 transition-colors">
+          <div class="flex items-center gap-2.5 truncate cursor-pointer flex-1" onclick="openModal('modal-workspace-settings')">
             <div id="sidebar-user-avatar" class="w-8 h-8 rounded-full bg-pistachio text-[#1A3E08] font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
               VA
             </div>
@@ -426,7 +426,9 @@
               <div class="text-[10px] text-gray-500 truncate" id="sidebar-role-label"><span data-i18n="owner_role">Egasi</span> • <span id="sidebar-ws-subtitle">Default</span></div>
             </div>
           </div>
-          <i data-lucide="more-vertical" class="w-3.5 h-3.5 text-gray-400"></i>
+          <button type="button" onclick="handleLogout()" class="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer shrink-0" title="Tizimdan chiqish">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
         </div>
       </div>
     </aside>
@@ -2061,13 +2063,69 @@
     let selectedAvatar = '👩‍💼';
     let selectedTone = 'friendly_closer';
     let playgroundSessionId = 'play_' + Date.now();
+    let currentUser = null;
+    let isChannelLocked = false;
+
+    async function checkAuthSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (!data.authenticated || !data.user) {
+          window.location.href = '/onboarding';
+          return false;
+        }
+
+        currentUser = data.user;
+        localStorage.setItem('vertaflow_user', JSON.stringify(data.user));
+
+        // Update profile in sidebar
+        const name = currentUser.full_name || currentUser.identifier || 'Foydalanuvchi';
+        const nameEl = document.getElementById('sidebar-user-name');
+        const avatarEl = document.getElementById('sidebar-user-avatar');
+        const subEl = document.getElementById('sidebar-ws-subtitle');
+        if (nameEl) nameEl.textContent = name;
+        if (avatarEl) {
+          const initials = name.replace('@', '').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'VF';
+          avatarEl.textContent = initials;
+        }
+        if (subEl) subEl.textContent = currentUser.identifier;
+
+        // Check channel lock: if registered via email and no channel is connected
+        const lockOverlay = document.getElementById('channel-lock-overlay');
+        if (lockOverlay) {
+          const isEmailAuth = currentUser.auth_method === 'email';
+          if (isEmailAuth && !data.has_primary_channel) {
+            isChannelLocked = true;
+            lockOverlay.classList.remove('hidden');
+          } else {
+            isChannelLocked = false;
+            lockOverlay.classList.add('hidden');
+          }
+        }
+        return true;
+      } catch (err) {
+        console.error('Session check error', err);
+        return false;
+      }
+    }
+
+    async function handleLogout() {
+      if (!confirm("Haqiqatan ham hisobdan chiqmoqchimisiz?")) return;
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (e) {}
+      localStorage.removeItem('vertaflow_user');
+      window.location.href = '/onboarding';
+    }
 
     // Init on load
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       initLanguage();
+      const authed = await checkAuthSession();
+      if (!authed) return;
+
       loadWorkspaces();
       loadBilling();
-      loadUserProfile();
       switchTab('dashboard');
       loadDashboardStats();
       loadChannels();
@@ -2261,8 +2319,6 @@
       }
     }
 
-    let isChannelLocked = false;
-
     function checkChannelGate() {
       const rawUser = localStorage.getItem('vertaflow_user');
       let user = null;
@@ -2320,7 +2376,7 @@
         }
 
         await loadChannels();
-        checkChannelGate();
+        await checkAuthSession();
         alert(`${channelType.toUpperCase()} muvaffaqiyatli ulandi! Barcha bo'limlar ochildi 🎉`);
       } catch (e) {
         alert('Kanalni ulashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
