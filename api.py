@@ -853,6 +853,18 @@ def serve_landing():
         return FileResponse(index_file)
     return {"message": "VertaFlow API online. Landing page not found."}
 
+@app.get("/onboarding")
+@app.get("/setup")
+def serve_onboarding():
+    """Interactive Onboarding Wizard for configuring AI Closer before platform access."""
+    onboard_file = os.path.join(static_dir, "onboarding.html")
+    if os.path.exists(onboard_file):
+        return FileResponse(onboard_file)
+    index_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"message": "Onboarding page not found."}
+
 @app.get("/app")
 @app.get("/dashboard")
 @app.get("/platform")
