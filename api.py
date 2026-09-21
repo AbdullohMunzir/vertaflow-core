@@ -220,9 +220,21 @@ class WorkspaceSwitch(BaseModel):
     workspace_id: str
 
 class BillingCheckout(BaseModel):
-    plan_id: str  # 'pro' or 'business'
-    period_months: int  # 1, 3, 6, 12
-    payment_method: str  # 'payme' or 'click'
+    plan_id: str  # 'free', 'pro', or 'business'
+    period_months: Optional[int] = 1  # 1, 3, 6, 12
+    payment_method: Optional[str] = "free"  # 'free', 'payme' or 'click'
+
+class RegisterRequest(BaseModel):
+    auth_method: str  # 'email', 'telegram', 'instagram'
+    identifier: str  # email or @username
+    full_name: Optional[str] = ""
+    password: Optional[str] = ""
+    selected_plan: Optional[str] = "free"
+
+class LoginRequest(BaseModel):
+    auth_method: str  # 'email', 'telegram', 'instagram'
+    identifier: str
+    password: Optional[str] = ""
 
 # ----------------- CHAT & CONVERSATIONS API -----------------
 
@@ -808,8 +820,9 @@ def get_billing_status(workspace_id: Optional[str] = None):
 def checkout_plan(req: BillingCheckout):
     """Processes plan purchase via Payme or Click, upgrades workspace, and generates payment record."""
     prices_per_month = {
-        "pro": 199000,
-        "business": 499000
+        "free": 0,
+        "pro": 490000,
+        "business": 990000
     }
     discounts = {
         1: 0.0,
@@ -817,22 +830,80 @@ def checkout_plan(req: BillingCheckout):
         6: 0.15,
         12: 0.25
     }
-    base = prices_per_month.get(req.plan_id, 199000)
+    base = prices_per_month.get(req.plan_id, 0)
     disc = discounts.get(req.period_months, 0.0)
-    total = int(base * req.period_months * (1.0 - disc))
+    total = int(base * (req.period_months or 1) * (1.0 - disc))
     
     ws_id = db.get_active_workspace_id()
     billing_data = db.record_payment(
         workspace_id=ws_id,
         plan_id=req.plan_id,
-        period_months=req.period_months,
+        period_months=req.period_months or 1,
         amount=total,
-        payment_method=req.payment_method
+        payment_method=req.payment_method or "free"
     )
     return {
         "status": "success",
-        "message": f"{req.plan_id.capitalize()} tarifi {req.period_months} oyga muvaffaqiyatli faollashtirildi!",
+        "message": f"{req.plan_id.capitalize()} tarifi muvaffaqiyatli faollashtirildi!",
         "billing": billing_data
+    }
+
+# ----------------- AUTHENTICATION & USERS API -----------------
+
+@app.post("/api/auth/register")
+def auth_register(req: RegisterRequest):
+    """Register user using Email, Telegram, or Instagram with selected plan."""
+    if not req.identifier or not req.identifier.strip():
+        raise HTTPException(status_code=400, detail="Identifikator (email/username) kiritilishi shart")
+    
+    valid_methods = ["email", "telegram", "instagram"]
+    method = req.auth_method.lower().strip()
+    if method not in valid_methods:
+        method = "email"
+        
+    res = db.register_user(
+        auth_method=method,
+        identifier=req.identifier.strip(),
+        full_name=req.full_name or "",
+        password=req.password or "",
+        selected_plan=req.selected_plan or "free"
+    )
+    return res
+
+@app.post("/api/auth/login")
+def auth_login(req: LoginRequest):
+    """Authenticate user with identifier and password."""
+    if not req.identifier or not req.identifier.strip():
+        raise HTTPException(status_code=400, detail="Identifikator kiritilishi shart")
+        
+    user = db.authenticate_user(
+        auth_method=req.auth_method.lower().strip(),
+        identifier=req.identifier.strip(),
+        password=req.password or ""
+    )
+    if not user:
+        raise HTTPException(status_code=401, detail="Akkaunt topilmadi yoki parol noto'g'ri")
+    return {"status": "success", "user": user}
+
+@app.get("/api/auth/me")
+def auth_me(user_id: Optional[str] = None):
+    """Returns currently authenticated user profile and active plan."""
+    if user_id:
+        user = db.get_user_by_id(user_id)
+        if user:
+            return {"authenticated": True, "user": user}
+            
+    billing = db.get_billing_info()
+    return {
+        "authenticated": True,
+        "user": {
+            "id": "usr_default",
+            "auth_method": "direct",
+            "identifier": "foydalanuvchi@vertaflow.uz",
+            "full_name": "Faol Foydalanuvchi",
+            "selected_plan": billing.get("plan_id", "free"),
+            "active_workspace_id": "default"
+        }
     }
 
 # ----------------- STATIC ASSETS & FRONTEND -----------------
@@ -854,7 +925,9 @@ def serve_landing():
     return {"message": "VertaFlow API online. Landing page not found."}
 
 @app.get("/onboarding")
+@app.head("/onboarding")
 @app.get("/setup")
+@app.head("/setup")
 def serve_onboarding():
     """Interactive Onboarding Wizard for configuring AI Closer before platform access."""
     onboard_file = os.path.join(static_dir, "onboarding.html")
@@ -866,8 +939,11 @@ def serve_onboarding():
     return {"message": "Onboarding page not found."}
 
 @app.get("/app")
+@app.head("/app")
 @app.get("/dashboard")
+@app.head("/dashboard")
 @app.get("/platform")
+@app.head("/platform")
 def serve_app():
     """VertaFlow Core SaaS Platform Dashboard."""
     index_file = os.path.join(static_dir, "index.html")

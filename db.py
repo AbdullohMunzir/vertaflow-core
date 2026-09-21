@@ -61,6 +61,20 @@ def init_db():
     );
     """)
 
+    # Users Table (Email, Telegram, Instagram registration)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        auth_method TEXT NOT NULL,
+        identifier TEXT NOT NULL,
+        full_name TEXT,
+        password_hash TEXT,
+        selected_plan TEXT DEFAULT 'free',
+        active_workspace_id TEXT DEFAULT 'default',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     # 2. Conversations Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS conversations (
@@ -946,6 +960,81 @@ def record_payment(workspace_id: str, plan_id: str, period_months: int, amount: 
     conn.commit()
     conn.close()
     return get_billing_info(workspace_id)
+
+import uuid
+import hashlib
+
+def hash_password(password: str) -> str:
+    if not password:
+        return ""
+    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+def register_user(auth_method: str, identifier: str, full_name: str = "", password: str = "", selected_plan: str = "free") -> Dict[str, Any]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    clean_id = identifier.strip().lower()
+    
+    cursor.execute("SELECT * FROM users WHERE auth_method = ? AND identifier = ?", (auth_method, clean_id))
+    row = cursor.fetchone()
+    if row:
+        user = dict(row)
+        cursor.execute("UPDATE users SET selected_plan = ? WHERE id = ?", (selected_plan, user["id"]))
+        conn.commit()
+        conn.close()
+        user["selected_plan"] = selected_plan
+        return {"status": "exists", "user": user}
+    
+    user_id = "usr_" + uuid.uuid4().hex[:12]
+    pwd_hash = hash_password(password) if password else ""
+    display_name = full_name.strip() or clean_id.replace("@", "").split(".")[0].capitalize()
+    
+    cursor.execute("""
+        INSERT INTO users (id, auth_method, identifier, full_name, password_hash, selected_plan, active_workspace_id)
+        VALUES (?, ?, ?, ?, ?, ?, 'default');
+    """, (user_id, auth_method, clean_id, display_name, pwd_hash, selected_plan))
+    
+    # Also update active workspace plan
+    cursor.execute("UPDATE businesses SET plan_id = ? WHERE id = 'default'", (selected_plan,))
+    
+    conn.commit()
+    conn.close()
+    return {
+        "status": "created",
+        "user": {
+            "id": user_id,
+            "auth_method": auth_method,
+            "identifier": clean_id,
+            "full_name": display_name,
+            "selected_plan": selected_plan,
+            "active_workspace_id": "default"
+        }
+    }
+
+def authenticate_user(auth_method: str, identifier: str, password: str = "") -> Optional[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    clean_id = identifier.strip().lower()
+    
+    cursor.execute("SELECT * FROM users WHERE auth_method = ? AND identifier = ?", (auth_method, clean_id))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        res = register_user(auth_method, clean_id, password=password)
+        return res.get("user")
+    
+    user = dict(row)
+    if password and user.get("password_hash"):
+        if hash_password(password) != user["password_hash"]:
+            return None
+    return user
+
+def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, auth_method, identifier, full_name, selected_plan, active_workspace_id, created_at FROM users WHERE id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
 
 # Initialize database on module import
 init_db()
