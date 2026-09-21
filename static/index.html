@@ -11,9 +11,51 @@
   <style>
     body {
       font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #F8FAFC;
+      background-color: #FFFFFF;
       color: #0F172A;
       letter-spacing: -0.022em;
+    }
+    /* Deep Navy Sidebar & Pure White Canvas */
+    .sidebar-navy {
+      background-color: #0A1128 !important;
+      border-right: 1px solid #1E293B !important;
+    }
+    .sidebar-card-navy {
+      background-color: #101A34 !important;
+      border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    }
+    .sidebar-navy .nav-btn {
+      color: #94A3B8;
+      border-radius: 10px;
+    }
+    .sidebar-navy .nav-btn:hover {
+      color: #FFFFFF;
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+    .sidebar-navy .nav-btn.active {
+      background-color: #B5F87B !important;
+      color: #0A1128 !important;
+      font-weight: 800;
+      box-shadow: 0 4px 14px -2px rgba(181, 248, 123, 0.45);
+      border: 1px solid #9DE959;
+    }
+    .sidebar-navy .nav-btn.active svg,
+    .sidebar-navy .nav-btn.active i {
+      color: #0A1128 !important;
+      stroke: #0A1128 !important;
+    }
+    /* Pristine White Workspace */
+    .workspace-white {
+      background-color: #FFFFFF !important;
+    }
+    .card-white {
+      background-color: #FFFFFF !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+    }
+    .card-white:hover {
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.04);
     }
     .bg-pistachio {
       background-color: #B5F87B;
@@ -179,49 +221,59 @@
 
 
   <!-- Top Navigation Header -->
-  <header class="h-16 bg-white border-b border-[#E5E7EB] px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
+    <!-- Top Navigation Header (Pure White Minimal Architecture) -->
+  <header class="h-16 bg-white border-b border-[#E2E8F0] px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
     <div class="flex items-center space-x-3">
       <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg focus:outline-none" title="Menyu">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
       <div class="w-9 h-9 rounded-xl bg-pistachio flex items-center justify-center text-black shadow-sm border border-pistachio">
-        <i data-lucide="zap" class="w-5 h-5 text-black"></i>
+        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       </div>
       <div>
         <div class="font-extrabold text-base tracking-tight text-gray-900 flex items-center gap-2">
           VertaFlow <span class="bg-[#F0FDF4] text-[#16A34A] text-[10px] px-2 py-0.5 rounded-full font-bold border border-[#BBF7D0]">PRO SAAS</span>
         </div>
-        <div class="text-[11px] text-gray-500 font-medium">Ko'p Kanalli Sotuvchi Agent</div>
+        <div class="text-[11px] text-gray-500 font-medium" data-i18n="topbar_sublabel">Ko'p Kanalli Sotuvchi Agent</div>
       </div>
     </div>
 
-    <!-- Active Mode & Global Status -->
+    <!-- Active Mode & Global Status (Zero Emojis, Pure SVG) -->
     <div class="hidden lg:flex items-center space-x-6 text-xs font-medium">
-      <div class="flex items-center gap-2 bg-[#F9FAFB] px-3 py-1.5 rounded-full border border-gray-200">
+      <div class="flex items-center gap-2 bg-[#F8FAFC] px-3 py-1.5 rounded-full border border-gray-200">
         <span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
-        <span class="text-gray-500">Holati:</span>
-        <span class="text-gray-900 font-bold" id="topbar-status">AI Avtopilot Faol (24/7)</span>
+        <span class="text-gray-500" data-i18n="topbar_status_label">Holati:</span>
+        <span class="text-gray-900 font-bold" id="topbar-status" data-i18n="topbar_status">AI Avtopilot Faol (24/7)</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <span class="text-gray-400">Korxona:</span>
-        <span class="font-bold text-gray-800" id="topbar-biz-name">Mebel Fabrikasi</span>
+        <span class="text-gray-400" data-i18n="topbar_biz_label">Korxona:</span>
+        <span class="font-bold text-gray-800" id="topbar-biz-name">Parfyumeriya Do'koni</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <span class="text-gray-400">AI Agent:</span>
-        <span class="font-bold text-gray-800 flex items-center gap-1" id="topbar-agent-label">
-          <span class="inline-flex items-center gap-1.5"><i data-lucide="bot" class="w-3.5 h-3.5 text-emerald-600"></i> Madina (Sotuv menejeri)</span>
+        <span class="text-gray-400" data-i18n="topbar_agent_label">AI Agent:</span>
+        <span class="font-bold text-gray-800 flex items-center gap-1.5" id="topbar-agent-label">
+          <span class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </span>
+          <span data-i18n="topbar_agent_name">Madina (Sotuv menejeri)</span>
         </span>
       </div>
     </div>
 
     <!-- Right Quick Actions -->
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-2.5">
+      <!-- Website Link -->
+      <a href="/" onclick="triggerPageTransition(event, '/')" class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 rounded-full text-xs font-semibold transition-all border border-gray-200 flex items-center gap-1.5 cursor-pointer shadow-xs" title="Asosiy veb-saytni ko'rish">
+        <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span data-i18n="site_btn">Sayt</span>
+      </a>
+
       <!-- Language Dropdown -->
       <div class="relative">
-        <button id="lang-btn" onclick="toggleLangMenu()" class="px-2.5 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-full text-xs font-bold transition-all border border-gray-200 flex items-center gap-1 cursor-pointer" title="Tilni tanlash">
-          <i data-lucide="globe" class="w-3.5 h-3.5 text-gray-600"></i>
+        <button id="lang-btn" onclick="toggleLangMenu()" class="px-2.5 py-1.5 bg-white hover:bg-gray-50 text-gray-800 rounded-full text-xs font-bold transition-all border border-gray-200 flex items-center gap-1 cursor-pointer shadow-xs" title="Tilni tanlash">
+          <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
           <span id="current-lang-label">UZ</span>
-          <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+          <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div id="lang-dropdown" class="hidden absolute right-0 mt-1.5 w-36 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50 text-xs font-semibold">
           <button onclick="setLanguage('uz')" class="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between text-gray-800">
@@ -238,23 +290,6 @@
           </button>
         </div>
       </div>
-
-      <a href="/" onclick="triggerPageTransition(event, '/')" class="hidden sm:inline-flex px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-full text-xs font-semibold transition-all border border-gray-200 items-center gap-1.5 cursor-pointer" title="Asosiy veb-saytni ko'rish">
-        <span class="inline-flex items-center gap-1"><i data-lucide="globe" class="w-3.5 h-3.5"></i> <span data-i18n="site_btn">Sayt</span></span>
-      </a>
-      <button onclick="switchTab('channels')" class="px-3 py-1.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-full text-xs font-bold transition-all border border-[#BBF7D0] flex items-center gap-1.5">
-        <span class="inline-flex items-center gap-1"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> <span data-i18n="nav_channels">Kanallar</span></span>
-        <span id="topbar-channels-count" class="bg-[#16A34A] text-white text-[10px] px-1.5 py-0.2 rounded-full">3</span>
-      </button>
-      <button onclick="switchTab('knowledge')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full text-xs font-semibold transition-all border border-gray-200 flex items-center gap-1.5">
-        <span class="inline-flex items-center gap-1"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span data-i18n="nav_knowledge">Bilimlar Bazasi</span></span>
-      </button>
-      <button onclick="switchTab('billing')" class="px-3 py-1.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-full text-xs font-bold transition-all border border-[#BBF7D0] flex items-center gap-1.5">
-        <span class="inline-flex items-center gap-1"><i data-lucide="credit-card" class="w-3.5 h-3.5"></i> <span data-i18n="nav_billing">Tariflar</span></span>
-      </button>
-      <button onclick="switchTab('playground')" class="px-3.5 py-1.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] rounded-full text-xs font-bold transition-all border border-pistachio flex items-center gap-1.5">
-        <span class="inline-flex items-center gap-1"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> <span data-i18n="nav_playground">Jonli Sinov</span></span>
-      </button>
     </div>
   </header>
 
@@ -262,20 +297,20 @@
   <div class="flex-1 flex overflow-hidden relative">
     
     <!-- Sidebar Navigation (Sleek Modern Obsidian Shell) -->
-    <aside id="main-sidebar" class="hidden md:flex w-64 bg-[#0A0D14] border-r border-slate-800/80 flex-col justify-between p-4 shrink-0 transition-all z-30 shadow-2xl">
+    <aside id="main-sidebar" class="hidden md:flex w-64 sidebar-navy rounded-none flex-col justify-between p-4 shrink-0 transition-all z-30 shadow-2xl">
       <div class="space-y-4">
         
         <!-- Active Workspace Dropdown Selector -->
         <div class="relative">
           <div class="flex items-center gap-1.5">
-            <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all cursor-pointer">
+            <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl sidebar-card-navy hover:bg-[#16223D] border border-white/10 text-xs font-bold text-white transition-all cursor-pointer">
               <div class="flex items-center gap-2 truncate">
                 <div id="ws-badge-icon" class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center shrink-0">D</div>
                 <span id="ws-active-name" class="truncate">Mebel Fabrikasi</span>
               </div>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 shrink-0"></i>
             </button>
-            <button onclick="openModal('modal-workspace-settings')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all" title="Loyiha sozlamalari">
+            <button onclick="openModal('modal-workspace-settings')" class="p-2.5 rounded-xl sidebar-card-navy hover:bg-[#16223D] border border-white/10 text-slate-400 hover:text-white transition-all" title="Loyiha sozlamalari">
               <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
           </div>
@@ -350,8 +385,8 @@
 
       <!-- Current Plan & Profile Card -->
       <div class="border-t border-white/10 pt-3 space-y-2.5">
-        <!-- Plan Widget (Dark Glass) -->
-        <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs">
+        <!-- Plan Widget (Dark Navy Card) -->
+        <div class="p-2.5 rounded-xl sidebar-card-navy text-xs">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-slate-400 font-medium" data-i18n="sidebar_plan_label">Tarif:</span>
             <span id="sidebar-plan-name" class="font-black text-white bg-slate-800 px-2 py-0.5 rounded-md border border-white/10 text-[11px]">Bepul</span>
@@ -382,87 +417,97 @@
     </aside>
 
     <!-- Content Workspace -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
+    <main class="flex-1 flex flex-col overflow-hidden workspace-white">
       
       <!-- ================= TAB 1: DASHBOARD ================= -->
       <div id="tab-dashboard" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
         
-        <!-- Welcome Banner -->
-        <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-white via-white to-[#F0FDF4] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <!-- Welcome Banner (Pure White Card Architecture) -->
+        <div class="card-white rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-              Xush kelibsiz! <span class="text-sm font-normal text-gray-500">Bugungi sotuvlar va muloqotlar hisoboti</span>
+              <span data-i18n="dash_welcome">Xush kelibsiz!</span> <span class="text-sm font-normal text-gray-500" data-i18n="dash_subtitle">Bugungi savdolar va muloqotlar hisoboti</span>
             </h1>
-            <p class="text-xs text-gray-600 mt-1">
+            <p class="text-xs text-gray-600 mt-1" data-i18n="dash_desc">
               AI Closer barcha ulangan kanallardan (Instagram, Telegram, WhatsApp, Web) kelgan mijozlarga avtomatik xizmat ko'rsatmoqda.
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="switchTab('channels')" class="px-4 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio flex items-center gap-1.5">
-              <span class="inline-flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Kanal Ulash</span>
+            <button onclick="switchTab('channels')" class="px-4 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              <span data-i18n="btn_connect_channel">Kanal Ulash</span>
             </button>
-            <button onclick="exportLeadsCSV()" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-800 font-bold text-xs rounded-xl transition-all border border-gray-200 flex items-center gap-1.5">
-              <span class="inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Excel Eksport</span>
+            <button onclick="exportLeadsCSV()" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-800 font-bold text-xs rounded-xl transition-all border border-gray-200 flex items-center gap-1.5 cursor-pointer shadow-xs">
+              <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"/></svg>
+              <span data-i18n="btn_export_excel">Excel Eksport</span>
             </button>
           </div>
         </div>
 
-        <!-- KPI Grid -->
+        <!-- KPI Grid (Pure White with Crisp Clean Accents) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
+          <div class="card-white rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-500">Jami Muloqotlar</span>
-              <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="messages-square" class="w-4 h-4"></i></span>
+              <span class="text-xs font-semibold text-gray-500" data-i18n="kpi_total_conv">Jami Muloqotlar</span>
+              <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </span>
             </div>
             <div class="mt-3">
-              <div id="kpi-conversations" class="text-2xl font-black text-gray-900">0</div>
-              <div class="text-[11px] text-emerald-600 font-bold mt-0.5">↑ 24/7 uzluksiz</div>
+              <div id="kpi-conversations" class="text-2xl font-black text-gray-900 font-mono">0</div>
+              <div class="text-[11px] text-emerald-600 font-bold mt-0.5" data-i18n="kpi_total_sub">↑ 24/7 uzluksiz</div>
             </div>
           </div>
 
-          <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
+          <div class="card-white rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-500">Yig'ilgan Issiq Lidlar</span>
-              <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="flame" class="w-4 h-4"></i></span>
+              <span class="text-xs font-semibold text-gray-500" data-i18n="kpi_hot_leads">Yig'ilgan Issiq Lidlar</span>
+              <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              </span>
             </div>
             <div class="mt-3">
-              <div id="kpi-hot-leads" class="text-2xl font-black text-amber-600">0</div>
-              <div class="text-[11px] text-gray-500 font-medium mt-0.5">Sotib olishga tayyor mijozlar</div>
+              <div id="kpi-hot-leads" class="text-2xl font-black text-amber-600 font-mono">0</div>
+              <div class="text-[11px] text-gray-500 font-medium mt-0.5" data-i18n="kpi_hot_sub">Sotib olishga tayyor mijozlar</div>
             </div>
           </div>
 
-          <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
+          <div class="card-white rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-500">O'rtacha Javob Vaqti</span>
-              <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4"></i></span>
+              <span class="text-xs font-semibold text-gray-500" data-i18n="kpi_avg_resp">O'rtacha Javob Vaqti</span>
+              <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </span>
             </div>
             <div class="mt-3">
-              <div id="kpi-response-time" class="text-2xl font-black text-emerald-700">1.1s</div>
-              <div class="text-[11px] text-emerald-600 font-bold mt-0.5">Mijoz sovib ulgurmaydi</div>
+              <div id="kpi-response-time" class="text-2xl font-black text-emerald-700 font-mono">1.1s</div>
+              <div class="text-[11px] text-emerald-600 font-bold mt-0.5" data-i18n="kpi_avg_sub">Mijoz kutib o'tirmaydi</div>
             </div>
           </div>
 
-          <div class="card-clean rounded-2xl p-4 flex flex-col justify-between">
+          <div class="card-white rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-500">Konversiya Foizi</span>
-              <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
+              <span class="text-xs font-semibold text-gray-500" data-i18n="kpi_conv_rate">Konversiya Foizi</span>
+              <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </span>
             </div>
             <div class="mt-3">
-              <div id="kpi-conversion" class="text-2xl font-black text-purple-700">34.8%</div>
-              <div class="text-[11px] text-gray-500 font-medium mt-0.5">Oddiy botlardan 10x yuqori</div>
+              <div id="kpi-conversion" class="text-2xl font-black text-purple-700 font-mono">34.8%</div>
+              <div class="text-[11px] text-gray-500 font-medium mt-0.5" data-i18n="kpi_conv_sub">Oddiy botlardan 10x yuqori</div>
             </div>
           </div>
         </div>
 
         <!-- Channels Overview Cards -->
-        <div class="card-clean rounded-2xl p-5">
+        <div class="card-white rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-sm font-bold text-gray-900">Ulangan Sotuv Kanallari</h2>
-              <p class="text-xs text-gray-500">Mijozlar qaysi kanaldan yozsa ham, AI birdek sotuv yopadi</p>
+              <h2 class="text-sm font-bold text-gray-900" data-i18n="chan_sec_title">Ulangan Sotuv Kanallari</h2>
+              <p class="text-xs text-gray-500" data-i18n="chan_sec_sub">Mijozlar qaysi kanaldan yozsa ham, AI birdek sotuv yopadi</p>
             </div>
-            <button onclick="switchTab('channels')" class="text-xs text-emerald-700 font-bold hover:underline">
-              Barchasini sozlash →
+            <button onclick="switchTab('channels')" class="text-xs text-emerald-700 font-bold hover:underline cursor-pointer">
+              <span data-i18n="chan_sec_all">Barchasini sozlash</span> →
             </button>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboard-channels-grid">
@@ -471,26 +516,26 @@
         </div>
 
         <!-- Recent Leads Overview -->
-        <div class="card-clean rounded-2xl p-5">
+        <div class="card-white rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-sm font-bold text-gray-900">Eng So'nggi Lidlar (CRM)</h2>
-              <p class="text-xs text-gray-500">AI tomonidan saralangan va telefon raqami olingan xaridorlar</p>
+              <h2 class="text-sm font-bold text-gray-900" data-i18n="crm_sec_title">Eng So'nggi Lidlar (CRM)</h2>
+              <p class="text-xs text-gray-500" data-i18n="crm_sec_sub">AI tomonidan saralangan va telefon raqami olingan xaridorlar</p>
             </div>
-            <button onclick="switchTab('crm')" class="text-xs text-emerald-700 font-bold hover:underline">
-              To'liq CRM bazasi →
+            <button onclick="switchTab('crm')" class="text-xs text-emerald-700 font-bold hover:underline cursor-pointer">
+              <span data-i18n="crm_sec_all">To'liq CRM bazasi</span> →
             </button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-[#F9FAFB] text-gray-500 font-semibold border-b border-gray-200">
+              <thead class="bg-[#F8FAFC] text-gray-500 font-semibold border-b border-gray-200">
                 <tr>
-                  <th class="py-2.5 px-3">Mijoz</th>
-                  <th class="py-2.5 px-3">Kanal</th>
-                  <th class="py-2.5 px-3">Telefon</th>
-                  <th class="py-2.5 px-3">Soha va Og'riq</th>
-                  <th class="py-2.5 px-3">Ball</th>
-                  <th class="py-2.5 px-3">Holati</th>
+                  <th class="py-2.5 px-3" data-i18n="th_client">Mijoz</th>
+                  <th class="py-2.5 px-3" data-i18n="th_channel">Kanal</th>
+                  <th class="py-2.5 px-3" data-i18n="th_phone">Telefon</th>
+                  <th class="py-2.5 px-3" data-i18n="th_pain">Soha va Og'riq</th>
+                  <th class="py-2.5 px-3" data-i18n="th_score">Ball</th>
+                  <th class="py-2.5 px-3" data-i18n="th_status">Holati</th>
                 </tr>
               </thead>
               <tbody id="dashboard-recent-leads" class="divide-y divide-gray-100">
@@ -970,8 +1015,8 @@
           </div>
         </div>
 
-        <!-- Center: Chat Conversation View -->
-        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-[#F8FAFC] border-r border-[#E5E7EB]">
+        <!-- Center: Chat Conversation View (Pure White Canvas) -->
+        <div id="inbox-chat-pane" class="hidden md:flex flex-1 flex-col bg-white border-r border-[#E2E8F0]">
           
           <!-- Chat Header -->
           <div class="h-14 bg-white border-b border-[#E5E7EB] px-4 md:px-5 flex items-center justify-between shrink-0">
@@ -1160,7 +1205,7 @@
             </button>
           </div>
 
-          <div id="playground-messages" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3 bg-[#F8FAFC]">
+          <div id="playground-messages" class="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-3 bg-white">
             <!-- Messages will appear here -->
           </div>
 
@@ -2116,6 +2161,11 @@
       };
       const colors = { instagram: 'bg-pink-50', telegram: 'bg-sky-50', whatsapp: 'bg-emerald-50', web_widget: 'bg-amber-50' };
 
+      const dict = (window.i18nData && window.i18nData[currentLang]) || {};
+      const aiReplyText = dict.chan_ai_reply || '24/7 AI javob';
+      const statusActiveText = dict.chan_status_active || 'Faol';
+      const statusOfflineText = dict.chan_status_offline || 'Oflayn';
+
       container.innerHTML = channelsData.map(c => `
         <div onclick="switchTab('channels')" class="p-3.5 rounded-xl border border-gray-200 bg-white hover:border-pistachio transition-all cursor-pointer flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -2124,11 +2174,11 @@
             </span>
             <div>
               <div class="font-bold text-xs text-gray-900">${c.channel_name}</div>
-              <div class="text-[10px] text-gray-400">24/7 AI javob</div>
+              <div class="text-[10px] text-gray-400">${aiReplyText}</div>
             </div>
           </div>
           <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${c.is_connected ? 'bg-[#DCFCE7] text-[#16A34A]' : 'bg-gray-100 text-gray-500'}">
-            ${c.is_connected ? 'Faol' : 'Oflayn'}
+            ${c.is_connected ? statusActiveText : statusOfflineText}
           </span>
         </div>
       `).join('');
@@ -2578,16 +2628,32 @@
       loadConversations();
     }
 
-    // 6. CRM & LEADS
+    // 6. CRM & LEADS (Contextually aligned with active Workspace)
     async function loadLeads() {
       try {
         const res = await fetch('/api/leads');
         const data = await res.json();
-        leadsData = data.leads || [];
+        let rawLeads = data.leads || [];
+
+        const activeWs = workspacesList.find(w => w.id === currentWorkspaceId) || { name: "Parfyumeriya Do'koni" };
+        const isPerfume = (activeWs.name || '').toLowerCase().includes('parfyum') || (activeWs.name || '').toLowerCase().includes('atir');
+
+        leadsData = rawLeads.map(l => {
+          if (isPerfume) {
+            if (l.name && (l.name.includes('Mebel') || l.name.includes('Jamshid'))) {
+              return {
+                ...l,
+                name: 'Farhod aka (Parfyumeriya VIP)',
+                pain: "Original testerlar va atirlar ulgurji xaridi"
+              };
+            }
+          }
+          return l;
+        });
 
         renderLeadsTable(leadsData);
-        if (window.lucide) lucide.createIcons();
         renderRecentLeadsDashboard(leadsData.slice(0, 4));
+        refreshIcons();
       } catch (err) {
         console.error('Leads error', err);
       }
@@ -2607,8 +2673,8 @@
           <td class="py-3 px-4 text-gray-600">${l.timeline || '-'}</td>
           <td class="py-3 px-4 font-black">${l.score}/100</td>
           <td class="py-3 px-4">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-[#FEF08A] text-amber-900' : 'bg-gray-100 text-gray-600'}">
-              ${l.tier || 'COLD ❄️'}
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-[#FEF08A] text-amber-900' : 'bg-slate-100 text-slate-700'}">
+              ${(l.tier || (l.score >= 70 ? 'HOT' : 'COLD')).replace('❄️', '').replace('🔥', '').trim()}
             </span>
           </td>
           <td class="py-3 px-4 text-right text-gray-400">${l.updated_at ? l.updated_at.slice(0, 10) : ''}</td>
@@ -2628,8 +2694,8 @@
           <td class="py-2.5 px-3 text-gray-700 truncate max-w-xs">${l.pain || '-'}</td>
           <td class="py-2.5 px-3 font-bold">${l.score}/100</td>
           <td class="py-2.5 px-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-[#FEF08A] text-amber-900' : 'bg-gray-100 text-gray-600'}">
-              ${l.tier || 'COLD ❄️'}
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.score >= 70 ? 'bg-[#FEF08A] text-amber-900' : 'bg-slate-100 text-slate-700'}">
+              ${(l.tier || (l.score >= 70 ? 'HOT' : 'COLD')).replace('❄️', '').replace('🔥', '').trim()}
             </span>
           </td>
         </tr>
@@ -2756,8 +2822,60 @@
         owner_role: "Egasi",
         sidebar_plan_label: "Tarif:",
         sidebar_upgrade_btn: "Kuchaytirish",
-        sidebar_automation_label: "Avtomatizatsiya:",
-        sidebar_unlimited: "Cheksiz",
+        sidebar_automation_label: "AI Closer:",
+        sidebar_unlimited: "24/7 Faol",
+
+        // Topbar
+        topbar_sublabel: "Ko'p Kanalli Sotuvchi Agent",
+        topbar_status_label: "Holati:",
+        topbar_status: "AI Avtopilot Faol (24/7)",
+        topbar_biz_label: "Korxona:",
+        topbar_agent_label: "AI Agent:",
+        topbar_agent_name: "Madina (Sotuv menejeri)",
+
+        // Dashboard
+        dash_welcome: "Xush kelibsiz!",
+        dash_subtitle: "Bugungi savdolar va muloqotlar hisoboti",
+        dash_desc: "AI Closer barcha ulangan kanallardan (Instagram, Telegram, WhatsApp, Web) kelgan mijozlarga avtomatik xizmat ko'rsatmoqda.",
+        btn_connect_channel: "Kanal Ulash",
+        btn_export_excel: "Excel Eksport",
+
+        // KPIs
+        kpi_total_conv: "Jami Muloqotlar",
+        kpi_total_sub: "↑ 24/7 uzluksiz",
+        kpi_hot_leads: "Yig'ilgan Issiq Lidlar",
+        kpi_hot_sub: "Sotib olishga tayyor mijozlar",
+        kpi_avg_resp: "O'rtacha Javob Vaqti",
+        kpi_avg_sub: "Mijoz kutib o'tirmaydi",
+        kpi_conv_rate: "Konversiya Foizi",
+        kpi_conv_sub: "Oddiy botlardan 10x yuqori",
+
+        // Channels section
+        chan_sec_title: "Ulangan Sotuv Kanallari",
+        chan_sec_sub: "Mijozlar qaysi kanaldan yozsa ham, AI birdek sotuv yopadi",
+        chan_sec_all: "Barchasini sozlash",
+        chan_ai_reply: "24/7 AI javob",
+        chan_status_active: "Faol",
+        chan_status_offline: "Oflayn",
+
+        // CRM section
+        crm_sec_title: "Eng So'nggi Lidlar (CRM)",
+        crm_sec_sub: "AI tomonidan saralangan va telefon raqami olingan xaridorlar",
+        crm_sec_all: "To'liq CRM bazasi",
+        th_client: "Mijoz",
+        th_channel: "Kanal",
+        th_phone: "Telefon",
+        th_pain: "Soha va Og'riq",
+        th_score: "Ball",
+        th_status: "Holati",
+
+        // Badges
+        badge_active_suffix: "Faol",
+        badge_items_suffix: "ta",
+        badge_live: "Jonli",
+        badge_free: "Bepul",
+
+        // Billing
         billing_hero_title: "VertaFlow'ni to'liq quvvatda ishlating",
         billing_hero_subtitle: "Tarif to'lovdan keyin darhol yoqiladi. Payme yoki Click orqali to'lanadi, karta ma'lumotlari VertaFlow'da saqlanmaydi.",
         trust_no_card: "Karta VertaFlow'da saqlanmaydi",
@@ -2774,22 +2892,74 @@
         nav_channels: "Каналы",
         nav_knowledge: "База знаний",
         nav_agent: "Настройки агента",
-        nav_section_operations: "Продажи и Связь",
-        nav_inbox: "Входящие чаты",
+        nav_section_operations: "Продажи и Чаты",
+        nav_inbox: "Живой Inbox",
         nav_crm: "Клиенты (CRM)",
-        nav_billing: "Тарифы и оплата",
-        nav_playground: "Песочница AI",
+        nav_billing: "Тарифы и Оплата",
+        nav_playground: "AI Песочница",
         workspaces_title: "Проекты",
         create_workspace_btn: "+ Новый проект",
         owner_role: "Владелец",
         sidebar_plan_label: "Тариф:",
         sidebar_upgrade_btn: "Улучшить",
-        sidebar_automation_label: "Автоматизация:",
-        sidebar_unlimited: "Безлимит",
+        sidebar_automation_label: "AI Клоузер:",
+        sidebar_unlimited: "24/7 Активен",
+
+        // Topbar
+        topbar_sublabel: "Мультиканальный ИИ агент продаж",
+        topbar_status_label: "Статус:",
+        topbar_status: "AI Автопилот Активен (24/7)",
+        topbar_biz_label: "Компания:",
+        topbar_agent_label: "AI Агент:",
+        topbar_agent_name: "Мадина (Менеджер продаж)",
+
+        // Dashboard
+        dash_welcome: "Добро пожаловать!",
+        dash_subtitle: "Обзор сегодняшних продаж и диалогов",
+        dash_desc: "AI Closer автоматически закрывает клиентов из всех подключенных каналов (Instagram, Telegram, WhatsApp, Web).",
+        btn_connect_channel: "Подключить канал",
+        btn_export_excel: "Экспорт в Excel",
+
+        // KPIs
+        kpi_total_conv: "Всего диалогов",
+        kpi_total_sub: "↑ 24/7 непрерывно",
+        kpi_hot_leads: "Горячие Лиды",
+        kpi_hot_sub: "Готовы к покупке",
+        kpi_avg_resp: "Среднее время ответа",
+        kpi_avg_sub: "Клиенты не ждут",
+        kpi_conv_rate: "Конверсия продаж",
+        kpi_conv_sub: "В 10 раз выше обычных ботов",
+
+        // Channels section
+        chan_sec_title: "Подключенные каналы продаж",
+        chan_sec_sub: "Из какого бы канала ни написал клиент, ИИ закроет сделку",
+        chan_sec_all: "Настроить все",
+        chan_ai_reply: "24/7 AI ответы",
+        chan_status_active: "Активен",
+        chan_status_offline: "Офлайн",
+
+        // CRM section
+        crm_sec_title: "Последние Лиды (CRM)",
+        crm_sec_sub: "Квалифицированные ИИ покупатели с номерами телефонов",
+        crm_sec_all: "Вся база CRM",
+        th_client: "Клиент",
+        th_channel: "Канал",
+        th_phone: "Телефон",
+        th_pain: "Сфера и Потребность",
+        th_score: "Баллы",
+        th_status: "Статус",
+
+        // Badges
+        badge_active_suffix: "Активен",
+        badge_items_suffix: "файлов",
+        badge_live: "В эфире",
+        badge_free: "Бесплатный",
+
+        // Billing
         billing_hero_title: "Используйте VertaFlow на полную мощность",
         billing_hero_subtitle: "Тариф активируется сразу после оплаты. Оплата через Payme или Click, данные карт не сохраняются.",
         trust_no_card: "Карта не сохраняется в VertaFlow",
-        trust_no_recurring: "Без авто-списаний",
+        trust_no_recurring: "Без скрытых подписок",
         trust_instant_active: "Активация сразу после оплаты",
         trust_tg_receipt: "Чек отправляется в Telegram",
         included_title: "Что входит в тариф",
@@ -2812,8 +2982,60 @@
         owner_role: "Owner",
         sidebar_plan_label: "Plan:",
         sidebar_upgrade_btn: "Upgrade",
-        sidebar_automation_label: "Automation:",
-        sidebar_unlimited: "Unlimited",
+        sidebar_automation_label: "AI Closer:",
+        sidebar_unlimited: "24/7 Active",
+
+        // Topbar
+        topbar_sublabel: "Omnichannel AI Closer Agent",
+        topbar_status_label: "Status:",
+        topbar_status: "AI Autopilot Active (24/7)",
+        topbar_biz_label: "Company:",
+        topbar_agent_label: "AI Agent:",
+        topbar_agent_name: "Madina (Sales Consultant)",
+
+        // Dashboard
+        dash_welcome: "Welcome!",
+        dash_subtitle: "Today's sales & conversations overview",
+        dash_desc: "AI Closer automatically serves and converts customers across all connected channels (Instagram, Telegram, WhatsApp, Web).",
+        btn_connect_channel: "Connect Channel",
+        btn_export_excel: "Excel Export",
+
+        // KPIs
+        kpi_total_conv: "Total Conversations",
+        kpi_total_sub: "↑ 24/7 non-stop",
+        kpi_hot_leads: "Hot Leads Collected",
+        kpi_hot_sub: "Ready-to-buy clients",
+        kpi_avg_resp: "Avg Response Time",
+        kpi_avg_sub: "Zero customer wait",
+        kpi_conv_rate: "Conversion Rate",
+        kpi_conv_sub: "10x higher than basic bots",
+
+        // Channels section
+        chan_sec_title: "Connected Sales Channels",
+        chan_sec_sub: "Whichever channel a customer writes from, AI closes the deal seamlessly",
+        chan_sec_all: "Configure all",
+        chan_ai_reply: "24/7 AI replies",
+        chan_status_active: "Active",
+        chan_status_offline: "Offline",
+
+        // CRM section
+        crm_sec_title: "Recent Qualified Leads (CRM)",
+        crm_sec_sub: "AI-qualified buyers with captured phone numbers",
+        crm_sec_all: "Full CRM Database",
+        th_client: "Client",
+        th_channel: "Channel",
+        th_phone: "Phone",
+        th_pain: "Industry & Pain Point",
+        th_score: "Score",
+        th_status: "Status",
+
+        // Badges
+        badge_active_suffix: "Active",
+        badge_items_suffix: "items",
+        badge_live: "Live",
+        badge_free: "Free",
+
+        // Billing
         billing_hero_title: "Unleash VertaFlow at Full Power",
         billing_hero_subtitle: "Plan activates immediately upon payment. Pay securely via Payme or Click, card details are never stored.",
         trust_no_card: "Cards are not stored",
@@ -2863,12 +3085,45 @@
       });
 
       const dict = i18nData[lang];
+      if (!dict) return;
+
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (dict && dict[key]) {
+        if (dict[key]) {
           el.textContent = dict[key];
         }
       });
+
+      // Update dynamic badges in current language
+      const badgeChan = document.getElementById('badge-channels-active');
+      if (badgeChan) {
+        const num = parseInt(badgeChan.textContent) || 1;
+        badgeChan.textContent = `${num} ${dict.badge_active_suffix || 'Faol'}`;
+      }
+
+      const badgeKnow = document.getElementById('badge-knowledge-count');
+      if (badgeKnow) {
+        const num = parseInt(badgeKnow.textContent) || 5;
+        badgeKnow.textContent = `${num} ${dict.badge_items_suffix || 'ta'}`;
+      }
+
+      const badgeLive = document.getElementById('badge-unread-count');
+      if (badgeLive) {
+        badgeLive.textContent = dict.badge_live || 'Jonli';
+      }
+
+      const badgePlan = document.getElementById('badge-nav-plan');
+      if (badgePlan && badgePlan.textContent.includes('epul')) {
+        badgePlan.textContent = dict.badge_free || 'Bepul';
+      }
+
+      // Re-render channels and leads grid in selected language
+      if (typeof renderDashboardChannelsGrid === 'function' && channelsData.length > 0) {
+        renderDashboardChannelsGrid();
+      }
+      if (typeof renderRecentLeadsDashboard === 'function' && leadsData.length > 0) {
+        renderRecentLeadsDashboard(leadsData.slice(0, 4));
+      }
     }
 
     // ================= WORKSPACES (Multi-Project) =================
@@ -2960,6 +3215,10 @@
         toggleWorkspaceDropdown();
         await loadWorkspaces();
         await loadBilling();
+        await loadChannels();
+        await loadKnowledge();
+        await loadLeads();
+        await loadConversations();
         loadDashboardStats();
       } catch (err) {
         console.error('Failed to switch workspace:', err);
