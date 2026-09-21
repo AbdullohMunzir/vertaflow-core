@@ -2262,12 +2262,13 @@
       try {
         const res = await fetch('/api/dashboard/stats');
         const data = await res.json();
-        document.getElementById('kpi-conversations').textContent = data.total_conversations || 0;
-        document.getElementById('kpi-hot-leads').textContent = data.hot_leads || 0;
-        document.getElementById('kpi-response-time').textContent = data.avg_response_time || '1.1s';
-        document.getElementById('kpi-conversion').textContent = data.conversion_rate || '34.8%';
-        document.getElementById('topbar-channels-count').textContent = data.active_channels || 1;
-        document.getElementById('badge-channels-active').textContent = `${data.active_channels || 1} Faol`;
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        setEl('kpi-conversations', data.total_conversations || 0);
+        setEl('kpi-hot-leads', data.hot_leads || 0);
+        setEl('kpi-response-time', data.avg_response_time || '1.1s');
+        setEl('kpi-conversion', data.conversion_rate || '34.8%');
+        setEl('topbar-channels-count', data.active_channels || 1);
+        setEl('badge-channels-active', `${data.active_channels || 1} Faol`);
       } catch (err) {
         console.error('Stats error', err);
       }
@@ -2292,23 +2293,24 @@
               badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600';
             }
           }
-          if (c.channel_id === 'instagram' && c.config.account_name) {
+          const cfg = c.config || {};
+          if (c.channel_id === 'instagram' && cfg.account_name) {
             const accEl = document.getElementById('chan-ig-acc');
-            if (accEl) accEl.textContent = c.config.account_name;
+            if (accEl) accEl.textContent = cfg.account_name;
           }
           if (c.channel_id === 'telegram') {
-            if (c.config.bot_username) {
+            if (cfg.bot_username) {
               const bEl = document.getElementById('chan-tg-botname');
-              if (bEl) bEl.textContent = c.config.bot_username;
+              if (bEl) bEl.textContent = cfg.bot_username;
             }
-            if (c.config.manager_chat_id) {
+            if (cfg.manager_chat_id) {
               const mEl = document.getElementById('chan-tg-manager');
-              if (mEl) mEl.textContent = c.config.manager_chat_id;
+              if (mEl) mEl.textContent = cfg.manager_chat_id;
             }
           }
-          if (c.channel_id === 'whatsapp' && c.config.phone_number) {
+          if (c.channel_id === 'whatsapp' && cfg.phone_number) {
             const pEl = document.getElementById('chan-wa-phone');
-            if (pEl) pEl.textContent = c.config.phone_number;
+            if (pEl) pEl.textContent = cfg.phone_number;
           }
         });
 

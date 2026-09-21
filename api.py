@@ -192,14 +192,16 @@ class TextKnowledge(BaseModel):
     category: Optional[str] = "Katalog va Narxlar"
 
 class PersonaUpdate(BaseModel):
-    name: str
+    name: Optional[str] = "Madina"
+    company_name: Optional[str] = ""
     role: Optional[str] = "Sotuv bo'yicha maslahatchi"
     avatar: Optional[str] = "👩‍💼"
     tone: Optional[str] = "friendly_closer"
     tone_label: Optional[str] = "Samimiy & Savdo yopuvchi"
-    greeting: Optional[str] = "Assalomu alaykum! Fabrikamizga xush kelibsiz. Qaysi mebel turi sizga ma'qul bo'lyapti?"
+    greeting: Optional[str] = "Assalomu alaykum! Qaysi mahsulotimiz sizga ma'qul bo'lyapti?"
     max_discount: Optional[str] = "10%"
     rules: Optional[Dict[str, bool]] = None
+    system_prompt: Optional[str] = None
 
 class ChannelConfigUpdate(BaseModel):
     is_connected: Optional[int] = None
@@ -845,6 +847,8 @@ def checkout_plan(req: BillingCheckout):
     return {
         "status": "success",
         "message": f"{req.plan_id.capitalize()} tarifi muvaffaqiyatli faollashtirildi!",
+        "total_amount": total,
+        "plan_id": req.plan_id,
         "billing": billing_data
     }
 
