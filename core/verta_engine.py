@@ -4,22 +4,38 @@ VertaFlow — Unified Master Core Engine
 Orchestrates:
 - VertaStage state machine (SPIN + Challenger)
 - VertaLeadState (Attribute tracking & Lead Scoring)
+- Hybrid LLM Generation (OpenAI / Groq / OpenRouter) with deterministic fallback
 - Uzbek Linguistic & Script Mirroring
 - Battlecard Landmine Injection
 """
 
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from verta_stages import VertaStage, VERTA_STAGES_CONFIG, determine_next_stage
 from verta_state import VertaLeadState
 from verta_uzbek_engine import detect_script, process_agent_output, to_cyrillic
-from verta_battlecards import BattlecardEngine
+from verta_battlecards import BattlecardEngine, Battlecard
+from verta_prompt import build_sales_closer_prompt
+from verta_llm import VertaLLMClient
 
 class VertaFlowEngine:
-    def __init__(self, session_id: str, channel: str = "telegram"):
+    def __init__(
+        self,
+        session_id: str,
+        channel: str = "telegram",
+        business_profile: Optional[Dict[str, Any]] = None,
+        llm_client: Optional[VertaLLMClient] = None
+    ):
         self.state = VertaLeadState(session_id=session_id, channel=channel)
         self.battlecards = BattlecardEngine()
+        self.business_profile = business_profile or {
+            "business_name": "Mebel Fabrikasi",
+            "business_desc": "Oshxona va uy mebellari ishlab chiqarish",
+            "avg_check": "5 000 000 so'm",
+            "faq_list": []
+        }
+        self.llm_client = llm_client or VertaLLMClient()
 
     def process_message(self, user_message: str) -> Dict[str, Any]:
         """
@@ -57,8 +73,24 @@ class VertaFlowEngine:
         self.state.current_stage = next_stage
         self.state.questions_asked += 1
 
-        # 6. Response Construction based on Stage
-        response_text = self._generate_stage_response(next_stage, battlecard, raw_msg)
+        # 6. Response Construction: Try LLM First, Fallback to Rules
+        response_text = None
+        if self.llm_client:
+            prompt = build_sales_closer_prompt(
+                business_profile=self.business_profile,
+                stage_name=next_stage.value,
+                collected_attributes=self.state.collected_attributes,
+                detected_script=detected_script,
+                battlecard=battlecard
+            )
+            response_text = self.llm_client.generate_response(
+                system_prompt=prompt,
+                user_message=raw_msg,
+                recent_history=self.state.history
+            )
+
+        if not response_text:
+            response_text = self._generate_stage_response(next_stage, battlecard, raw_msg)
 
         # 7. Post-Processing: Uzbek Calque Filter, Brevity Guard, Script Mirroring
         final_text = process_agent_output(response_text, target_script=detected_script)
@@ -66,7 +98,7 @@ class VertaFlowEngine:
 
         # 8. Check Lead Status & Dossier
         dossier = None
-        if self.state.is_lead_ready() or self.state.lead_score >= 80:
+        if self.state.is_lead_ready() or self.state.lead_score >= 70:
             dossier = self.state.generate_lead_dossier()
 
         return {
@@ -104,14 +136,16 @@ class VertaFlowEngine:
                 self.state.update_attribute("timeline", msg, 15, "Xarid qilish muddati aniq")
 
     def _generate_stage_response(self, stage: VertaStage, battlecard: Optional[Any], user_msg: str) -> str:
-        """Stage-specific tailored message generation."""
+        """Stage-specific tailored message generation (Deterministic Fallback)."""
         if battlecard:
             return self.battlecards.generate_counter_response(battlecard)
 
+        biz_name = self.business_profile.get("business_name", "Korxonamiz")
+
         if stage == VertaStage.INTRO or stage == VertaStage.SITUATION:
             return (
-                "Assalomu alaykum! Tizimimiz 1.5 mln so'mdan boshlanadi.\n"
-                "Sizga eng ma'qulini hisoblashimiz uchun: hozir kuniga nechta buyurtma qabul qilyapsiz?"
+                f"Assalomu alaykum! {biz_name} xizmatlari 1.5 mln so'mdan boshlanadi.\n"
+                f"Sizga eng ma'qulini hisoblashimiz uchun: hozir kuniga nechta buyurtma qabul qilyapsiz?"
             )
         elif stage == VertaStage.PROBLEM:
             return (

@@ -1,26 +1,34 @@
 # /home/kinfolkt/verta-platform/api.py
 """
-VertaFlow — Central FastAPI Server & Omnichannel Hub
-Exposes conversational sales engine, live lead scoring, onboarding,
-self-improving evaluator, battlecard repository, and web UI.
+VertaFlow — Central Production-Grade FastAPI Server & Hub
+Fully backed by SQLite database (db.py).
+Provides REST endpoints for Chat, CRM, Real-time Inbox, Human Takeover,
+AI Settings, Telegram Bot Lifecycle, Battlecards, and Self-Improving Evaluator.
 """
 
 import sys
 import os
+import asyncio
 from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+import aiohttp
 
 # Add core engine to path
+sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "core"))
+
+import db
 from verta_engine import VertaFlowEngine
+from verta_llm import VertaLLMClient
 from verta_battlecards import Battlecard, BattlecardEngine
 from verta_evaluator import VertaEvaluator
+from telegram_bot import bot_instance
 
-app = FastAPI(title="VertaFlow AI Platform API", version="1.1.0")
+app = FastAPI(title="VertaFlow AI Platform API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,73 +38,57 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Shared Battlecard Engine instance
-global_battlecards = BattlecardEngine()
+# In-memory runtime cache for engine states
+engine_cache: Dict[str, VertaFlowEngine] = {}
 
-# Telegram Configuration state
-telegram_config = {
-    "token": os.getenv("TELEGRAM_BOT_TOKEN", ""),
-    "manager_chat_id": os.getenv("SALES_MANAGER_CHAT_ID", ""),
-    "is_connected": bool(os.getenv("TELEGRAM_BOT_TOKEN")),
-    "channel": "Telegram Bot"
-}
+def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> VertaFlowEngine:
+    if session_id not in engine_cache:
+        biz_profile = db.get_business_profile()
+        api_key = db.get_setting("llm_api_key")
+        provider = db.get_setting("llm_provider", "openai")
+        model = db.get_setting("llm_model")
+        llm_client = VertaLLMClient(api_key=api_key, provider=provider, model=model)
 
-# Global Business Onboarding Profile
-business_profile = {
-    "business_name": "Mebel Fabrikasi",
-    "business_desc": "Oshxona va uy mebellari ishlab chiqarish",
-    "avg_check": "5 000 000 so'm",
-    "faq_list": [
-        {"question": "Narxi qancha?", "answer": "Metri 2.5 mln dan boshlanadi, o'lchamga qarab hisoblanadi."},
-        {"question": "Yetkazib berasizmi?", "answer": "Ha, butun Toshkent bo'ylab bepul yetkazib o'rnatamiz."},
-        {"question": "Kafolat bormi?", "answer": "5 yil rasmiy kafolat beramiz."}
-    ]
-}
+        engine = VertaFlowEngine(
+            session_id=session_id,
+            channel=channel,
+            business_profile=biz_profile,
+            llm_client=llm_client
+        )
 
-# In-memory session store: session_id -> VertaFlowEngine
-sessions: Dict[str, VertaFlowEngine] = {}
+        # Sync battlecards from database
+        db_cards = db.get_battlecards()
+        cards_list = []
+        for c in db_cards:
+            cards_list.append(Battlecard(
+                name=c["name"],
+                keywords=c["keywords"],
+                their_strength=c.get("strength") or "Past narx",
+                their_weakness=c["weakness"],
+                reframe_talk_track=c["reframe"],
+                landmine_question=c["landmine"]
+            ))
+        if cards_list:
+            engine.battlecards = BattlecardEngine(cards_list)
 
-def seed_sample_sessions():
-    """Seeds realistic lead sessions for immediate dashboard visibility."""
-    # 1. Hot lead (Kirill)
-    s1 = VertaFlowEngine("sess_jamshid", channel="telegram")
-    s1.process_message("Салом, мебел фабрикамиз учун нархи қанча?")
-    s1.process_message("Кунига 30-40 та буюртма тушади, лекин сотувчиларимиз улгурмай мижозларни совитиб қўйяпти.")
-    s1.process_message("Шу ҳафта ўрнатмоқчимиз. Мана рақамим +998901234567")
-    sessions["sess_jamshid"] = s1
+        engine_cache[session_id] = engine
 
-    # 2. Warm lead (Lotin)
-    s2 = VertaFlowEngine("sess_anvar", channel="instagram")
-    s2.process_message("Salom, o'quv markazimiz uchun bot kerak edi.")
-    s2.process_message("Kuniga 15 ta o'quvchi yozadi, lekin ko'pi narxni bilib yo'qolib qoladi.")
-    sessions["sess_anvar"] = s2
+    # Always ensure business profile is up-to-date
+    engine_cache[session_id].business_profile = db.get_business_profile()
+    return engine_cache[session_id]
 
-    # 3. Hot lead 2 (Lotin)
-    s3 = VertaFlowEngine("sess_farhod", channel="web_widget")
-    s3.process_message("Assalomu alaykum, ulgurji savdo do'konimizga tizim joriy qilmoqchimiz.")
-    s3.process_message("Hozir 5 ta operatorimiz bor, mijozlarga kech javob berib ulgurmayapti.")
-    s3.process_message("Tezroq joriy qilish kerak, telefonim 998977654321")
-    sessions["sess_farhod"] = s3
-
-    # 4. Cold lead
-    s4 = VertaFlowEngine("sess_nigora", channel="telegram")
-    s4.process_message("Salom, qimmat emasmi?")
-    sessions["sess_nigora"] = s4
-
-seed_sample_sessions()
-
-def get_or_create_engine(session_id: str) -> VertaFlowEngine:
-    if session_id not in sessions:
-        engine = VertaFlowEngine(session_id=session_id)
-        # Link shared battlecards
-        engine.battlecards = global_battlecards
-        sessions[session_id] = engine
-    return sessions[session_id]
-
-# Request models
+# Request Models
 class ChatMessage(BaseModel):
     session_id: str
     message: str
+    channel: Optional[str] = "web_simulator"
+    user_name: Optional[str] = "Mijoz"
+
+class OperatorReply(BaseModel):
+    text: str
+
+class ToggleAutopilot(BaseModel):
+    enabled: bool
 
 class OnboardingData(BaseModel):
     business_name: str
@@ -110,165 +102,280 @@ class BattlecardItem(BaseModel):
     their_weakness: str
     reframe_talk_track: str
     landmine_question: str
+    their_strength: Optional[str] = "Past narx"
+
+class SettingsData(BaseModel):
+    telegram_bot_token: Optional[str] = None
+    sales_manager_chat_id: Optional[str] = None
+    llm_provider: Optional[str] = None
+    llm_api_key: Optional[str] = None
+    llm_model: Optional[str] = None
 
 class RecommendationApply(BaseModel):
     id: str
 
-class TelegramConfigData(BaseModel):
-    token: str
-    manager_chat_id: Optional[str] = ""
+# ----------------- CHAT & CONVERSATIONS API -----------------
 
-# Endpoints
 @app.post("/api/chat")
 def process_chat(msg: ChatMessage):
-    if not msg.message.strip():
+    """Processes incoming chat from web simulator or widget, persists to DB, and returns AI Closer response."""
+    text = msg.message.strip()
+    if not text:
         raise HTTPException(status_code=400, detail="Xabar bo'sh bo'lishi mumkin emas")
-    
-    engine = get_or_create_engine(msg.session_id)
-    response = engine.process_message(msg.message)
+
+    session_id = msg.session_id
+    channel = msg.channel or "web_simulator"
+
+    # 1. Ensure conversation exists in DB
+    conv = db.get_conversation(session_id)
+    if not conv:
+        db.create_or_update_conversation(session_id, name=msg.user_name or "Mijoz", channel=channel)
+        conv = db.get_conversation(session_id)
+
+    # 2. Record user message to DB
+    db.add_message(session_id, sender="user", text=text)
+
+    # 3. Check if operator paused autopilot
+    if conv and conv.get("autopilot_enabled") == 0:
+        return {
+            "reply": "Operator qabul qildi. Hozirda inson-operator sizga javob yozmoqda.",
+            "stage": "HANDOFF_HUMAN",
+            "lead_score": 50,
+            "lead_tier": "WARM ⚡",
+            "autopilot_paused": True
+        }
+
+    # 4. Process via Master Sales Engine
+    engine = get_or_create_engine(session_id, channel=channel)
+    response = engine.process_message(text)
+
+    # 5. Record agent reply to DB
+    db.add_message(session_id, sender="agent", text=response["reply"], stage=response["stage"], script=response["script"])
+
+    # 6. Save qualified lead state
+    db.save_lead(
+        session_id=session_id,
+        name=conv["name"] if conv else "Mijoz",
+        channel=channel,
+        phone=engine.state.collected_attributes.get("phone"),
+        pain=engine.state.collected_attributes.get("identified_pain"),
+        volume=engine.state.collected_attributes.get("volume_or_size"),
+        timeline=engine.state.collected_attributes.get("timeline"),
+        score=response["lead_score"],
+        tier=response["lead_tier"],
+        stage=response["stage"],
+        script=response["script"],
+        score_reasons=response["score_reasons"],
+        dossier=response.get("dossier")
+    )
+
     return response
 
-@app.get("/api/session/{session_id}")
-def get_session_state(session_id: str):
-    if session_id not in sessions:
+@app.get("/api/conversations")
+def get_conversations():
+    """Returns dynamic inbox list with latest messages and statuses."""
+    conversations = db.list_conversations()
+    return {"conversations": conversations, "total": len(conversations)}
+
+@app.get("/api/conversations/{session_id}/messages")
+def get_conversation_messages(session_id: str):
+    """Returns full chronological chat messages for a session."""
+    conv = db.get_conversation(session_id)
+    if not conv:
         raise HTTPException(status_code=404, detail="Sessiya topilmadi")
-    engine = sessions[session_id]
-    return {
-        "state": engine.state.to_dict(),
-        "history": engine.state.history,
-        "dossier": engine.state.generate_lead_dossier() if engine.state.lead_score >= 50 else None
-    }
+    messages = db.get_messages(session_id)
+    return {"conversation": conv, "messages": messages}
+
+@app.post("/api/conversations/{session_id}/operator_reply")
+async def send_operator_reply(session_id: str, reply: OperatorReply):
+    """Allows human operator to send reply directly, pausing AI autopilot."""
+    conv = db.get_conversation(session_id)
+    if not conv:
+        raise HTTPException(status_code=404, detail="Sessiya topilmadi")
+
+    # Disable autopilot so AI doesn't interfere
+    db.toggle_conversation_autopilot(session_id, False)
+
+    # Save operator message to DB
+    db.add_message(session_id, sender="operator", text=reply.text)
+
+    # If it's a Telegram chat, forward message to real user!
+    if conv["channel"] == "telegram" and session_id.startswith("tg_"):
+        chat_id = int(session_id.replace("tg_", ""))
+        async with aiohttp.ClientSession() as http_sess:
+            await bot_instance.send_message(http_sess, chat_id, f"👨‍💼 <b>Operator:</b> {reply.text}")
+
+    return {"status": "success", "message": "Xabar yuborildi va AI avtopilot to'xtatildi."}
+
+@app.post("/api/conversations/{session_id}/toggle_autopilot")
+def toggle_autopilot(session_id: str, data: ToggleAutopilot):
+    """Toggles AI autopilot on or off for a specific conversation."""
+    db.toggle_conversation_autopilot(session_id, data.enabled)
+    return {"status": "success", "autopilot_enabled": data.enabled}
+
+# ----------------- LEADS & CRM API -----------------
 
 @app.get("/api/leads")
 def list_leads():
-    leads = []
-    for sid, engine in sessions.items():
-        state = engine.state
-        name_hint = "Mijoz"
-        if "jamshid" in sid:
-            name_hint = "Jamshid aka"
-        elif "anvar" in sid:
-            name_hint = "Anvar Rasulov"
-        elif "farhod" in sid:
-            name_hint = "Farhod Aliyev"
-        elif "nigora" in sid:
-            name_hint = "Nigora Karimova"
-        else:
-            name_hint = f"Mijoz ({sid[-4:]})"
-
-        leads.append({
-            "session_id": sid,
-            "name": name_hint,
-            "channel": state.channel,
-            "tier": state.lead_tier,
-            "score": state.lead_score,
-            "stage": state.current_stage.value,
-            "script": state.script_preference,
-            "phone": state.collected_attributes.get("phone"),
-            "pain": state.collected_attributes.get("identified_pain"),
-            "volume": state.collected_attributes.get("volume_or_size"),
-            "timeline": state.collected_attributes.get("timeline"),
-            "score_reasons": state.score_reasons,
-            "dossier": state.generate_lead_dossier() if state.lead_score >= 50 else None
-        })
-    leads.sort(key=lambda x: x["score"], reverse=True)
+    leads = db.get_leads()
     return {"leads": leads, "total_leads": len(leads)}
+
+# ----------------- BATTLECARDS API -----------------
 
 @app.get("/api/battlecards")
 def get_battlecards():
-    cards = []
-    for bc in global_battlecards.battlecards:
-        cards.append({
-            "name": bc.name,
-            "keywords": bc.keywords,
-            "weakness": bc.their_weakness,
-            "reframe": bc.reframe_talk_track,
-            "landmine": bc.landmine_question
-        })
+    cards = db.get_battlecards()
     return {"battlecards": cards}
 
 @app.post("/api/battlecards/add")
 def add_battlecard(item: BattlecardItem):
-    card = Battlecard(
+    db.add_battlecard(
         name=item.name,
         keywords=item.keywords,
-        their_weakness=item.their_weakness,
-        reframe_talk_track=item.reframe_talk_track,
-        landmine_question=item.landmine_question
+        weakness=item.their_weakness,
+        reframe=item.reframe_talk_track,
+        landmine=item.landmine_question,
+        strength=item.their_strength or "Past narx"
     )
-    global_battlecards.battlecards.append(card)
-    return {"status": "success", "message": f"'{item.name}' battlecardi muvaffaqiyatli qo'shildi!"}
+    # Clear engine cache so new battlecards reload
+    engine_cache.clear()
+    return {"status": "success", "message": f"'{item.name}' battlecardi saqlandi!"}
+
+# ----------------- ONBOARDING & BUSINESS PROFILE -----------------
+
+@app.get("/api/onboarding")
+def get_onboarding():
+    return db.get_business_profile()
+
+@app.post("/api/onboarding")
+def save_onboarding(data: OnboardingData):
+    db.update_business_profile(
+        name=data.business_name,
+        desc=data.business_desc,
+        avg_check=data.avg_check or "",
+        faq_list=data.faq_list
+    )
+    # Clear cache so engines reload the new business profile
+    engine_cache.clear()
+    return {"status": "success", "profile": db.get_business_profile()}
+
+# ----------------- EVALUATOR & NIGHTLY AUDIT -----------------
 
 @app.get("/api/evaluator/insights")
 def get_evaluator_insights():
-    evaluator = VertaEvaluator(sessions)
+    # Pass all active engine instances or leads
+    leads = db.get_leads()
+    mock_sessions = {}
+    for l in leads:
+        sid = l["session_id"]
+        eng = get_or_create_engine(sid, channel=l["channel"])
+        mock_sessions[sid] = eng
+
+    evaluator = VertaEvaluator(mock_sessions)
     report = evaluator.generate_audit_report()
     return report
 
 @app.post("/api/evaluator/apply")
 def apply_evaluator_recommendation(req: RecommendationApply):
-    evaluator = VertaEvaluator(sessions)
+    evaluator = VertaEvaluator({})
     report = evaluator.generate_audit_report()
     recs = report.get("recommendations", [])
     
-    target = None
-    for r in recs:
-        if r["id"] == req.id:
-            target = r
-            break
-            
+    target = next((r for r in recs if r["id"] == req.id), None)
     if not target:
         raise HTTPException(status_code=404, detail="Tavsiya topilmadi")
 
-    # Execute recommendation action
     if target["action_type"] == "add_battlecard":
         payload = target["action_payload"]
-        bc = Battlecard(
+        db.add_battlecard(
             name=payload["competitor_name"],
             keywords=payload["keywords"],
-            their_weakness=payload["weakness"],
-            reframe_talk_track=payload["reframe"],
-            landmine_question=payload["landmine"]
+            weakness=payload["weakness"],
+            reframe=payload["reframe"],
+            landmine=payload["landmine"],
+            strength="Past narx"
         )
-        global_battlecards.battlecards.append(bc)
+        engine_cache.clear()
         return {"status": "applied", "message": f"'{payload['competitor_name']}' battlecardi qo'shildi!"}
     
     elif target["action_type"] == "add_faq":
         payload = target["action_payload"]
-        business_profile["faq_list"].append(payload)
-        return {"status": "applied", "message": f"Yangi FAQ bilimi muvaffaqiyatli qo'shildi!"}
+        biz = db.get_business_profile()
+        faqs = biz.get("faq_list", [])
+        faqs.append(payload)
+        db.update_business_profile(biz["business_name"], biz["business_desc"], biz["avg_check"], faqs)
+        engine_cache.clear()
+        return {"status": "applied", "message": "Yangi FAQ bilimi saqlandi!"}
 
-    return {"status": "applied", "message": "Tavsiya amaliyotga tatbiq etildi!"}
+    return {"status": "applied", "message": "Tavsiya tatbiq etildi!"}
 
-@app.get("/api/telegram/status")
-def get_telegram_status():
-    return telegram_config
+# ----------------- SETTINGS & TELEGRAM LIFECYCLE -----------------
 
-@app.post("/api/telegram/config")
-def update_telegram_config(cfg: TelegramConfigData):
-    global telegram_config
-    telegram_config["token"] = cfg.token
-    if cfg.manager_chat_id:
-        telegram_config["manager_chat_id"] = cfg.manager_chat_id
-    telegram_config["is_connected"] = bool(cfg.token.strip())
-    return {"status": "updated", "config": telegram_config}
+telegram_task: Optional[asyncio.Task] = None
 
-@app.post("/api/onboarding")
-def save_onboarding(data: OnboardingData):
-    global business_profile
-    business_profile["business_name"] = data.business_name
-    business_profile["business_desc"] = data.business_desc
-    if data.avg_check:
-        business_profile["avg_check"] = data.avg_check
-    if data.faq_list:
-        business_profile["faq_list"] = data.faq_list
-    return {"status": "success", "profile": business_profile}
+@app.get("/api/settings")
+def get_settings():
+    all_s = db.get_all_settings()
+    token = all_s.get("telegram_bot_token", "")
+    masked_token = f"{token[:6]}...{token[-4:]}" if len(token) > 10 else ("Bor" if token else "")
+    
+    api_key = all_s.get("llm_api_key", "")
+    masked_key = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else ("Bor" if api_key else "")
 
-@app.get("/api/onboarding")
-def get_onboarding():
-    return business_profile
+    return {
+        "telegram_bot_token_masked": masked_token,
+        "sales_manager_chat_id": all_s.get("sales_manager_chat_id", ""),
+        "telegram_connected": bool(token and (telegram_task and not telegram_task.done())),
+        "llm_provider": all_s.get("llm_provider", "openai"),
+        "llm_model": all_s.get("llm_model", "gpt-4o-mini"),
+        "llm_api_key_masked": masked_key,
+        "llm_is_active": bool(api_key)
+    }
 
-# Mount static files and frontend
+@app.post("/api/settings")
+async def save_settings(s: SettingsData):
+    if s.telegram_bot_token is not None:
+        db.set_setting("telegram_bot_token", s.telegram_bot_token)
+        bot_instance.token = s.telegram_bot_token
+    if s.sales_manager_chat_id is not None:
+        db.set_setting("sales_manager_chat_id", s.sales_manager_chat_id)
+        bot_instance.manager_chat_id = s.sales_manager_chat_id
+    if s.llm_provider is not None:
+        db.set_setting("llm_provider", s.llm_provider)
+    if s.llm_api_key is not None and s.llm_api_key.strip():
+        db.set_setting("llm_api_key", s.llm_api_key)
+    if s.llm_model is not None:
+        db.set_setting("llm_model", s.llm_model)
+
+    engine_cache.clear()
+    return {"status": "success", "message": "Sozlamalar saqlandi!"}
+
+@app.post("/api/telegram/start")
+async def start_telegram_bot():
+    global telegram_task
+    token = db.get_setting("telegram_bot_token")
+    if not token:
+        raise HTTPException(status_code=400, detail="Telegram Bot Token topilmadi. Avval tokenni kiriting.")
+
+    if telegram_task and not telegram_task.done():
+        return {"status": "already_running", "message": "Telegram bot allaqachon ishlab turibdi."}
+
+    bot_instance.token = token
+    bot_instance.manager_chat_id = db.get_setting("sales_manager_chat_id")
+    telegram_task = asyncio.create_task(bot_instance.start_polling())
+    return {"status": "started", "message": "Telegram bot muvaffaqiyatli ishga tushirildi!"}
+
+@app.post("/api/telegram/stop")
+def stop_telegram_bot():
+    global telegram_task
+    bot_instance.stop_polling()
+    if telegram_task:
+        telegram_task.cancel()
+        telegram_task = None
+    return {"status": "stopped", "message": "Telegram bot to'xtatildi."}
+
+# ----------------- STATIC ASSETS & FRONTEND -----------------
+
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")

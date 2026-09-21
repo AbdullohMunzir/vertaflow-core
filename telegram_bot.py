@@ -1,9 +1,9 @@
 # /home/kinfolkt/verta-platform/telegram_bot.py
 """
 VertaFlow — Telegram Omnichannel Connector
+Synchronized with SQLite database (db.py).
 Handles real-time Telegram incoming messages, routes them through VertaFlowEngine,
-mirrors user's script (Latin/Cyrillic), enforces 2-3 line brevity,
-and dispatches instant Hot Lead Dossiers to the Sales Manager's chat!
+checks Autopilot status (Human Takeover), and dispatches instant Hot Lead Dossiers.
 """
 
 import os
@@ -13,30 +13,44 @@ import logging
 from typing import Dict, Optional, Any
 import aiohttp
 
-# Add core engine to path
+# Add core and root to path
+sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "core"))
+
+import db
 from verta_engine import VertaFlowEngine
+from verta_llm import VertaLLMClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("VertaTelegramBot")
 
-# Configuration
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-SALES_MANAGER_CHAT_ID = os.getenv("SALES_MANAGER_CHAT_ID", "")
 BASE_TELEGRAM_URL = "https://api.telegram.org/bot"
 
 class VertaTelegramBot:
     def __init__(self, token: Optional[str] = None, manager_chat_id: Optional[str] = None):
-        self.token = token or TELEGRAM_BOT_TOKEN
-        self.manager_chat_id = manager_chat_id or SALES_MANAGER_CHAT_ID
+        self.token = token or db.get_setting("telegram_bot_token", "") or os.getenv("TELEGRAM_BOT_TOKEN", "")
+        self.manager_chat_id = manager_chat_id or db.get_setting("sales_manager_chat_id", "") or os.getenv("SALES_MANAGER_CHAT_ID", "")
         self.sessions: Dict[int, VertaFlowEngine] = {}
         self.is_running = False
         self.last_update_id = 0
-        self.alerted_sessions = set()  # To avoid spamming dossier for same lead repeatedly
+        self.alerted_sessions = set()
+        self._polling_task: Optional[asyncio.Task] = None
 
-    def get_or_create_session(self, chat_id: int) -> VertaFlowEngine:
+    def get_or_create_engine(self, chat_id: int) -> VertaFlowEngine:
         if chat_id not in self.sessions:
-            self.sessions[chat_id] = VertaFlowEngine(session_id=f"tg_{chat_id}", channel="telegram")
+            biz_profile = db.get_business_profile()
+            api_key = db.get_setting("llm_api_key")
+            provider = db.get_setting("llm_provider", "openai")
+            model = db.get_setting("llm_model")
+            llm_client = VertaLLMClient(api_key=api_key, provider=provider, model=model)
+
+            engine = VertaFlowEngine(
+                session_id=f"tg_{chat_id}",
+                channel="telegram",
+                business_profile=biz_profile,
+                llm_client=llm_client
+            )
+            self.sessions[chat_id] = engine
         return self.sessions[chat_id]
 
     async def send_message(self, session: aiohttp.ClientSession, chat_id: int, text: str, parse_mode: str = "HTML") -> bool:
@@ -66,10 +80,9 @@ class VertaTelegramBot:
     async def notify_sales_manager(self, session: aiohttp.ClientSession, chat_id: int, engine: VertaFlowEngine):
         """Dispatches high-priority Lead Dossier to sales manager."""
         if chat_id in self.alerted_sessions:
-            return  # Already alerted for this lead
+            return
 
         self.alerted_sessions.add(chat_id)
-        dossier = engine.state.generate_lead_dossier()
         attrs = engine.state.collected_attributes
         score = engine.state.lead_score
         tier = engine.state.lead_tier
@@ -86,11 +99,10 @@ class VertaTelegramBot:
             f"⚡ <b>AI Tavsiyasi:</b> Xaridor tayyor! Operator chatga kirishi tavsiya etiladi."
         )
 
-        target_manager = self.manager_chat_id or str(chat_id)
-        logger.info(f"🚨 Dispatching Lead Dossier for tg_{chat_id} to Manager: {target_manager}")
-        if self.manager_chat_id:
+        target_manager = self.manager_chat_id or db.get_setting("sales_manager_chat_id")
+        if target_manager:
             try:
-                await self.send_message(session, int(self.manager_chat_id), manager_text)
+                await self.send_message(session, int(target_manager), manager_text)
             except Exception as e:
                 logger.error(f"Failed to notify sales manager: {e}")
 
@@ -102,7 +114,17 @@ class VertaTelegramBot:
 
         chat_id = message["chat"]["id"]
         text = message["text"].strip()
-        user_name = message.get("from", {}).get("first_name", "Mijoz")
+        user_name = message.get("from", {}).get("first_name", "Telegram Mijoz")
+        session_id = f"tg_{chat_id}"
+
+        # 1. Check or create conversation in SQLite database
+        conv = db.get_conversation(session_id)
+        if not conv:
+            db.create_or_update_conversation(session_id, user_name, channel="telegram")
+            conv = db.get_conversation(session_id)
+
+        # 2. Record incoming message to DB
+        db.add_message(session_id, sender="user", text=text)
 
         # Command handling
         if text.startswith("/start"):
@@ -111,6 +133,7 @@ class VertaTelegramBot:
                 f"Sizga biznesingiz uchun eng ma'qul yechimni hisoblab berishimiz mumkin.\n"
                 f"Hozirda korxonangizda qaysi mahsulot yoki xizmat sotuvini rivojlantirmoqchisiz?"
             )
+            db.add_message(session_id, sender="agent", text=welcome_msg, stage="1_INTRO")
             await self.send_message(session, chat_id, welcome_msg)
             return
 
@@ -118,25 +141,50 @@ class VertaTelegramBot:
             if chat_id in self.sessions:
                 del self.sessions[chat_id]
             self.alerted_sessions.discard(chat_id)
-            await self.send_message(session, chat_id, "✅ Muloqot va sessiya tozalandi. Yangidan boshlaymiz!")
+            msg = "✅ Muloqot va sessiya tozalandi. Yangidan boshlaymiz!"
+            db.add_message(session_id, sender="agent", text=msg)
+            await self.send_message(session, chat_id, msg)
             return
 
-        # Process through VertaFlow Sales Engine
-        engine = self.get_or_create_session(chat_id)
+        # 3. Check Autopilot Status (Human Takeover)
+        if conv and conv.get("autopilot_enabled") == 0:
+            logger.info(f"Operator takeover active for tg_{chat_id}. AI response skipped.")
+            return
+
+        # 4. Process message through VertaFlow Sales Engine
+        engine = self.get_or_create_engine(chat_id)
         result = engine.process_message(text)
         reply = result["reply"]
 
-        # Send 2-3 line response to user
+        # 5. Persist agent reply and lead state to DB
+        db.add_message(session_id, sender="agent", text=reply, stage=result["stage"], script=result["script"])
+        db.save_lead(
+            session_id=session_id,
+            name=user_name,
+            channel="telegram",
+            phone=engine.state.collected_attributes.get("phone"),
+            pain=engine.state.collected_attributes.get("identified_pain"),
+            volume=engine.state.collected_attributes.get("volume_or_size"),
+            timeline=engine.state.collected_attributes.get("timeline"),
+            score=result["lead_score"],
+            tier=result["lead_tier"],
+            stage=result["stage"],
+            script=result["script"],
+            score_reasons=result["score_reasons"],
+            dossier=result.get("dossier")
+        )
+
+        # 6. Send 2-3 line response to Telegram user
         await self.send_message(session, chat_id, reply)
 
-        # Check if lead is HOT -> Send alert to manager
+        # 7. Check if lead is HOT -> Send alert to manager
         if result["lead_score"] >= 70 or result.get("dossier"):
             await self.notify_sales_manager(session, chat_id, engine)
 
     async def start_polling(self):
         """Starts asynchronous polling loop."""
         if not self.token:
-            logger.info("ℹ️ Telegram Bot Token o'rnatilmagan. Bot simulyatsiya rejimida kutmoqda.")
+            logger.info("Telegram Bot Token kiritilmagan. Sozlamalardan token kiriting.")
             return
 
         self.is_running = True
@@ -146,8 +194,8 @@ class VertaTelegramBot:
             while self.is_running:
                 try:
                     url = f"{BASE_TELEGRAM_URL}{self.token}/getUpdates"
-                    params = {"offset": self.last_update_id + 1, "timeout": 30}
-                    async with http_session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=35)) as resp:
+                    params = {"offset": self.last_update_id + 1, "timeout": 20}
+                    async with http_session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=25)) as resp:
                         if resp.status == 200:
                             data = await resp.json()
                             updates = data.get("result", [])
@@ -155,7 +203,6 @@ class VertaTelegramBot:
                                 self.last_update_id = update["update_id"]
                                 await self.handle_update(http_session, update)
                         else:
-                            logger.error(f"Polling HTTP {resp.status}")
                             await asyncio.sleep(5)
                 except asyncio.CancelledError:
                     break
@@ -166,11 +213,4 @@ class VertaTelegramBot:
     def stop_polling(self):
         self.is_running = False
 
-if __name__ == "__main__":
-    print("VertaFlow Telegram Bot module ready.")
-    bot = VertaTelegramBot()
-    # If token exists, run polling
-    if bot.token:
-        asyncio.run(bot.start_polling())
-    else:
-        print("Telegram Bot Token kiritilmagan. Test o'tkazish uchun env TELEGRAM_BOT_TOKEN belgilang.")
+bot_instance = VertaTelegramBot()

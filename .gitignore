@@ -22,3 +22,8 @@ research/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Databases
+*.db
+*.sqlite3
+
