@@ -757,16 +757,48 @@ def stop_telegram_bot():
 
 # ----------------- STATIC ASSETS & FRONTEND -----------------
 
+# ----------------- STATIC ASSETS & FRONTEND -----------------
+
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/")
-def serve_index():
+def serve_landing():
+    """Public SEO-optimized Landing Page for visitors from Google and social media."""
+    landing_file = os.path.join(static_dir, "landing.html")
+    if os.path.exists(landing_file):
+        return FileResponse(landing_file)
     index_file = os.path.join(static_dir, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)
-    return {"message": "VertaFlow API online. Web index.html not found yet."}
+    return {"message": "VertaFlow API online. Landing page not found."}
+
+@app.get("/app")
+@app.get("/dashboard")
+@app.get("/platform")
+def serve_app():
+    """VertaFlow Core SaaS Platform Dashboard."""
+    index_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"message": "VertaFlow SaaS Platform index.html not found."}
+
+@app.get("/robots.txt")
+def serve_robots():
+    """Robots.txt for Googlebot and search crawlers."""
+    robots_file = os.path.join(static_dir, "robots.txt")
+    if os.path.exists(robots_file):
+        return FileResponse(robots_file, media_type="text/plain")
+    return Response(content="User-agent: *\nAllow: /\nAllow: /app\nDisallow: /api/\nSitemap: https://vertaflow.uz/sitemap.xml", media_type="text/plain")
+
+@app.get("/sitemap.xml")
+def serve_sitemap():
+    """XML Sitemap for Google Indexation."""
+    sitemap_file = os.path.join(static_dir, "sitemap.xml")
+    if os.path.exists(sitemap_file):
+        return FileResponse(sitemap_file, media_type="application/xml")
+    return Response(content="<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"><url><loc>https://vertaflow.uz/</loc></url></urlset>", media_type="application/xml")
 
 if __name__ == "__main__":
     import uvicorn
