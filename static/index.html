@@ -1354,7 +1354,7 @@
           <!-- Duration Cycle Switcher with animated pills -->
           <div class="flex justify-center pt-3 pb-2">
             <div class="bg-gray-200/80 p-1.5 rounded-2xl inline-flex items-center text-xs font-bold shadow-inner">
-              <button onclick="setBillingPeriod(1)" id="period-btn-1" class="period-btn px-4 py-2 rounded-xl">
+              <button onclick="setBillingPeriod(1)" id="period-btn-1" class="period-btn active px-4 py-2 rounded-xl">
                 1 oy
               </button>
               <button onclick="setBillingPeriod(3)" id="period-btn-3" class="period-btn px-4 py-2 rounded-xl">
@@ -1363,7 +1363,7 @@
               <button onclick="setBillingPeriod(6)" id="period-btn-6" class="period-btn px-4 py-2 rounded-xl">
                 6 oy <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full ml-1 font-black">-15%</span>
               </button>
-              <button onclick="setBillingPeriod(12)" id="period-btn-12" class="period-btn active px-4 py-2 rounded-xl">
+              <button onclick="setBillingPeriod(12)" id="period-btn-12" class="period-btn px-4 py-2 rounded-xl">
                 12 oy <span class="text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full ml-1 font-black">-25%</span>
               </button>
             </div>
@@ -1438,12 +1438,12 @@
 
               <!-- Savings and total banner (animated) -->
               <div id="pro-savings-banner" class="text-[11px] text-emerald-400 font-medium mt-3 min-h-[16px]">
-                12 oy : jami 1 791 000 so'm : tejaysiz 597 000 so'm
+                Har oy to'lanadi
               </div>
 
               <div class="mt-2">
                 <div class="text-3xl font-black text-white flex items-baseline gap-1">
-                  <span id="pro-monthly-price">149 250</span>
+                  <span id="pro-monthly-price">249 000</span>
                   <span class="text-sm font-semibold text-gray-400">so'm / oy</span>
                 </div>
                 <div class="text-xs text-gray-400 mt-1" id="pro-sub-text">Har oy hisoblanadi</div>
@@ -1501,12 +1501,12 @@
 
               <!-- Savings and total banner (animated) -->
               <div id="biz-savings-banner" class="text-[11px] text-emerald-600 font-medium mt-3 min-h-[16px]">
-                12 oy : jami 4 491 000 so'm : tejaysiz 1 497 000 so'm
+                Har oy to'lanadi
               </div>
 
               <div class="mt-2">
                 <div class="text-3xl font-black text-gray-900 flex items-baseline gap-1">
-                  <span id="biz-monthly-price">374 250</span>
+                  <span id="biz-monthly-price">590 000</span>
                   <span class="text-sm font-semibold text-gray-400">so'm / oy</span>
                 </div>
                 <div class="text-xs text-gray-400 mt-1" id="biz-sub-text">Har oy hisoblanadi</div>
@@ -1780,12 +1780,12 @@
       <div class="bg-slate-900 text-white p-4 rounded-2xl space-y-2">
         <div class="flex items-center justify-between">
           <div class="font-black text-base" id="checkout-plan-title">Pro Tarifi</div>
-          <span class="px-2 py-0.5 bg-pistachio text-[#1A3E08] rounded-full text-[10px] font-bold" id="checkout-discount-badge">-25% Tejamkorlik</span>
+          <span class="px-2 py-0.5 bg-pistachio text-[#1A3E08] rounded-full text-[10px] font-bold hidden" id="checkout-discount-badge">-25% Tejamkorlik</span>
         </div>
-        <div class="text-xs text-gray-400" id="checkout-period-label">Muddati: 12 oy</div>
+        <div class="text-xs text-gray-400" id="checkout-period-label">Muddati: 1 oy (249 000 so'm / oy)</div>
         <div class="flex items-baseline justify-between pt-2 border-t border-slate-800">
           <span class="text-xs text-gray-400">Jami to'lov:</span>
-          <span class="text-xl font-black text-pistachio" id="checkout-total-price">1 791 000 so'm</span>
+          <span class="text-xl font-black text-pistachio" id="checkout-total-price">249 000 so'm</span>
         </div>
       </div>
 
@@ -3505,7 +3505,7 @@
     }
 
     // ================= BILLING & PLANS =================
-    let currentBillingPeriod = 12;
+    let currentBillingPeriod = 1;
     let selectedCheckoutPlan = 'pro';
     let selectedPaymentMethod = 'payme';
 
@@ -3690,6 +3690,9 @@
             `;
           }
         }
+
+        // Ensure period pills and prices are synchronized
+        setBillingPeriod(currentBillingPeriod);
 
         // Apply translations
         applyLanguage(currentLang);
