@@ -8,7 +8,7 @@ Zero external database dependencies, persistent across server restarts.
 import sqlite3
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "vertaflow.db")
@@ -32,6 +32,32 @@ def init_db():
         avg_check TEXT,
         faq_list TEXT,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # Schema migration for workspaces & billing
+    for col_sql in [
+        "ALTER TABLE businesses ADD COLUMN plan_id TEXT DEFAULT 'free';",
+        "ALTER TABLE businesses ADD COLUMN plan_expires_at TIMESTAMP;",
+        "ALTER TABLE businesses ADD COLUMN billing_period INTEGER DEFAULT 1;",
+        "ALTER TABLE businesses ADD COLUMN niche TEXT DEFAULT 'general';"
+    ]:
+        try:
+            cursor.execute(col_sql)
+        except Exception:
+            pass
+
+    # Payments Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        workspace_id TEXT NOT NULL,
+        plan_id TEXT NOT NULL,
+        period_months INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        payment_method TEXT NOT NULL,
+        status TEXT DEFAULT 'paid',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
 
@@ -757,6 +783,169 @@ def get_dashboard_stats() -> Dict[str, Any]:
         "avg_response_time": "1.1s",
         "conversion_rate": f"{round((hot_leads / max(total_convs, 1)) * 100, 1)}%"
     }
+
+# ----------------- WORKSPACE & BILLING HELPERS -----------------
+
+def get_active_workspace_id() -> str:
+    active = get_setting("active_workspace_id")
+    if not active:
+        active = "default"
+        set_setting("active_workspace_id", "default")
+    return active
+
+def set_active_workspace_id(workspace_id: str):
+    set_setting("active_workspace_id", workspace_id)
+
+def get_workspaces() -> List[Dict[str, Any]]:
+    conn = get_connection()
+    active_id = get_active_workspace_id()
+    rows = conn.execute("SELECT * FROM businesses ORDER BY updated_at ASC;").fetchall()
+    res = []
+    for r in rows:
+        d = dict(r)
+        d["is_active"] = (d["id"] == active_id)
+        d["plan_id"] = d.get("plan_id") or "free"
+        res.append(d)
+    conn.close()
+    return res
+
+def get_workspace(workspace_id: str) -> Optional[Dict[str, Any]]:
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM businesses WHERE id = ?;", (workspace_id,)).fetchone()
+    conn.close()
+    if row:
+        d = dict(row)
+        d["plan_id"] = d.get("plan_id") or "free"
+        return d
+    return None
+
+def create_workspace(name: str, niche: str = "Chakana savdo", description: str = "", avg_check: str = "1 000 000 so'm") -> Dict[str, Any]:
+    import uuid
+    ws_id = "ws_" + uuid.uuid4().hex[:8]
+    conn = get_connection()
+    conn.execute("""
+        INSERT INTO businesses (id, name, niche, description, avg_check, plan_id, billing_period)
+        VALUES (?, ?, ?, ?, ?, 'free', 1);
+    """, (ws_id, name, niche, description or f"{name} savdo boti", avg_check))
+    conn.commit()
+    conn.close()
+    set_active_workspace_id(ws_id)
+    return get_workspace(ws_id)
+
+def delete_workspace(workspace_id: str) -> bool:
+    if workspace_id == "default":
+        return False
+    conn = get_connection()
+    conn.execute("DELETE FROM businesses WHERE id = ?;", (workspace_id,))
+    conn.commit()
+    conn.close()
+    if get_active_workspace_id() == workspace_id:
+        set_active_workspace_id("default")
+    return True
+
+def get_billing_info(workspace_id: Optional[str] = None) -> Dict[str, Any]:
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
+    ws = get_workspace(workspace_id)
+    if not ws:
+        ws = {"id": "default", "name": "Mebel Fabrikasi", "plan_id": "free", "billing_period": 1}
+    
+    plan_id = ws.get("plan_id") or "free"
+    billing_period = ws.get("billing_period") or 1
+    expires_at = ws.get("plan_expires_at")
+
+    conn = get_connection()
+    knowledge_count = conn.execute("SELECT COUNT(*) FROM knowledge_items;").fetchone()[0]
+    catalog_count = min(knowledge_count * 2, 8)
+    ig_chan = conn.execute("SELECT is_connected FROM channels WHERE channel_id = 'instagram';").fetchone()
+    tg_chan = conn.execute("SELECT is_connected FROM channels WHERE channel_id = 'telegram';").fetchone()
+    ig_connected = 1 if ig_chan and ig_chan[0] == 1 else 0
+    tg_connected = 1 if tg_chan and tg_chan[0] == 1 else 0
+
+    pay_rows = conn.execute("""
+        SELECT * FROM payments 
+        WHERE workspace_id = ? 
+        ORDER BY created_at DESC LIMIT 10;
+    """, (workspace_id,)).fetchall()
+    payments = [dict(p) for p in pay_rows]
+    conn.close()
+
+    plan_names = {
+        "free": "Bepul",
+        "pro": "Pro",
+        "business": "Biznes"
+    }
+    
+    limits = {
+        "free": {
+            "knowledge_max": 3,
+            "catalog_max": 10,
+            "ai_responses_max": "Qo'lda",
+            "broadcast_max": 0,
+            "instagram_max": 1,
+            "telegram_max": 1,
+            "reels_ai": False,
+            "smart_model": False
+        },
+        "pro": {
+            "knowledge_max": 25,
+            "catalog_max": 50,
+            "ai_responses_max": "1 000 ta",
+            "broadcast_max": 200,
+            "instagram_max": 1,
+            "telegram_max": 1,
+            "reels_ai": True,
+            "smart_model": False
+        },
+        "business": {
+            "knowledge_max": 9999,
+            "catalog_max": 300,
+            "ai_responses_max": "3 000 ta (3x)",
+            "broadcast_max": 1000,
+            "instagram_max": 3,
+            "telegram_max": 3,
+            "reels_ai": True,
+            "smart_model": True
+        }
+    }
+
+    cur_limit = limits.get(plan_id, limits["free"])
+
+    return {
+        "workspace_id": workspace_id,
+        "workspace_name": ws.get("name", "VertaFlow Loyiha"),
+        "plan_id": plan_id,
+        "plan_name": plan_names.get(plan_id, "Bepul"),
+        "billing_period": billing_period,
+        "expires_at": expires_at or "Cheksiz",
+        "usage": {
+            "knowledge": {"current": knowledge_count, "max": cur_limit["knowledge_max"]},
+            "catalog": {"current": catalog_count, "max": cur_limit["catalog_max"]},
+            "instagram": {"current": ig_connected, "max": cur_limit["instagram_max"]},
+            "telegram": {"current": tg_connected, "max": cur_limit["telegram_max"]},
+            "reels_active": cur_limit["reels_ai"],
+            "smart_model": cur_limit["smart_model"]
+        },
+        "payments": payments
+    }
+
+def record_payment(workspace_id: str, plan_id: str, period_months: int, amount: int, payment_method: str) -> Dict[str, Any]:
+    expires = (datetime.now() + timedelta(days=period_months * 30)).strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO payments (workspace_id, plan_id, period_months, amount, payment_method, status)
+        VALUES (?, ?, ?, ?, ?, 'paid');
+    """, (workspace_id, plan_id, period_months, amount, payment_method))
+    
+    cursor.execute("""
+        UPDATE businesses
+        SET plan_id = ?, billing_period = ?, plan_expires_at = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?;
+    """, (plan_id, period_months, expires, workspace_id))
+    conn.commit()
+    conn.close()
+    return get_billing_info(workspace_id)
 
 # Initialize database on module import
 init_db()

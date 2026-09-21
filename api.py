@@ -210,6 +210,20 @@ class ChannelTestMessage(BaseModel):
     message: str
     user_name: Optional[str] = "Mijoz"
 
+class WorkspaceCreate(BaseModel):
+    name: str
+    niche: Optional[str] = "Chakana savdo"
+    description: Optional[str] = ""
+    avg_check: Optional[str] = "1 000 000 so'm"
+
+class WorkspaceSwitch(BaseModel):
+    workspace_id: str
+
+class BillingCheckout(BaseModel):
+    plan_id: str  # 'pro' or 'business'
+    period_months: int  # 1, 3, 6, 12
+    payment_method: str  # 'payme' or 'click'
+
 # ----------------- CHAT & CONVERSATIONS API -----------------
 
 @app.post("/api/chat")
@@ -755,7 +769,70 @@ def stop_telegram_bot():
         telegram_task = None
     return {"status": "stopped", "message": "Telegram bot to'xtatildi."}
 
-# ----------------- STATIC ASSETS & FRONTEND -----------------
+# ----------------- WORKSPACES API -----------------
+
+@app.get("/api/workspaces")
+def list_workspaces():
+    """Returns all user workspaces and indicates active workspace."""
+    return {"workspaces": db.get_workspaces(), "active_workspace_id": db.get_active_workspace_id()}
+
+@app.post("/api/workspaces")
+def add_workspace(ws: WorkspaceCreate):
+    """Creates a new workspace and sets it as active."""
+    new_ws = db.create_workspace(name=ws.name, niche=ws.niche, description=ws.description, avg_check=ws.avg_check)
+    return {"status": "success", "workspace": new_ws, "message": "Yangi loyiha muvaffaqiyatli yaratildi!"}
+
+@app.post("/api/workspaces/switch")
+def switch_workspace(req: WorkspaceSwitch):
+    """Switches the active workspace."""
+    db.set_active_workspace_id(req.workspace_id)
+    return {"status": "success", "active_workspace_id": req.workspace_id, "message": "Loyiha almashtirildi!"}
+
+@app.delete("/api/workspaces/{workspace_id}")
+def remove_workspace(workspace_id: str):
+    """Deletes a workspace."""
+    if workspace_id == "default":
+        raise HTTPException(status_code=400, detail="Asosiy (Default) loyihani o'chirish mumkin emas.")
+    res = db.delete_workspace(workspace_id)
+    return {"status": "success" if res else "error", "message": "Loyiha o'chirildi!"}
+
+# ----------------- BILLING & PLANS API -----------------
+
+@app.get("/api/billing")
+def get_billing_status(workspace_id: Optional[str] = None):
+    """Returns billing status, quotas, and payment history for workspace."""
+    return db.get_billing_info(workspace_id)
+
+@app.post("/api/billing/checkout")
+def checkout_plan(req: BillingCheckout):
+    """Processes plan purchase via Payme or Click, upgrades workspace, and generates payment record."""
+    prices_per_month = {
+        "pro": 199000,
+        "business": 499000
+    }
+    discounts = {
+        1: 0.0,
+        3: 0.10,
+        6: 0.15,
+        12: 0.25
+    }
+    base = prices_per_month.get(req.plan_id, 199000)
+    disc = discounts.get(req.period_months, 0.0)
+    total = int(base * req.period_months * (1.0 - disc))
+    
+    ws_id = db.get_active_workspace_id()
+    billing_data = db.record_payment(
+        workspace_id=ws_id,
+        plan_id=req.plan_id,
+        period_months=req.period_months,
+        amount=total,
+        payment_method=req.payment_method
+    )
+    return {
+        "status": "success",
+        "message": f"{req.plan_id.capitalize()} tarifi {req.period_months} oyga muvaffaqiyatli faollashtirildi!",
+        "billing": billing_data
+    }
 
 # ----------------- STATIC ASSETS & FRONTEND -----------------
 
