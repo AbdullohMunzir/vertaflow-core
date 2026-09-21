@@ -34,11 +34,12 @@
 
 ## 🎨 Dizayn Tizimi (Design System)
 
-Platforma boshqaruv paneli **Chatla** andozasida quyidagi ranglar gammasida yaratilgan:
-- **Asosiy fon**: Tinch kashmir/off-white (`#F7F9F6`)
-- **Kartalar va bloklar**: Toza oq (`#FFFFFF`), nozik chegara (`#E5E7EB`)
-- **Asosiy aksent**: Pastel Pistachio Lime (`#B5F87B`)
-- **Lead Hot nishoni**: Warm Amber (`#FEF08A` / `#78350F`)
+Platforma boshqaruv paneli va landing sahifasi **VertaFlow Obsidian Dark Luxury** eksklyuziv dizayn tizimida yaratilgan:
+- **Asosiy fon**: Chuqur Obsidian Dark (`#0B0F17`) va Deep Slate (`#0F172A`)
+- **Kartalar va bloklar**: Shaffof Glassmorphic Dark (`#131A26`), nozik chegara (`rgba(255, 255, 255, 0.08)`)
+- **Asosiy aksent**: Neon Pistachio Lime (`#B5F87B`) va Electric Emerald (`#10B981`)
+- **Lead Hot nishoni**: Amber Flame (`#F59E0B` / `#FEF08A`)
+- **Tipografika**: Plus Jakarta Sans
 
 ---
 
@@ -54,7 +55,8 @@ vertaflow/
 │   ├── verta_battlecards.py  # Raqobat battlecards va landmine savollari
 │   └── verta_evaluator.py   # Tungi audit va avto-tavsiyalar dvigateli
 ├── static/
-│   ├── index.html            # Chatla uslubidagi zamonaviy boshqaruv paneli
+│   ├── index.html            # VertaFlow Obsidian Dark Luxury boshqaruv paneli
+│   ├── landing.html          # VertaFlow rasmiy bosh sahifasi
 │   └── widget.js             # Veb-saytlar uchun embeddable chat vidjeti
 ├── api.py                    # FastAPI server (Chat, CRM, Battlecards, Telegram)
 ├── telegram_bot.py           # Telegram bot va xabarnomalar moduli

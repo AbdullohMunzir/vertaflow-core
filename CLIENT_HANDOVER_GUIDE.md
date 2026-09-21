@@ -2,7 +2,7 @@
 
 Hush kelibsiz! Ushbu qo'llanma **VertaFlow AI Closer Platformasi**ni real biznes korxonasiga (Mebel fabrikasi, O'quv markazi, Tibbiyot klinikasi, Elektronika do'koni va h.k.) topshirish, uni ishga tushirish va undan maksimal savdo natijalariga erishish bo'yicha to'liq va amaliy qo'llanmadir.
 
-Platforma **Chatla.uz** uslubidagi zamonaviy, qulay va toza interfeysda (`#F7F9F6` kashmir fon, `#B5F87B` pastel pista yashil aksentlar) yaratilgan bo'lib, korxona xodimlari va rahbarlaridan hech qanday dasturlash yoki texnik bilim talab qilmaydi.
+Platforma jahon darajasidagi nufuzli SaaS mahsulotlari (Linear, Perplexity, Supabase) andozasidagi eksklyuziv **Obsidian Dark Luxury** interfeysida (`#0B0F17` kosmik qora fon, shaffof oynasimon kartalar, `#B5F87B` neon pista yashil aksentlar) yaratilgan bo'lib, korxona xodimlari va rahbarlaridan hech qanday dasturlash yoki texnik bilim talab qilmaydi.
 
 ---
 
