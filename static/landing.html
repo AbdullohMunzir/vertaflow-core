@@ -3,1116 +3,719 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VertaFlow AI — O'zbekistondagi 1-Raqamli Avtonom AI Closer (Savdo Yopuvchi Agent)</title>
-  <meta name="description" content="Har bir murojaatni real savdoga aylantiruvchi 24/7 avtonom AI Closer. Instagram, Telegram va WhatsApp orqali e'tirozlarni psixologik aniqlikda yopadi.">
+  <title>VertaFlow — Avtonom AI Closer Infratuzilmasi</title>
+  <meta name="description" content="Har bir murojaatni real savdoga aylantiruvchi avtonom AI Closer. SPIN va Challenger metodologiyasi orqali savdo e'tirozlarini psixologik aniqlikda yopadi.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23B5F87B'><path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'/></svg>">
+  
+  <!-- Fonts: Geist & Geist Mono (World-class Typography) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            obsidian: '#080A0F',
-            onyx: '#0D111A',
-            surface: '#131824',
-            surfaceBorder: 'rgba(255, 255, 255, 0.08)',
-            pistachio: '#B5F87B',
-            pistachioDark: '#0B0F17',
-            pistachioHover: '#C6FF94',
-            pistachioBorder: '#9DE959'
-          },
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif']
+            sans: ['Geist', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['Geist Mono', 'ui-monospace', 'monospace']
+          },
+          colors: {
+            brand: {
+              pistachio: '#B5F87B',
+              pistachioHover: '#C4FFA0',
+              dark: '#08090C',
+              surface: '#0E1015',
+              card: '#12151C',
+              border: 'rgba(255, 255, 255, 0.08)'
+            }
           }
         }
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #080A0F;
-      color: #F1F5F9;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      letter-spacing: -0.015em;
+      background-color: #08090C;
+      color: #E2E8F0;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      letter-spacing: -0.022em;
       overflow-x: hidden;
     }
 
-    /* Ambient Tech Grid & Glow */
-    .bg-grid-pattern {
+    /* Architectural Subtle Lighting Grid */
+    .hero-grid {
       background-image: 
-        radial-gradient(circle at 50% -10%, rgba(181, 248, 123, 0.14) 0%, transparent 60%),
-        radial-gradient(circle at 80% 30%, rgba(56, 189, 248, 0.06) 0%, transparent 50%),
-        radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 32px 32px;
+        radial-gradient(ellipse 900px 500px at 50% -100px, rgba(181, 248, 123, 0.09) 0%, transparent 80%),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
     }
 
-    /* Glassmorphism */
-    .glass-panel {
-      background: rgba(13, 17, 26, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+    /* Elite Glass Card */
+    .elite-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%), #0E1015;
       border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .glass-panel-glow {
-      background: rgba(13, 17, 26, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(181, 248, 123, 0.25);
-      box-shadow: 0 0 35px -5px rgba(181, 248, 123, 0.15);
-    }
-
-    /* Bento Cards */
-    .bento-card {
-      background: #0E131F;
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 1.5rem;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .bento-card:hover {
-      border-color: rgba(181, 248, 123, 0.35);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(181, 248, 123, 0.15);
+    .elite-card:hover {
+      border-color: rgba(181, 248, 123, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
     }
 
-    /* Silky Smooth Keyframes */
-    @keyframes glissadeUp {
-      from { opacity: 0; transform: translateY(16px) scale(0.99); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    /* Primary Precision Button */
+    .btn-pistachio {
+      background-color: #B5F87B;
+      color: #08090C;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 20px -4px rgba(181, 248, 123, 0.4);
     }
-    .animate-glissade {
-      animation: glissadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    .btn-pistachio:hover {
+      background-color: #C4FFA0;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 30px -2px rgba(181, 248, 123, 0.6);
     }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(181, 248, 123, 0.2); }
-      50% { box-shadow: 0 0 30px rgba(181, 248, 123, 0.5); }
-    }
-    .glow-radar {
-      animation: pulseGlow 3s infinite ease-in-out;
-    }
-
-    /* Sliders */
-    input[type=range] {
-      accent-color: #B5F87B;
-    }
-
-    /* Scroll reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .reveal.active {
-      opacity: 1;
+    .btn-pistachio:active {
       transform: translateY(0);
+    }
+
+    /* Custom Precision Range Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #1E2330;
+      border-radius: 9999px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #B5F87B;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(181, 248, 123, 0.6);
+      transition: transform 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Tab Switch Animation */
+    @keyframes fadeScale {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tab-fade-in {
+      animation: fadeScale 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-obsidian antialiased selection:bg-pistachio selection:text-black min-h-screen flex flex-col relative bg-grid-pattern">
+<body class="bg-[#08090C] antialiased selection:bg-[#B5F87B] selection:text-black min-h-screen flex flex-col relative hero-grid">
 
-  <!-- Top Announcement Bar -->
-  <div class="bg-gradient-to-r from-[#0D111A] via-[#141C2B] to-[#0D111A] border-b border-white/5 py-2 px-4 text-center text-xs text-slate-300 font-medium">
-    <div class="max-w-6xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pistachio/15 text-pistachio font-bold text-[11px] border border-pistachio/30">
-        <span class="w-1.5 h-1.5 rounded-full bg-pistachio animate-ping"></span>
-        Yangi Avlod AI Closer
-      </span>
-      <span>O'zbekiston bizneslari uchun SPIN va Challenger savdo algoritmi integratsiya qilindi.</span>
-      <a href="/app" class="text-pistachio font-bold hover:underline inline-flex items-center gap-1 ml-1">
-        Sinab ko'rish &rarr;
-      </a>
-    </div>
-  </div>
-
-  <!-- Floating Glass Navbar -->
-  <header class="sticky top-3 z-50 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="glass-panel rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all duration-300 shadow-2xl">
-      <!-- Brand Logo -->
-      <a href="/" class="flex items-center gap-2.5 group">
-        <div class="w-9 h-9 rounded-xl bg-pistachio flex items-center justify-center text-black font-black shadow-md border border-pistachio transition-transform duration-300 group-hover:scale-105">
-          <i data-lucide="zap" class="w-5 h-5 text-black"></i>
+  <!-- Top Navigation Header -->
+  <header class="sticky top-4 z-50 px-4 sm:px-6 max-w-6xl mx-auto w-full">
+    <div class="bg-[#0E1015]/80 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#B5F87B] flex items-center justify-center text-[#08090C]">
+          <i data-lucide="zap" class="w-4 h-4 text-[#08090C]"></i>
         </div>
-        <div class="flex flex-col">
-          <div class="flex items-center gap-1.5">
-            <span class="text-lg font-black tracking-tight text-white">VertaFlow</span>
-            <span class="bg-white/10 text-pistachio text-[9px] px-2 py-0.5 rounded-md font-bold tracking-wider uppercase border border-white/10">AI CLOSER</span>
-          </div>
-          <span class="text-[10px] text-slate-400 font-medium -mt-0.5">Avtonom Savdo Infratuzilmasi</span>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-base tracking-tight text-white">VertaFlow</span>
+          <span class="text-[10px] font-semibold text-zinc-400 border border-white/10 px-2 py-0.5 rounded-full bg-white/[0.02]">AI CLOSER</span>
         </div>
       </a>
 
-      <!-- Navigation Links -->
-      <nav class="hidden lg:flex items-center space-x-7 text-xs font-semibold text-slate-300">
-        <a href="#pipeline" class="hover:text-pistachio transition-colors">3-Agent Pipeline</a>
-        <a href="#etirozlarni-yopish" class="hover:text-pistachio transition-colors">E'tirozlarni Yopish</a>
-        <a href="#taqqoslash" class="hover:text-pistachio transition-colors">Nega AI Closer?</a>
-        <a href="#kanallar" class="hover:text-pistachio transition-colors">Kanallar</a>
-        <a href="#kalkulyator" class="hover:text-pistachio transition-colors">ROI Kalkulyator</a>
-        <a href="#tariflar" class="hover:text-pistachio transition-colors">Tariflar</a>
-        <a href="#savollar" class="hover:text-pistachio transition-colors">FAQ</a>
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center space-x-7 text-xs font-medium text-zinc-300">
+        <a href="#pipeline" class="hover:text-white transition-colors">Arxitektura</a>
+        <a href="#etirozlar" class="hover:text-white transition-colors">E'tirozlarni Yopish</a>
+        <a href="#qiyos" class="hover:text-white transition-colors">Nega AI Closer?</a>
+        <a href="#kanallar" class="hover:text-white transition-colors">Kanallar</a>
+        <a href="#kalkulyator" class="hover:text-white transition-colors">ROI Hisoblagich</a>
+        <a href="#tariflar" class="hover:text-white transition-colors">Tariflar</a>
       </nav>
 
-      <!-- Right CTAs -->
+      <!-- Action Buttons -->
       <div class="flex items-center gap-3">
-        <a href="/app" class="hidden sm:inline-flex px-3.5 py-2 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all items-center gap-1.5 hover:bg-white/5">
+        <a href="/app" class="hidden sm:inline-flex text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 transition-colors">
           Kirish
         </a>
-        <a href="/app" class="px-4 py-2.5 bg-pistachio hover:bg-pistachioHover text-pistachioDark rounded-xl text-xs font-black transition-all duration-200 shadow-lg shadow-[rgba(181,248,123,0.3)] hover:shadow-[0_0_25px_rgba(181,248,123,0.5)] border border-pistachioBorder inline-flex items-center gap-1.5 active:scale-95">
+        <a href="/app" class="btn-pistachio px-4 py-2 rounded-xl text-xs flex items-center gap-1.5">
           <span>Platformaga O'tish</span>
           <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </a>
-        <!-- Mobile menu btn -->
-        <button onclick="toggleMobileNav()" class="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none">
-          <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
       </div>
-    </div>
-
-    <!-- Mobile Nav Dropdown -->
-    <div id="mobile-nav" class="hidden lg:hidden glass-panel rounded-2xl p-4 mt-2 shadow-2xl flex-col space-y-2 text-xs font-semibold text-slate-300 border border-white/10 animate-glissade">
-      <a href="#pipeline" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="cpu" class="w-4 h-4 text-pistachio"></i> <span>3-Agent Pipeline</span>
-      </a>
-      <a href="#etirozlarni-yopish" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="shield-alert" class="w-4 h-4 text-pistachio"></i> <span>E'tirozlarni Yopish</span>
-      </a>
-      <a href="#taqqoslash" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="scale" class="w-4 h-4 text-pistachio"></i> <span>Nega AI Closer?</span>
-      </a>
-      <a href="#kanallar" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="share-2" class="w-4 h-4 text-pistachio"></i> <span>Kanallar</span>
-      </a>
-      <a href="#kalkulyator" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="calculator" class="w-4 h-4 text-pistachio"></i> <span>ROI Kalkulyator</span>
-      </a>
-      <a href="#tariflar" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="credit-card" class="w-4 h-4 text-pistachio"></i> <span>Tariflar</span>
-      </a>
-      <a href="#savollar" onclick="toggleMobileNav()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 hover:text-pistachio">
-        <i data-lucide="help-circle" class="w-4 h-4 text-pistachio"></i> <span>FAQ</span>
-      </a>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="relative pt-12 pb-20 px-4 sm:px-6 max-w-7xl mx-auto w-full flex flex-col items-center text-center">
-    <!-- Pulsing Badge -->
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-white/10 text-xs font-semibold text-slate-300 mb-6 shadow-xl hover:border-pistachio/40 transition-colors">
-      <span class="w-2 h-2 rounded-full bg-pistachio animate-pulse"></span>
-      <span>24/7 E'tirozlarni Yopuvchi Sun'iy Intellekt</span>
-      <span class="text-slate-500">|</span>
-      <span class="text-pistachio font-bold">1-Raqamli AI Closer</span>
+  <section class="pt-16 pb-20 px-4 sm:px-6 max-w-5xl mx-auto w-full text-center flex flex-col items-center">
+    
+    <!-- Status Eyebrow Badge -->
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 text-xs font-medium text-zinc-300 mb-8 backdrop-blur-md">
+      <span class="w-2 h-2 rounded-full bg-[#B5F87B] animate-pulse"></span>
+      <span>Avtonom Sotuv Yopuvchi Agent</span>
+      <span class="text-zinc-600">•</span>
+      <span class="text-[#B5F87B] font-medium">v2.4 Pro Nashri</span>
     </div>
 
-    <!-- Main Headline -->
-    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl leading-[1.15] mb-6">
+    <!-- Main Headline: Disciplined typography, no chunky font-black, tight tracking -->
+    <h1 class="text-4xl sm:text-6xl font-semibold tracking-[-0.035em] text-white leading-[1.12] max-w-3xl">
       Har bir murojaatni <br class="hidden sm:inline" />
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-pistachio to-emerald-400">
-        real savdoga
-      </span> aylantiruvchi avtonom AI Agenti
+      <span class="text-[#B5F87B]">real savdoga</span> aylantiruvchi AI Agenti
     </h1>
 
-    <!-- Subtitle -->
-    <p class="text-sm sm:text-lg text-slate-400 max-w-2xl mb-10 leading-relaxed font-normal">
-      Oddiy savol-javob boti emas. VertaFlow mijozning og'riqli nuqtalarini aniqlaydi, <strong class="text-slate-200">"qimmat"</strong> va <strong class="text-slate-200">"o'ylab ko'raman"</strong> degan e'tirozlarini psixologik aniqlikda yopadi hamda to'lov havolasini yuboradi.
+    <!-- Subheading -->
+    <p class="text-base sm:text-lg text-zinc-400 font-normal leading-relaxed max-w-2xl mt-6">
+      Oddiy savol-javob boti emas. VertaFlow mijozning og'riqli nuqtalarini aniqlaydi, "qimmat" va "o'ylab ko'raman" degan e'tirozlarini psixologik aniqlikda yopadi hamda to'lovgacha yetaklaydi.
     </p>
 
-    <!-- Hero CTA Buttons -->
-    <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md mb-16">
-      <a href="/app" class="w-full sm:w-auto px-8 py-4 bg-pistachio hover:bg-pistachioHover text-pistachioDark font-black text-sm rounded-2xl transition-all duration-200 shadow-xl shadow-[rgba(181,248,123,0.3)] hover:shadow-[0_0_35px_rgba(181,248,123,0.5)] inline-flex items-center justify-center gap-2 border border-pistachioBorder group active:scale-95">
-        <span>14 Kun Bepul Boshlash</span>
-        <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row items-center gap-3.5 mt-10 w-full sm:w-auto justify-center">
+      <a href="/app" class="btn-pistachio px-7 py-3.5 rounded-xl text-sm w-full sm:w-auto flex items-center justify-center gap-2">
+        <span>14 Kun Bepul Sinash</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </a>
-      <a href="#cockpit" class="w-full sm:w-auto px-6 py-4 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-2xl transition-all border border-white/10 hover:border-pistachio/40 inline-flex items-center justify-center gap-2 backdrop-blur-md">
-        <i data-lucide="play-circle" class="w-4 h-4 text-pistachio"></i>
-        <span>Jonli Tizimni Ko'rish</span>
+      <a href="#console" class="px-6 py-3.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2">
+        <i data-lucide="terminal" class="w-4 h-4 text-zinc-400"></i>
+        <span>Jonli Tizim Simulyatori</span>
       </a>
     </div>
 
-    <!-- Live Telemetry Cockpit (Dual Pane) -->
-    <div id="cockpit" class="w-full max-w-5xl rounded-3xl glass-panel-glow p-3 sm:p-5 text-left transition-all relative overflow-hidden">
-      <!-- Cockpit Window Header -->
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/10 text-xs">
+    <!-- Product Telemetry Console -->
+    <div id="console" class="w-full mt-16 elite-card p-4 sm:p-6 text-left border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-white/10 text-xs text-zinc-400">
         <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+          <div class="flex gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-zinc-700"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-zinc-700"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-zinc-700"></span>
           </div>
-          <span class="text-slate-400 font-mono text-[11px] ml-2 hidden sm:inline">vertasales-engine // live-cognitive-cockpit</span>
+          <span class="font-mono text-[11px] text-zinc-500 ml-2">vertasales-engine // session-9482</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-pistachio animate-ping"></span>
-          <span class="text-pistachio font-bold text-[11px] tracking-wide uppercase">AI Closer Faol (0.8s)</span>
+        <div class="flex items-center gap-2 text-[11px] font-mono text-[#B5F87B]">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#B5F87B]"></span>
+          <span>ONLINE // 0.8s RESPONSE</span>
         </div>
       </div>
 
-      <!-- Split Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <!-- Left: Live Chat Flow -->
-        <div class="lg:col-span-7 bg-[#090C14] rounded-2xl p-4 border border-white/5 flex flex-col justify-between h-[360px]">
-          <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center text-xs">
-                <i data-lucide="instagram" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-white">Instagram Direct Muloqot</div>
-                <div class="text-[10px] text-slate-400">Mijoz: Shoxrux (Mebel do'koni)</div>
-              </div>
-            </div>
-            <span class="text-[10px] bg-emerald-950 text-pistachio border border-emerald-800/80 px-2 py-0.5 rounded-full font-bold">Avtonom Yopish</span>
+      <!-- Split Console Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Left: Realistic Chat Stream -->
+        <div class="lg:col-span-7 bg-[#0A0C11] rounded-xl p-4 border border-white/5 flex flex-col justify-between h-[360px]">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/5 text-xs text-zinc-400">
+            <span class="flex items-center gap-1.5 font-medium text-white">
+              <i data-lucide="message-square" class="w-3.5 h-3.5 text-zinc-400"></i> Instagram Direct
+            </span>
+            <span class="font-mono text-[10px] text-zinc-500">Mijoz: Sanjar R.</span>
           </div>
 
-          <!-- Chat Stream -->
-          <div class="space-y-3 overflow-y-auto pr-1 text-xs custom-scrollbar">
-            <!-- User Message -->
+          <!-- Chat messages -->
+          <div class="space-y-3 overflow-y-auto text-xs leading-relaxed pr-1">
             <div class="flex justify-start">
-              <div class="max-w-[85%] bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none border border-slate-700/60 leading-relaxed">
-                Salom, bu ofis kreslolaringiz necha pul? Boshqa joyda 1.2 mln deb turibdi, sizlarda 1.8 mln juda qimmat ekan...
+              <div class="max-w-[85%] bg-zinc-800/70 border border-zinc-700/50 text-zinc-200 p-3 rounded-xl rounded-tl-none">
+                Salom, bu kursingiz qimmat ekan. Boshqa joyda 500 mingga o'rgatishyapti, sizlarda 1.4 mln so'm...
               </div>
             </div>
-            <!-- AI Closer SPIN Objection Response -->
+
             <div class="flex justify-end">
-              <div class="max-w-[88%] bg-pistachio text-pistachioDark font-semibold p-3.5 rounded-2xl rounded-tr-none text-xs leading-relaxed shadow-lg border border-pistachioBorder">
-                Salom, Shoxrux aka! Narx masalasi muhim, albatta. Lekin arzonroq modellarda 3 oydan keyin amortizator va g'ildiraklar buzilib, ish unumi tushadi. Bizning kreslolar Italiya mexanizmida va 3 yillik rasmiy kafolat bilan keladi — agar 3 yil xizmat qilsa, bu sizga kuniga bor-yo'g'i 1,600 so'mga tushadi. Agar xohlasangiz, bugun buyurtma qilsangiz yetkazib berishni bepul qilib beramiz?
+              <div class="max-w-[90%] bg-[#121812] border border-[#B5F87B]/30 text-zinc-100 p-3.5 rounded-xl rounded-tr-none">
+                <div class="text-[10px] font-mono text-[#B5F87B] mb-1 font-semibold flex items-center gap-1">
+                  <i data-lucide="cpu" class="w-3 h-3"></i> Objection Defuser (Challenger Reframe)
+                </div>
+                Salom, Sanjar aka! Narx masalasi muhim, albatta. Farq shundaki: arzon kurslar faqat nazariya berib, real amaliyotsiz tugaydi. Bizning dasturimizda esa 1-oyning o'zidayoq real buyurtmalar bilan ishlaysiz va shaxsiy mentor har bir vazifangizni tekshiradi. O'tgan oy 24 nafar bitiruvchimiz o'qish davomidayoq kurs pulini to'liq qoplagan. Agar 14 kun ichida natija ko'rmasangiz, pulingizni 100% qaytaramiz. Bugungi guruhga chegirma bilan joy band qilib qo'yaymi?
               </div>
             </div>
-            <!-- User Follow up -->
+
             <div class="flex justify-start">
-              <div class="max-w-[85%] bg-slate-800 text-slate-200 p-2.5 rounded-2xl rounded-tl-none border border-slate-700/60">
-                To'g'ri aytasiz, sifat muhim. Bepul yetkazib bersangiz, bittasini buyurtma qilay. To'lov qanday?
+              <div class="max-w-[85%] bg-zinc-800/70 border border-zinc-700/50 text-zinc-200 p-2.5 rounded-xl rounded-tl-none">
+                Kafolati bo'lsa yaxshi ekan. To'lov qilib joy band qilsam bo'ladimi?
               </div>
             </div>
-            <!-- AI Closer Checkout Link -->
+
             <div class="flex justify-end">
-              <div class="max-w-[88%] bg-pistachio text-pistachioDark font-bold p-3 rounded-2xl rounded-tr-none text-xs border border-pistachioBorder">
-                Ajoyib tanlov! Buyurtmangiz qabul qilindi. To'lovni Click yoki Payme orqali qulay amalga oshirishingiz mumkin: 👉 <span class="underline">click.uz/pay/verta-841</span>. Manzilingizni yozib qoldiring, bugunoq yetkazamiz!
+              <div class="max-w-[90%] bg-[#121812] border border-[#B5F87B]/30 text-zinc-100 p-3 rounded-xl rounded-tr-none">
+                <div class="text-[10px] font-mono text-[#B5F87B] mb-1 font-semibold flex items-center gap-1">
+                  <i data-lucide="credit-card" class="w-3 h-3"></i> Deal Closer & Payment
+                </div>
+                Albatta! Mana profilingiz uchun maxsus to'lov havolasi: <span class="text-[#B5F87B] underline font-mono">click.uz/pay/verta-749</span>. To'lovdan so'ng guruhga darhol qo'shilasiz.
               </div>
             </div>
           </div>
 
-          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-            <span class="flex items-center gap-1"><i data-lucide="check-check" class="w-3.5 h-3.5 text-pistachio"></i> Savdo Yopildi (Deal Closed)</span>
-            <span class="font-mono text-pistachio">Vaqt: 1 daqiqa 12 soniya</span>
+          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+            <span>BITIM HOLATI: YOPILDI (CLOSED)</span>
+            <span class="text-[#B5F87B]">KONVERSIYA: 100%</span>
           </div>
         </div>
 
-        <!-- Right: Real-time Cognitive Radar -->
-        <div class="lg:col-span-5 bg-[#090C14] rounded-2xl p-4 border border-white/5 flex flex-col justify-between h-[360px]">
+        <!-- Right: Telemetry Radar -->
+        <div class="lg:col-span-5 bg-[#0A0C11] rounded-xl p-4 border border-white/5 flex flex-col justify-between h-[360px]">
           <div>
-            <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-3">
-              <span class="text-xs font-bold text-white flex items-center gap-1.5">
-                <i data-lucide="brain-circuit" class="w-4 h-4 text-pistachio"></i> Kognitiv Telemetriya
+            <div class="flex items-center justify-between pb-2 mb-3 border-b border-white/5 text-xs text-zinc-400">
+              <span class="font-medium text-white flex items-center gap-1.5">
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Psixologik Telemetriya
               </span>
-              <span class="text-[10px] text-slate-400 font-mono">STATUS: 200 OK</span>
+              <span class="font-mono text-[10px] text-[#B5F87B]">ACTIVE</span>
             </div>
 
-            <!-- Telemetry Items -->
-            <div class="space-y-3 text-xs">
+            <div class="space-y-3.5 text-xs">
               <div>
-                <div class="flex justify-between text-[11px] mb-1">
-                  <span class="text-slate-400">Xarid Tayyorgarligi (Intent):</span>
-                  <span class="font-black text-pistachio">94% — HOT LEAD 🔥</span>
+                <div class="flex justify-between text-[11px] mb-1 font-mono">
+                  <span class="text-zinc-400">BUYING_INTENT_SCORE:</span>
+                  <span class="text-[#B5F87B] font-bold">96.4%</span>
                 </div>
-                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div class="bg-pistachio h-full rounded-full w-[94%]"></div>
-                </div>
-              </div>
-
-              <div class="p-2.5 rounded-xl bg-surface border border-white/5 space-y-1.5 text-[11px]">
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Aniqlangan E'tiroz:</span>
-                  <span class="font-bold text-amber-300">Narx / Qiyosiy e'tiroz</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Qo'llangan Taktika:</span>
-                  <span class="font-bold text-pistachio">Challenger + Kunlik Qiymat</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Kafolat Argumenti:</span>
-                  <span class="font-bold text-slate-200">3 Yil Italiya Mexanizmi</span>
+                <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-[#B5F87B] h-full rounded-full w-[96.4%]"></div>
                 </div>
               </div>
 
-              <div class="p-2.5 rounded-xl bg-surface border border-white/5 space-y-1 text-[11px]">
+              <div class="p-3 rounded-lg bg-zinc-900/80 border border-white/5 space-y-2 text-[11px] font-mono">
                 <div class="flex justify-between">
-                  <span class="text-slate-400">Kutilgan Daromad:</span>
-                  <span class="font-bold text-white">1,800,000 UZS</span>
+                  <span class="text-zinc-500">ANIQLANGAN_E'TIROZ:</span>
+                  <span class="text-amber-300">PriceSensitivity</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-slate-400">CRM Sinkronizatsiya:</span>
-                  <span class="font-bold text-pistachio flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> 1C va Telegram Guruh</span>
+                  <span class="text-zinc-500">METODOLOGIYA:</span>
+                  <span class="text-[#B5F87B]">Challenger ROI</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-zinc-500">XAVF_REVERSIYASI:</span>
+                  <span class="text-zinc-200">100% Kafolat</span>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-lg bg-zinc-900/80 border border-white/5 space-y-1.5 text-[11px] font-mono">
+                <div class="flex justify-between">
+                  <span class="text-zinc-500">HISOB_KITOB:</span>
+                  <span class="text-white">1,400,000 UZS</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-zinc-500">CRM_SINXRON:</span>
+                  <span class="text-[#B5F87B]">Bitrix24 + Telegram</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-800/50 text-[11px] text-emerald-300 flex items-center gap-2">
-            <i data-lucide="shield-check" class="w-4 h-4 text-pistachio shrink-0"></i>
-            <span>Menejer aralashuvisiz to'liq avtonom bitim amalga oshirildi.</span>
+          <div class="p-2.5 rounded-lg bg-[#0E150F] border border-[#B5F87B]/20 text-[11px] text-zinc-300 font-mono flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-[#B5F87B] shrink-0"></i>
+            <span>Inson omilisiz to'liq avtonom savdo bitimi.</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Key Metrics Row -->
-  <section class="py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-      <div class="bento-card p-6 text-center">
-        <div class="text-3xl sm:text-4xl font-black text-pistachio mb-1">98.4%</div>
-        <div class="text-xs sm:text-sm font-semibold text-slate-300">E'tirozlarni Yopish</div>
-        <div class="text-[11px] text-slate-500 mt-1">SPIN va Challenger algoritmi</div>
+  <!-- Metrics Bar -->
+  <section class="py-10 px-4 sm:px-6 max-w-5xl mx-auto w-full border-y border-white/5">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="text-3xl font-semibold tracking-tight text-white font-mono">98.4%</div>
+        <div class="text-xs text-zinc-400 mt-1 font-medium">E'tirozlarni Yopish</div>
       </div>
-      <div class="bento-card p-6 text-center">
-        <div class="text-3xl sm:text-4xl font-black text-white mb-1">&lt; 0.8s</div>
-        <div class="text-xs sm:text-sm font-semibold text-slate-300">Javob Qaytish Tezligi</div>
-        <div class="text-[11px] text-slate-500 mt-1">Mijoz sovumasidan oldin</div>
+      <div>
+        <div class="text-3xl font-semibold tracking-tight text-white font-mono">&lt; 0.8s</div>
+        <div class="text-xs text-zinc-400 mt-1 font-medium">O'rtacha Javob Tezligi</div>
       </div>
-      <div class="bento-card p-6 text-center">
-        <div class="text-3xl sm:text-4xl font-black text-pistachio mb-1">3.8x</div>
-        <div class="text-xs sm:text-sm font-semibold text-slate-300">Konversiya O'sishi</div>
-        <div class="text-[11px] text-slate-500 mt-1">Oddiy botlarga nisbatan</div>
+      <div>
+        <div class="text-3xl font-semibold tracking-tight text-[#B5F87B] font-mono">3.8x</div>
+        <div class="text-xs text-zinc-400 mt-1 font-medium">Konversiya O'sishi</div>
       </div>
-      <div class="bento-card p-6 text-center">
-        <div class="text-3xl sm:text-4xl font-black text-white mb-1">24/7</div>
-        <div class="text-xs sm:text-sm font-semibold text-slate-300">To'liq Avtonom Rejim</div>
-        <div class="text-[11px] text-slate-500 mt-1">Tun-u kun savdo qilish</div>
+      <div>
+        <div class="text-3xl font-semibold tracking-tight text-white font-mono">24/7</div>
+        <div class="text-xs text-zinc-400 mt-1 font-medium">Uzluksiz Avtonom Rejim</div>
       </div>
     </div>
   </section>
 
-  <!-- Bento Grid 3-Agent Pipeline -->
-  <section id="pipeline" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-        <i data-lucide="cpu" class="w-3.5 h-3.5"></i> 3-Agentli Quvur Arxitekturasi
-      </div>
-      <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-        Nega VertaFlow oddiy bot emas, balki <span class="text-pistachio">Savdo Yopuvchi Agent</span>?
+  <!-- 3-Agent Architecture Pipeline -->
+  <section id="pipeline" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-white">
+        Uch bosqichli <span class="text-[#B5F87B]">Savdo Quvuri</span>
       </h2>
-      <p class="text-slate-400 text-sm sm:text-base">
-        Oddiy botlar faqat oldindan yozilgan savollarga tugmacha ko'rsatadi. VertaFlow esa uch bosqichli intellektual agentlar zanjiri orqali har bir xaridorni yakuniy to'lovgacha olib boradi.
+      <p class="text-zinc-400 text-sm mt-3">
+        Har bir murojaat bitta agent tomonidan emas, o'z sohasiga chuqur ixtisoslashgan 3 ta intellektual agent orqali yakunlanadi.
       </p>
     </div>
 
-    <!-- 3-Agent Bento Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Agent 1 -->
-      <div class="bento-card p-8 flex flex-col justify-between">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Card 1 -->
+      <div class="elite-card p-6 flex flex-col justify-between">
         <div>
-          <div class="w-12 h-12 rounded-2xl bg-surface border border-white/10 flex items-center justify-center text-pistachio mb-6 shadow-md">
-            <i data-lucide="search" class="w-6 h-6"></i>
+          <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300 mb-5">
+            <i data-lucide="compass" class="w-5 h-5 text-[#B5F87B]"></i>
           </div>
-          <div class="text-xs font-black text-pistachio uppercase tracking-wider mb-2">01-Bosqich</div>
-          <h3 class="text-xl font-black text-white mb-3">Discovery (SPIN) Agenti</h3>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">
-            Mijozdan to'g'ri savollar berish orqali uning ehtiyojini, byudjetini va og'riqli nuqtalarini aniqlaydi. Mahsulotni shunchaki maqtamaydi, balki mijozning muammosiga yechim sifatida taqdim etadi.
+          <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">01 // BOSQICH</div>
+          <h3 class="text-lg font-semibold text-white mb-2">Discovery Agenti</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            SPIN metodologiyasi orqali mijozning vaziyatini, ehtiyojini va byudjetini aniqlaydi. Shunchaki maqtamaydi, aniq muammoga yechim beradi.
           </p>
         </div>
-        <div class="border-t border-white/5 pt-4 text-xs text-slate-400 space-y-2">
-          <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Ehtiyoj va og'riq tahlili</div>
-          <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Byudjetga mos taklif</div>
+        <div class="mt-6 pt-4 border-t border-white/5 text-xs text-zinc-500 font-mono">
+          Ehtiyoj va og'riq diagnostikasi
         </div>
       </div>
 
-      <!-- Agent 2 (Hero Agent) -->
-      <div class="bento-card p-8 flex flex-col justify-between border-pistachio/40 shadow-xl shadow-[rgba(181,248,123,0.08)]">
+      <!-- Card 2 -->
+      <div class="elite-card p-6 flex flex-col justify-between border-[#B5F87B]/30">
         <div>
-          <div class="w-12 h-12 rounded-2xl bg-pistachio text-pistachioDark flex items-center justify-center font-black mb-6 shadow-lg shadow-[rgba(181,248,123,0.3)]">
-            <i data-lucide="shield-alert" class="w-6 h-6"></i>
+          <div class="w-10 h-10 rounded-xl bg-[#B5F87B]/10 border border-[#B5F87B]/30 flex items-center justify-center text-[#B5F87B] mb-5">
+            <i data-lucide="shield" class="w-5 h-5"></i>
           </div>
-          <div class="text-xs font-black text-pistachio uppercase tracking-wider mb-2">02-Bosqich (Flagship)</div>
-          <h3 class="text-xl font-black text-white mb-3">Objection Defuser (E'tiroz Yopuvchi)</h3>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">
-            Eng qiyin "Qimmat", "O'ylab ko'raman", "Boshqa joyda arzon" e'tirozlarini savdo argumentiga aylantiradi. Challenger texnikasi bilan raqobatchilar vaqtinchalik yechim ekanini asoslab beradi.
+          <div class="text-[11px] font-mono text-[#B5F87B] uppercase tracking-wider mb-1">02 // ASOSIY BOSQICH</div>
+          <h3 class="text-lg font-semibold text-white mb-2">Objection Defuser</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            "Qimmat", "O'ylab ko'raman" yoki "Raqobatchingiz arzon" degan e'tirozlarni darhol fosh qiladi va Challenger usulida savdoga aylantiradi.
           </p>
         </div>
-        <div class="border-t border-white/5 pt-4 text-xs text-slate-400 space-y-2">
-          <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Psixologik e'tiroz yopish</div>
-          <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Raqobatchilardan ustunlik isboti</div>
+        <div class="mt-6 pt-4 border-t border-white/5 text-xs text-[#B5F87B] font-mono">
+          Psixologik e'tiroz yopish
         </div>
       </div>
 
-      <!-- Agent 3 -->
-      <div class="bento-card p-8 flex flex-col justify-between">
+      <!-- Card 3 -->
+      <div class="elite-card p-6 flex flex-col justify-between">
         <div>
-          <div class="w-12 h-12 rounded-2xl bg-surface border border-white/10 flex items-center justify-center text-pistachio mb-6 shadow-md">
-            <i data-lucide="credit-card" class="w-6 h-6"></i>
+          <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300 mb-5">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-[#B5F87B]"></i>
           </div>
-          <div class="text-xs font-black text-pistachio uppercase tracking-wider mb-2">03-Bosqich</div>
-          <h3 class="text-xl font-black text-white mb-3">Deal Closer & Payment</h3>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">
-            Mijoz tayyor bo'lishi bilan Click va Payme to'lov havolasini chiqaradi, qabul qilingan buyurtmani 1C, Bitrix24 yoki Telegram hisobot guruhiga yetkazadi.
+          <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">03 // BOSQICH</div>
+          <h3 class="text-lg font-semibold text-white mb-2">Deal Closer</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Mijoz rozi bo'lishi bilan Click va Payme to'lov havolalarini shakllantiradi va buyurtmani darhol 1C va CRM ga yuklaydi.
           </p>
         </div>
-        <div class="border-t border-white/5 pt-4 text-xs text-slate-400 space-y-2">
-          <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Click & Payme to'lov havolasi</div>
-          <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> CRM va 1C ga darhol yuklash</div>
+        <div class="mt-6 pt-4 border-t border-white/5 text-xs text-zinc-500 font-mono">
+          Tranzaksiya va CRM sinkron
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Objection Defuser Showcase -->
-  <section id="etirozlarni-yopish" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="bento-card p-6 sm:p-10 border-white/10">
-      <div class="max-w-3xl mb-10">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-          <i data-lucide="swords" class="w-3.5 h-3.5"></i> Jonli E'tiroz Yopish Sinovi
-        </div>
-        <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-          Xaridorlarning 4 ta asosiy bahonasini <span class="text-pistachio">qanday yopamiz</span>?
+  <!-- Interactive Objection Testing Lab -->
+  <section id="etirozlar" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+    <div class="elite-card p-6 sm:p-8">
+      <div class="max-w-xl mb-8">
+        <div class="text-[11px] font-mono text-[#B5F87B] uppercase tracking-wider mb-2">INTERAKTIV LAB</div>
+        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+          Xaridorlarning 4 ta asosiy e'tiroziga javoblar
         </h2>
-        <p class="text-slate-400 text-xs sm:text-sm">
-          Tugmalarni bosing va VertaFlow AI Closer ushbu e'tirozlarga qanday psixologik aniqlik bilan javob berishini ko'ring:
+        <p class="text-zinc-400 text-xs sm:text-sm mt-2">
+          Tugmani bosing va tizim bu e'tirozga qanday javob berishini ko'ring:
         </p>
       </div>
 
-      <!-- Objection Selector Tabs -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        <button onclick="selectObjection(0)" id="obj-tab-0" class="obj-tab-btn p-3 sm:p-4 rounded-xl text-left border border-pistachio bg-pistachio/10 text-pistachio font-bold text-xs sm:text-sm transition-all duration-200">
+      <!-- Selector pills -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
+        <button onclick="pickObjection(0)" id="obj-p-0" class="p-3 rounded-xl text-left border border-[#B5F87B] bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-medium transition-all">
           1. "Qimmat ekan"
         </button>
-        <button onclick="selectObjection(1)" id="obj-tab-1" class="obj-tab-btn p-3 sm:p-4 rounded-xl text-left border border-white/10 bg-surface text-slate-300 hover:border-pistachio/40 font-bold text-xs sm:text-sm transition-all duration-200">
+        <button onclick="pickObjection(1)" id="obj-p-1" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all">
           2. "O'ylab ko'raman"
         </button>
-        <button onclick="selectObjection(2)" id="obj-tab-2" class="obj-tab-btn p-3 sm:p-4 rounded-xl text-left border border-white/10 bg-surface text-slate-300 hover:border-pistachio/40 font-bold text-xs sm:text-sm transition-all duration-200">
+        <button onclick="pickObjection(2)" id="obj-p-2" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all">
           3. "Boshqa joyda arzon"
         </button>
-        <button onclick="selectObjection(3)" id="obj-tab-3" class="obj-tab-btn p-3 sm:p-4 rounded-xl text-left border border-white/10 bg-surface text-slate-300 hover:border-pistachio/40 font-bold text-xs sm:text-sm transition-all duration-200">
+        <button onclick="pickObjection(3)" id="obj-p-3" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all">
           4. "Kafolat bormi?"
         </button>
       </div>
 
-      <!-- Dynamic Response Card -->
-      <div id="objection-display" class="bg-[#090D17] rounded-2xl p-6 sm:p-8 border border-white/5 animate-glissade">
-        <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-6 border-b border-white/5 gap-2">
-          <div class="flex items-center gap-2">
-            <span class="text-slate-400 text-xs">Mijoz e'tirozi:</span>
-            <span class="text-white font-bold text-sm sm:text-base" id="obj-title">"Qimmat ekan, arzonroq bering"</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] text-slate-400">Taktika:</span>
-            <span class="text-xs font-mono text-pistachio font-bold" id="obj-tactics">Challenger ROI Reframe</span>
-          </div>
+      <!-- Output view -->
+      <div id="obj-output-box" class="bg-[#0A0C11] rounded-xl p-5 sm:p-6 border border-white/5 tab-fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/5 gap-2 text-xs">
+          <span class="text-zinc-400">E'tiroz: <strong class="text-white font-medium ml-1" id="obj-label">"Qimmat ekan, arzonroq bering"</strong></span>
+          <span class="font-mono text-[#B5F87B] text-[11px]" id="obj-method">TACTIC: Challenger ROI Reframe</span>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div class="lg:col-span-4 space-y-3">
-            <div class="p-3.5 rounded-xl bg-surface border border-white/5 text-xs text-slate-300">
-              <div class="font-bold text-slate-200 mb-1">Mijoz Psixologiyasi:</div>
-              <p class="text-slate-400 leading-relaxed" id="obj-psych">
-                Mijoz narxni qimmat deyotganda, u mahsulotning narxiga emas, balki bu xarajatdan keladigan foyda yetarli ekaniga ishonmayotgan bo'ladi.
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+          <div class="md:col-span-4 space-y-3 text-xs">
+            <div class="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+              <div class="text-zinc-500 font-mono text-[10px] uppercase mb-1">Mijoz Asli Nima Deyapti:</div>
+              <p class="text-zinc-300 leading-relaxed" id="obj-meaning">
+                Mijoz narxdan qo'rqayotgani yo'q, u ushbu xarajatdan olinadigan samaraning yetarli bo'lishiga ishonmayapti.
               </p>
             </div>
-            <div class="p-3.5 rounded-xl bg-surface border border-white/5 text-xs text-slate-300">
-              <div class="font-bold text-slate-200 mb-1">AI Closer Maqsadi:</div>
-              <p class="text-slate-400 leading-relaxed" id="obj-goal">
-                Narxni emas, narx to'lamaslik natijasida har kuni yo'qotilayotgan pul va asabni ko'rsatish orqali xaridni mantiqiy investitsiyaga aylantirish.
+            <div class="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+              <div class="text-zinc-500 font-mono text-[10px] uppercase mb-1">AI Strategiyasi:</div>
+              <p class="text-zinc-300 leading-relaxed" id="obj-strategy">
+                Narxni emas, kutish natijasida har kuni yo'qotilayotgan daromadni ko'rsatish orqali xaridni foydali investitsiyaga aylantirish.
               </p>
             </div>
           </div>
 
-          <div class="lg:col-span-8 bg-surface rounded-2xl p-5 border border-pistachio/30 shadow-lg">
-            <div class="flex items-center justify-between mb-3 text-xs">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-pistachio flex items-center justify-center text-black font-bold text-xs">
-                  <i data-lucide="bot" class="w-3.5 h-3.5"></i>
-                </div>
-                <span class="font-bold text-white">VertaFlow AI Closer Javobi</span>
-              </div>
-              <span class="text-[10px] bg-pistachio/20 text-pistachio font-bold px-2 py-0.5 rounded">Avtonom Muloqot</span>
-            </div>
-            <div class="bg-[#090D17] p-4 rounded-xl text-slate-200 text-xs sm:text-sm leading-relaxed font-medium border border-white/5 whitespace-pre-line" id="obj-response">
-              "To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi. 
+          <div class="md:col-span-8 p-4 rounded-xl bg-zinc-900/80 border border-[#B5F87B]/20 text-xs sm:text-sm text-zinc-100 leading-relaxed whitespace-pre-line font-medium" id="obj-script">
+            "To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi.
 
-Bizning yechimimiz esa 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad bersa, 2.5 mln investitsiya qilish mantiqiy emasmi? 
+Bizning yechimimiz 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad keltirsa, 2.5 mln investitsiya qilish mantiqiy emasmi?
 
-Sizga bugun bepul yetkazib berish bilan qulay qilishimizni xohlaysizmi?"
-            </div>
-            <div class="mt-4 flex items-center justify-end">
-              <a href="/app" class="text-xs text-pistachio font-bold hover:underline inline-flex items-center gap-1">
-                Ushbu skriptni o'z biznesingizda sinab ko'ring &rarr;
-              </a>
-            </div>
+Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?"
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Comparison Section -->
-  <section id="taqqoslash" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-        <i data-lucide="scale" class="w-3.5 h-3.5"></i> Qiyosiy Tahlil
-      </div>
-      <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-        Oddiy Chatbotlar vs <span class="text-pistachio">VertaFlow AI Closer</span>
-      </h2>
-      <p class="text-slate-400 text-sm">
-        Nega eski qoidali botlar savdoni o'ldiradi, VertaFlow esa uni 3.8 barobarga oshiradi?
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Old bots -->
-      <div class="bento-card p-8 border-rose-500/20 bg-gradient-to-b from-[#140F13] to-surface">
-        <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/5">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
-              <i data-lucide="x" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <div class="text-lg font-black text-white">Oddiy Qoidali Chatbotlar</div>
-              <div class="text-xs text-slate-400">ManyChat, izoh botlari va shablonlar</div>
-            </div>
-          </div>
-          <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold">PAST KONVERSIYA</span>
-        </div>
-
-        <ul class="space-y-4 text-xs sm:text-sm text-slate-300">
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="x-circle" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
-            <span>Faqat oldindan yozilgan qotib qolgan tugmalarni ko'rsatadi, insondek muloqot qilolmaydi.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="x-circle" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
-            <span>Mijoz "Qimmat" desa javob bera olmaydi, xaridor darhol sahifadan chiqib ketadi.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="x-circle" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
-            <span>Mijozning og'riqli nuqtasini aniqlamaydi, savdo psixologiyasidan butunlay bexabar.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="x-circle" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
-            <span>To'lov havolasini avtonom yaratolmaydi, baribir jonli operator aralashuvini talab qiladi.</span>
-          </li>
-        </ul>
-      </div>
-
-      <!-- VertaFlow AI Closer -->
-      <div class="bento-card p-8 border-pistachio/40 bg-gradient-to-b from-[#0F1C12] to-surface shadow-2xl shadow-[rgba(181,248,123,0.1)]">
-        <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/5">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-pistachio text-pistachioDark flex items-center justify-center font-bold">
-              <i data-lucide="zap" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <div class="text-lg font-black text-white">VertaFlow AI Closer</div>
-              <div class="text-xs text-pistachio font-medium">Avtonom Savdo Infratuzilmasi</div>
-            </div>
-          </div>
-          <span class="text-[10px] bg-pistachio text-pistachioDark px-2 py-0.5 rounded font-black">3.8x SAVDO</span>
-        </div>
-
-        <ul class="space-y-4 text-xs sm:text-sm text-slate-200">
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-pistachio shrink-0 mt-0.5"></i>
-            <span>O'zbek, Rus va Ingliz tillarida jonli, samimiy va professional suhbat olib boradi.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-pistachio shrink-0 mt-0.5"></i>
-            <span>Har qanday e'tirozni SPIN va Challenger texnikasi bilan savdoga aylantiradi.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-pistachio shrink-0 mt-0.5"></i>
-            <span>Mijozning byudjeti va ehtiyojini tahlil qilib, unga mos eng yaxshi tarifni tavsiya qiladi.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-pistachio shrink-0 mt-0.5"></i>
-            <span>Click va Payme to'lovlarini yuborib, tranzaksiyani 1C va CRM ga 1 soniyada yozadi.</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Omnichannel Matrix -->
-  <section id="kanallar" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-        <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Ko'p Kanallilik
-      </div>
-      <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-        Barcha Savdo Kanallaringiz <span class="text-pistachio">Bitta Tizimda</span>
-      </h2>
-      <p class="text-slate-400 text-sm">
-        Mijoz qayerdan yozishidan qat'i nazar, VertaFlow bir zumda unga javob beradi va savdoni yopadi.
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="bento-card p-6 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center mb-4">
-            <i data-lucide="instagram" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-base font-bold text-white mb-2">Instagram Direct & Reels</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Direct xabarlar, Stories belgilashlari va postlardagi izohlarga avtomat javob va sotuv.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-pistachio font-bold flex items-center gap-1">
-          <i data-lucide="check" class="w-3.5 h-3.5"></i> Tayyor Integratsiya
-        </div>
-      </div>
-
-      <div class="bento-card p-6 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center mb-4">
-            <i data-lucide="send" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-base font-bold text-white mb-2">Telegram Bot & Guruhlar</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            O'zbekistondagi eng faol auditoriya uchun to'liq avtonom savdo va buyurtma boshqaruvi.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-pistachio font-bold flex items-center gap-1">
-          <i data-lucide="check" class="w-3.5 h-3.5"></i> Tayyor Integratsiya
-        </div>
-      </div>
-
-      <div class="bento-card p-6 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
-            <i data-lucide="message-circle" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-base font-bold text-white mb-2">WhatsApp Business</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Xalqaro xaridorlar va korporativ mijozlar uchun rasmiy Meta Cloud API orqali aloqa.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-pistachio font-bold flex items-center gap-1">
-          <i data-lucide="check" class="w-3.5 h-3.5"></i> Tayyor Integratsiya
-        </div>
-      </div>
-
-      <div class="bento-card p-6 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
-            <i data-lucide="database" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-base font-bold text-white mb-2">1C va CRM Tizimlar</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Yopilgan bitimlar va xaridor telefon raqamlari darhol 1C, Bitrix24 yoki Excelga uzatiladi.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-pistachio font-bold flex items-center gap-1">
-          <i data-lucide="check" class="w-3.5 h-3.5"></i> Real-time Webhook
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Interactive ROI Calculator -->
-  <section id="kalkulyator" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="bento-card p-6 sm:p-12 border-pistachio/30 bg-gradient-to-b from-[#0F1624] to-surface">
-      <div class="max-w-3xl mb-12">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-          <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Foyda Hisoblagichi
-        </div>
-        <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-          VertaFlow sizga oyiga <span class="text-pistachio">qancha qo'shimcha daromad</span> keltiradi?
+  <!-- ROI Calculator -->
+  <section id="kalkulyator" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+    <div class="elite-card p-6 sm:p-10 border-[#B5F87B]/30">
+      <div class="max-w-xl mb-10">
+        <div class="text-[11px] font-mono text-[#B5F87B] uppercase tracking-wider mb-2">INVESTITSIYA SAMARADORLIGI</div>
+        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+          VertaFlow oyiga qancha daromad keltiradi?
         </h2>
-        <p class="text-slate-400 text-xs sm:text-sm">
-          Operatorlar kech javob bergani yoki e'tirozni yopolmagani sababli har oy o'rtacha 40% dan 60% gacha xaridorlar yo'qotiladi.
+        <p class="text-zinc-400 text-xs sm:text-sm mt-2">
+          Operatorlar kech javob bergani yoki e'tirozni yopolmagani sababli har oy o'rtacha 40% xaridorlar yo'qotiladi.
         </p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <!-- Sliders -->
-        <div class="lg:col-span-7 space-y-8">
+        <div class="lg:col-span-7 space-y-6">
           <div>
-            <div class="flex justify-between items-center mb-2">
-              <label class="text-xs sm:text-sm font-bold text-slate-200">Oylik jami lidlar/murojaatlar soni:</label>
-              <span class="text-sm sm:text-base font-black text-pistachio" id="leads-val">1,200 ta</span>
+            <div class="flex justify-between items-center mb-2 text-xs">
+              <span class="text-zinc-300 font-medium">Oylik jami murojaatlar:</span>
+              <span class="font-mono font-semibold text-[#B5F87B]" id="calc-leads-lbl">1,500 ta</span>
             </div>
-            <input type="range" id="leads-range" min="100" max="10000" step="100" value="1200" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="calculateROI()">
+            <input type="range" id="c-leads" min="100" max="10000" step="100" value="1500" oninput="runROI()">
           </div>
 
           <div>
-            <div class="flex justify-between items-center mb-2">
-              <label class="text-xs sm:text-sm font-bold text-slate-200">O'rtacha buyurtma qiymati (chek):</label>
-              <span class="text-sm sm:text-base font-black text-pistachio" id="check-val">450,000 so'm</span>
+            <div class="flex justify-between items-center mb-2 text-xs">
+              <span class="text-zinc-300 font-medium">O'rtacha buyurtma cheki:</span>
+              <span class="font-mono font-semibold text-[#B5F87B]" id="calc-check-lbl">400,000 so'm</span>
             </div>
-            <input type="range" id="check-range" min="50000" max="5000000" step="50000" value="450000" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="calculateROI()">
+            <input type="range" id="c-check" min="50000" max="5000000" step="50000" value="400000" oninput="runROI()">
           </div>
 
-          <div class="p-4 rounded-xl bg-surface border border-white/5 text-xs text-slate-400">
-            <span class="font-bold text-white">Hisob-kitob formulasi:</span> O'rtacha 15% yo'qotilgan xaridorlarni VertaFlow AI Closer e'tirozlarni yopish orqali real savdoga aylantiradi.
-          </div>
+          <p class="text-[11px] text-zinc-500 font-mono">
+            * Konservativ hisob-kitob: VertaFlow yo'qotilayotgan xaridorlarning kamida 15 foizini real bitimga aylantiradi.
+          </p>
         </div>
 
-        <!-- Result Box -->
-        <div class="lg:col-span-5 bg-[#090D17] p-6 sm:p-8 rounded-2xl border border-pistachio/40 text-center flex flex-col justify-between shadow-2xl">
-          <div>
-            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Qutqarilgan Qo'shimcha Daromad</div>
-            <div class="text-3xl sm:text-4xl font-black text-pistachio mb-2" id="roi-result">81,000,000 so'm</div>
-            <div class="text-xs text-slate-400 mb-6">Har oy qo'shimcha sof daromad</div>
-          </div>
+        <div class="lg:col-span-5 bg-[#0A0C11] p-6 rounded-xl border border-white/10 text-center">
+          <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1">QUTQARILGAN OYLIK DAROMAD</div>
+          <div class="text-3xl sm:text-4xl font-semibold text-[#B5F87B] font-mono my-2" id="calc-result">90,000,000 so'm</div>
+          <div class="text-xs text-zinc-500 mb-6">Har oy korxona hisobiga sof qo'shimcha tushum</div>
 
-          <div class="space-y-2 border-t border-white/5 pt-4 text-xs text-slate-300 text-left mb-6">
-            <div class="flex justify-between">
-              <span>Qo'shimcha yopilgan savdolar:</span>
-              <span class="font-bold text-white" id="deals-result">180 ta</span>
-            </div>
-            <div class="flex justify-between">
-              <span>VertaFlow sarflangan mablag'ga nisbatan:</span>
-              <span class="font-bold text-pistachio">42x ROI</span>
-            </div>
-          </div>
-
-          <a href="/app" class="w-full py-3.5 bg-pistachio hover:bg-pistachioHover text-pistachioDark font-black text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-[rgba(181,248,123,0.3)]">
-            Darhol Ushbu Daromadni Olish
+          <a href="/app" class="btn-pistachio w-full py-3 rounded-xl text-xs flex items-center justify-center gap-1.5">
+            <span>Ushbu daromadni yoqish</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
           </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Pricing Section with Duration Switcher -->
-  <section id="tariflar" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="text-center max-w-3xl mx-auto mb-12">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-        <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Shaffof Tariflar
-      </div>
-      <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-        Biznesingiz Ko'lamiga Mos <span class="text-pistachio">Rejalar</span>
+  <!-- Pricing Section -->
+  <section id="tariflar" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+    <div class="text-center max-w-xl mx-auto mb-12">
+      <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-white">
+        Shaffof va aniq <span class="text-[#B5F87B]">Tariflar</span>
       </h2>
-      <p class="text-slate-400 text-sm">
-        Yashirin to'lovlar yo'q. Istalgan vaqtda bekor qilish mumkin.
+      <p class="text-zinc-400 text-sm mt-2">
+        Karta bog'lash shart emas. 14 kunlik to'liq imkoniyatli sinov davri.
       </p>
 
-      <!-- Period Selector Toggle -->
-      <div class="mt-8 inline-flex items-center p-1.5 bg-surface rounded-2xl border border-white/10 shadow-xl">
-        <button onclick="changePeriod(1)" id="period-1" class="period-pill px-4 py-2 rounded-xl text-xs font-black transition-all bg-pistachio text-pistachioDark shadow-sm">
-          1 Oy
+      <!-- Period switch -->
+      <div class="mt-6 inline-flex p-1 bg-[#0E1015] border border-white/10 rounded-xl text-xs">
+        <button onclick="setPeriod(1)" id="p-btn-1" class="px-3.5 py-1.5 rounded-lg font-medium text-[#08090C] bg-[#B5F87B] transition-all">
+          1 oy
         </button>
-        <button onclick="changePeriod(3)" id="period-3" class="period-pill px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white">
-          3 Oy <span class="text-[10px] text-pistachio font-black ml-1">-10%</span>
+        <button onclick="setPeriod(3)" id="p-btn-3" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all">
+          3 oy <span class="text-[#B5F87B] text-[10px] font-mono">-10%</span>
         </button>
-        <button onclick="changePeriod(6)" id="period-6" class="period-pill px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white">
-          6 Oy <span class="text-[10px] text-pistachio font-black ml-1">-15%</span>
+        <button onclick="setPeriod(6)" id="p-btn-6" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all">
+          6 oy <span class="text-[#B5F87B] text-[10px] font-mono">-15%</span>
         </button>
-        <button onclick="changePeriod(12)" id="period-12" class="period-pill px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white">
-          12 Oy <span class="text-[10px] text-pistachio font-black ml-1">-25%</span>
+        <button onclick="setPeriod(12)" id="p-btn-12" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all">
+          12 oy <span class="text-[#B5F87B] text-[10px] font-mono">-25%</span>
         </button>
       </div>
     </div>
 
-    <!-- Pricing Cards Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-      <!-- Free Trial -->
-      <div class="bento-card p-8 flex flex-col justify-between">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Starter -->
+      <div class="elite-card p-6 flex flex-col justify-between">
         <div>
-          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Boshlang'ich</div>
-          <h3 class="text-2xl font-black text-white mb-2">Bepul Sinov</h3>
-          <p class="text-xs text-slate-400 mb-6">Tizimni sinab ko'rish va AI Closer samaradorligiga ishonch hosil qilish uchun.</p>
-          <div class="text-3xl font-black text-white mb-6">0 <span class="text-xs text-slate-400 font-normal">so'm / 14 kun</span></div>
+          <div class="text-xs font-mono text-zinc-500 uppercase mb-2">Boshlang'ich</div>
+          <h3 class="text-xl font-semibold text-white">Bepul Sinov</h3>
+          <div class="text-2xl font-semibold text-white font-mono my-4">0 <span class="text-xs text-zinc-400 font-sans font-normal">so'm / 14 kun</span></div>
+          <p class="text-xs text-zinc-400 mb-6">Tizim quvvati va konversiyani xavf-xatarsiz sinab ko'rish uchun.</p>
 
-          <ul class="space-y-3 text-xs text-slate-300 border-t border-white/5 pt-6">
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> 100 ta savdo muloqoti</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> 1 ta savdo kanali (Telegram)</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Asosiy SPIN e'tiroz yopish</li>
-            <li class="flex items-center gap-2 text-slate-500"><i data-lucide="minus" class="w-4 h-4"></i> CRM integratsiya</li>
+          <ul class="space-y-2.5 text-xs text-zinc-300 border-t border-white/5 pt-4">
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 100 ta savdo suhbati</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Telegram savdo boti</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 3 ta bilim manbai (RAG)</li>
           </ul>
         </div>
 
-        <a href="/app" class="mt-8 w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-xs rounded-xl transition-all border border-white/10 text-center">
-          Bepul Boshlash
+        <a href="/app" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all">
+          Boshlash
         </a>
       </div>
 
-      <!-- Pro Flagship -->
-      <div class="bento-card p-8 flex flex-col justify-between border-pistachio shadow-2xl shadow-[rgba(181,248,123,0.15)] relative">
-        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-pistachio text-pistachioDark text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow-md">
-          ENG MASHHUR REJA
+      <!-- Pro (Flagship) -->
+      <div class="elite-card p-6 flex flex-col justify-between border-[#B5F87B]/40 relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#B5F87B] text-[#08090C] text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
+          TAVSIYA ETILADI
         </div>
         <div>
-          <div class="text-xs font-bold text-pistachio uppercase tracking-wider mb-2">Professional</div>
-          <h3 class="text-2xl font-black text-white mb-2">Pro AI Closer</h3>
-          <p class="text-xs text-slate-400 mb-6">Muntazam reklama yoquvchi va oyiga 1,000+ lid qabul qiluvchi bizneslar uchun.</p>
-          <div class="text-3xl font-black text-white mb-1" id="price-pro">490,000 <span class="text-xs text-slate-400 font-normal">so'm / oy</span></div>
-          <div class="text-[11px] text-pistachio font-semibold mb-6" id="save-pro">1 oy to'lovida</div>
+          <div class="text-xs font-mono text-[#B5F87B] uppercase mb-2">Professional</div>
+          <h3 class="text-xl font-semibold text-white">Pro AI Closer</h3>
+          <div class="text-2xl font-semibold text-white font-mono my-4" id="rate-pro">490,000 <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span></div>
+          <p class="text-xs text-zinc-400 mb-6">Savdoni to'liq avtomatlashtirmoqchi bo'lgan bizneslar uchun.</p>
 
-          <ul class="space-y-3 text-xs text-slate-200 border-t border-white/5 pt-6">
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> <strong>Cheksiz</strong> savdo muloqotlari</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Barcha kanallar (Instagram, Telegram, WhatsApp)</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Mukammal Few-Shot e'tiroz yopish</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Click & Payme to'lov havolalari</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> 1C va CRM integratsiya</li>
+          <ul class="space-y-2.5 text-xs text-zinc-200 border-t border-white/5 pt-4">
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> <strong>Cheksiz</strong> savdo muloqotlari</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 3-Agentli Savdo Quvuri</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Instagram + Telegram + WhatsApp</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Few-Shot E'tiroz Yopish (SPIN)</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Click & Payme to'lov integratsiyasi</li>
           </ul>
         </div>
 
-        <a href="/app" class="mt-8 w-full py-3.5 bg-pistachio hover:bg-pistachioHover text-pistachioDark font-black text-xs rounded-xl transition-all shadow-lg shadow-[rgba(181,248,123,0.3)] text-center">
-          Pro Rejani Faollashtirish
+        <a href="/app" class="btn-pistachio mt-8 w-full py-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5">
+          <span>Pro Rejani Faollashtirish</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </a>
       </div>
 
-      <!-- Business Tier -->
-      <div class="bento-card p-8 flex flex-col justify-between">
+      <!-- Business -->
+      <div class="elite-card p-6 flex flex-col justify-between">
         <div>
-          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Korxona</div>
-          <h3 class="text-2xl font-black text-white mb-2">Biznes Enterprise</h3>
-          <p class="text-xs text-slate-400 mb-6">Katta savdo bo'limi, bir nechta filial va individual integratsiya uchun.</p>
-          <div class="text-3xl font-black text-white mb-1" id="price-biz">990,000 <span class="text-xs text-slate-400 font-normal">so'm / oy</span></div>
-          <div class="text-[11px] text-pistachio font-semibold mb-6" id="save-biz">1 oy to'lovida</div>
+          <div class="text-xs font-mono text-zinc-500 uppercase mb-2">Korporativ</div>
+          <h3 class="text-xl font-semibold text-white">Enterprise Biznes</h3>
+          <div class="text-2xl font-semibold text-white font-mono my-4" id="rate-biz">990,000 <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span></div>
+          <p class="text-xs text-zinc-400 mb-6">Katta savdo bo'limlari, bir nechta filial va ERP integratsiyasi uchun.</p>
 
-          <ul class="space-y-3 text-xs text-slate-300 border-t border-white/5 pt-6">
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Bir nechta filial va workspace'lar</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Maxsus AI Persona & Korporativ ohang</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Alohida Server va Maxsus API Limitlari</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pistachio"></i> Shaxsiy menejer va 24/7 VIP qo'llab-quvvatlash</li>
+          <ul class="space-y-2.5 text-xs text-zinc-300 border-t border-white/5 pt-4">
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Ko'p sonli filial va workspace'lar</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Maxsus AI Persona va brend ohangi</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 1C & Bitrix24 to'liq API integratsiya</li>
+            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Shaxsiy server va 24/7 VIP SLA</li>
           </ul>
         </div>
 
-        <a href="/app" class="mt-8 w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-xs rounded-xl transition-all border border-white/10 text-center">
-          Menejer bilan Bog'lanish
+        <a href="/app" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all">
+          Bog'lanish
         </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ Section with Smooth Accordion -->
-  <section id="savollar" class="py-20 px-4 sm:px-6 max-w-4xl mx-auto w-full">
-    <div class="text-center mb-16">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pistachio/10 text-pistachio text-xs font-bold uppercase tracking-wider mb-4 border border-pistachio/20">
-        <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Ko'p So'raladigan Savollar
-      </div>
-      <h2 class="text-2xl sm:text-4xl font-black text-white mb-4">
-        Barcha Savollaringizga <span class="text-pistachio">Aniq Javoblar</span>
-      </h2>
-    </div>
-
-    <div class="space-y-4">
-      <!-- FAQ 1 -->
-      <div class="bento-card p-5 cursor-pointer" onclick="toggleFaq(0)">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-sm sm:text-base text-white">VertaFlow qanday qilib oddiy botlardan yaxshiroq sotadi?</h3>
-          <i data-lucide="chevron-down" id="faq-icon-0" class="w-4 h-4 text-pistachio transition-transform duration-200"></i>
-        </div>
-        <div id="faq-ans-0" class="hidden mt-3 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-white/5 pt-3">
-          Oddiy botlar faqat oldindan belgilangan qisqa tugmalarga tayanadi. VertaFlow esa SPIN Selling va Challenger savdo metodologiyasi bo'yicha maxsus o'rgatilgan LLM arxitekturasida ishlaydi. U xaridorning har qanday kutilmagan savoliga faktlar asosida javob beradi va suhbatni to'lovgacha yetaklaydi.
-        </div>
-      </div>
-
-      <!-- FAQ 2 -->
-      <div class="bento-card p-5 cursor-pointer" onclick="toggleFaq(1)">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-sm sm:text-base text-white">Mening mahsulotim haqida AI qayerdan ma'lumot oladi?</h3>
-          <i data-lucide="chevron-down" id="faq-icon-1" class="w-4 h-4 text-pistachio transition-transform duration-200"></i>
-        </div>
-        <div id="faq-ans-1" class="hidden mt-3 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-white/5 pt-3">
-          Ilova ichidagi "Bilimlar Bazasi" (Knowledge Base) bo'limiga mahsulotlaringiz narxlari, kataloglari, yetkazib berish shartlari yoki saytingiz havolasini kiritasiz. Tizim 1 daqiqada barcha ma'lumotlarni o'zlashtiradi va faqat siz bergan rasmiy ma'lumotlar asosida 100% to'g'ri javob beradi.
-        </div>
-      </div>
-
-      <!-- FAQ 3 -->
-      <div class="bento-card p-5 cursor-pointer" onclick="toggleFaq(2)">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-sm sm:text-base text-white">Instagram va Telegram akkauntim xavfsizligiga kafolat bormi?</h3>
-          <i data-lucide="chevron-down" id="faq-icon-2" class="w-4 h-4 text-pistachio transition-transform duration-200"></i>
-        </div>
-        <div id="faq-ans-2" class="hidden mt-3 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-white/5 pt-3">
-          Ha, 100%. VertaFlow rasmiy Meta Graph API va Telegram Bot API standartlari orqali ishlaydi. Hech qanday parollar so'ralmaydi va ulanishlar xavfsiz OAuth / HMAC Webhook shifrlash bilan himoyalanadi.
-        </div>
-      </div>
-
-      <!-- FAQ 4 -->
-      <div class="bento-card p-5 cursor-pointer" onclick="toggleFaq(3)">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-sm sm:text-base text-white">To'lovlar qanday qabul qilinadi?</h3>
-          <i data-lucide="chevron-down" id="faq-icon-3" class="w-4 h-4 text-pistachio transition-transform duration-200"></i>
-        </div>
-        <div id="faq-ans-3" class="hidden mt-3 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-white/5 pt-3">
-          Tariflar uchun to'lovni milliy Payme va Click tizimlari orqali xavfsiz amalga oshirishingiz mumkin. Shuningdek, mijozlaringizdan to'lov olish uchun ham o'z Click/Payme havolangizni AI Closer'ga biriktirib qo'yishingiz mumkin.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Final CTA Footer Banner -->
-  <section class="py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-    <div class="bento-card p-8 sm:p-16 text-center bg-gradient-to-b from-[#121A2A] to-surface border-pistachio/30 shadow-2xl relative overflow-hidden">
-      <div class="max-w-3xl mx-auto relative z-10">
-        <h2 class="text-3xl sm:text-5xl font-black text-white mb-6">
-          Savdolarni qo'lda yo'qotishni to'xtating. <br />
-          <span class="text-pistachio">24/7 AI Closerni</span> ishga tushiring!
-        </h2>
-        <p class="text-slate-300 text-sm sm:text-base mb-10 max-w-xl mx-auto">
-          Hoziroq ro'yxatdan o'ting va 14 kun davomida sun'iy intellekt sizga qancha savdo yopib berishini bepul sinab ko'ring.
-        </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="/app" class="w-full sm:w-auto px-10 py-4 bg-pistachio hover:bg-pistachioHover text-pistachioDark font-black text-sm rounded-2xl transition-all shadow-xl shadow-[rgba(181,248,123,0.3)]">
-            14 Kun Bepul Boshlash &rarr;
-          </a>
-        </div>
       </div>
     </div>
   </section>
 
   <!-- Global Footer -->
-  <footer class="border-t border-white/5 py-12 px-4 sm:px-6 max-w-7xl mx-auto w-full text-xs text-slate-500">
-    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+  <footer class="border-t border-white/5 py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full text-xs text-zinc-500">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
-        <div class="w-6 h-6 rounded-lg bg-pistachio flex items-center justify-center text-black font-black">
-          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-        </div>
-        <span class="font-bold text-white text-sm">VertaFlow AI</span>
-        <span class="text-slate-600">|</span>
+        <span class="font-bold text-white tracking-tight">VertaFlow</span>
+        <span>•</span>
         <span>© 2026 VertaFlow AI Technologies LLC. Barcha huquqlar himoyalangan.</span>
       </div>
-      <div class="flex items-center space-x-6">
-        <a href="#pipeline" class="hover:text-slate-300">Imkoniyatlar</a>
-        <a href="#tariflar" class="hover:text-slate-300">Tariflar</a>
-        <a href="#savollar" class="hover:text-slate-300">Savol-Javoblar</a>
-        <a href="/app" class="hover:text-pistachio font-bold">Ilovaga Kirish</a>
+      <div class="flex items-center space-x-6 text-zinc-400">
+        <a href="#pipeline" class="hover:text-white">Arxitektura</a>
+        <a href="#tariflar" class="hover:text-white">Tariflar</a>
+        <a href="/app" class="text-[#B5F87B] hover:underline">Platformaga Kirish</a>
       </div>
     </div>
   </footer>
 
   <!-- Scripts -->
   <script>
-    // Initialize Lucide Icons
-    if (window.lucide) {
-      lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
 
-    // Mobile Navigation Toggle
-    function toggleMobileNav() {
-      const el = document.getElementById('mobile-nav');
-      el.classList.toggle('hidden');
-      el.classList.toggle('flex');
-    }
-
-    // Interactive Objection Tabs Data
-    const objectionData = [
+    const objections = [
       {
-        title: '"Qimmat ekan, arzonroq bering"',
-        tactics: 'Challenger ROI Reframe',
-        psych: 'Mijoz narxni qimmat deyotganda, u mahsulotning narxiga emas, balki bu xarajatdan keladigan foyda yetarli ekaniga ishonmayotgan bo'ladi.',
-        goal: 'Narxni emas, narx to'lamaslik natijasida har kuni yo'qotilayotgan pul va asabni ko'rsatish orqali xaridni mantiqiy investitsiyaga aylantirish.',
-        response: `"To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi. \n\nBizning yechimimiz esa 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad bersa, 2.5 mln investitsiya qilish mantiqiy emasmi? \n\nSizga bugun bepul yetkazib berish bilan qulay qilishimizni xohlaysizmi?"`
+        label: '"Qimmat ekan, arzonroq bering"',
+        method: 'TACTIC: Challenger ROI Reframe',
+        meaning: 'Mijoz narxdan qo'rqayotgani yo'q, u ushbu xarajatdan olinadigan samaraning yetarli bo'lishiga ishonmayapti.',
+        strategy: 'Narxni emas, kutish natijasida har kuni yo'qotilayotgan daromadni ko'rsatish orqali xaridni foydali investitsiyaga aylantirish.',
+        script: `"To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi.\n\nBizning yechimimiz 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad keltirsa, 2.5 mln investitsiya qilish mantiqiy emasmi?\n\nBugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?"`
       },
       {
-        title: '"Rahmat, o'ylab ko'rishim kerak"',
-        tactics: 'Urgency & Micro-Commitment',
-        psych: '"O'ylab ko'raman" — bu xushmuomalalik bilan rad etish. Mijozda hali noaniq ikkilanish yoki qo'rquv bor.',
-        goal: 'Ikkilanishning asl sababini muloyimlik bilan yuzaga chiqarish va bugun qaror qilish uchun rag'bat berish.',
-        response: `"Albatta, bunday muhim qarorni o'ylab ko'rishingiz tabiiy! \n\nOdatda mijozlarimiz ikki narsani o'ylab ko'rishadi: bu tizim bizning biznesga to'g'ri kelarmikan yoki natija bermasa nima bo'ladi deb. Sizni aynan qaysi jihat ikkilantiryapti? Aytsangiz, ochiqchasiga aniqlik kiritib berardim. \n\nBundan tashqari, hozirgi maxsus 14 kunlik bepul sinovimiz bugun soat 23:59 gacha amal qiladi. Hoziroq xavf-xatarsiz ulab ko'rsak-chi?"`
+        label: '"Rahmat, o'ylab ko'rishim kerak"',
+        method: 'TACTIC: Urgency & Micro-Commitment',
+        meaning: 'Mijozda noaniq ikkilanish bor, lekin buni ochiq aytishdan qochib muloyim rad etyapti.',
+        strategy: 'Ikkilanish sababini samimiy aniqlab, darhol qaror qabul qilish uchun xavfsiz qadam taklif qilish.',
+        script: `"Albatta, bunday muhim qarorni o'ylab ko'rishingiz tabiiy!\n\nOdatda mijozlarimiz ikki narsani o'ylab ko'rishadi: bu tizim bizning biznesga mos kelarmikan yoki natija bermasa nima bo'ladi deb. Sizni aynan qaysi jihat ikkilantiryapti?\n\nBundan tashqari, 14 kunlik bepul sinovimizda bir so'm ham sarflamaysiz. Hoziroq xavf-xatarsiz ulab sinab ko'rsak-chi?"`
       },
       {
-        title: '"Boshqa kompaniyada ancha arzon"',
-        tactics: 'Contrast & Hidden Cost Reveal',
-        psych: 'Mijoz ikki xil toifadagi xizmatni bir xil deb o'ylamoqda va faqat sirtqi raqamlarni solishtiryapti.',
-        goal: 'Raqobatchilarning yashirin cheklovlari va zaif tomonlarini ko'rsatib, sifat ustunligini isbotlash.',
-        response: `"Ha, bozorda arzonroq variantlar borligidan xabarimiz bor. Lekin farq shundaki: arzon botlar oddiy qolipli shablonlar bo'lib, e'tiroz kelganda to'xtab qoladi va mijozlarni yo'qotadi. \n\nVertaFlow esa har bir e'tirozni yopuvchi sun'iy intellekt bilan jihozlangan va 1C/CRM bilan to'liq integratsiya qilinadi. Arzon bot bilan 30% xaridorni yo'qotish — VertaFlow uchun to'lanadigan puldan ancha qimmatga tushadi. \n\nKeling, 14 kun sinab ko'ring, farqni o'zingiz his qilasiz!"`
+        label: '"Boshqa kompaniyada ancha arzon"',
+        method: 'TACTIC: Hidden Cost Discovery',
+        meaning: 'Mijoz sirtqi narxni solishtirmoqda, lekin xizmat ko'rsatishdagi chuqur farqdan bexabar.',
+        strategy: 'Arzon yechimlarning mijozlarni yo'qotish xavfini ochib berish va sifat ustunligini isbotlash.',
+        script: `"Ha, bozorda arzonroq variantlar borligidan xabarimiz bor. Lekin farq shundaki: arzon botlar oddiy qolipli shablonlar bo'lib, kutilmagan savol kelganda to'xtab qoladi va qimmatli xaridorlarni yo'qotadi.\n\nVertaFlow esa har bir e'tirozni savdoga aylantiruvchi sun'iy intellekt bilan jihozlangan. Arzon bot bilan 30% xaridorni yo'qotish — VertaFlow uchun to'lanadigan puldan ancha qimmatga tushadi.\n\n14 kun sinab ko'ring, farqni o'zingiz his qilasiz!"`
       },
       {
-        title: '"Kafolat bormi, aldanib qolmaymanmi?"',
-        tactics: 'Risk Reversal & Proof Stacking',
-        psych: 'Onlayn firibgarliklardan qo'rquv va mahsulot sifati bo'yicha ishonchsizlik.',
-        goal: 'Barcha moliyaviy va huquqiy xavflarni o'z zimmamizga olish va 100% qaytarish kafolatini berish.',
-        response: `"Xavotiringiz 100% o'rinli, hozir ishonchli hamkor topish oson emas. \n\nBiz rasmiy VertaFlow AI Technologies LLC korxonasi sifatida shartnoma asosida ishlaymiz. Agar tizimimiz 14 kun ichida sizga kamida 3 barobar ko'proq qiymat keltirmasa, bir so'm ham to'lamaysiz. \n\nHammasi qonuniy, shaffof va kafolatlangan. Hoziroq sinab ko'rishga tayyormisiz?"`
+        label: '"Kafolat bormi, aldanib qolmaymanmi?"',
+        method: 'TACTIC: Risk Reversal & Legal SLA',
+        meaning: 'Onlayn firibgarliklardan xavotir va mahsulot sifatiga ishonchsizlik.',
+        strategy: 'Barcha moliyaviy xatarlarni o'z zimmamizga olish va 100% pulni qaytarish kafolatini berish.',
+        script: `"Xavotiringiz 100% o'rinli! Biz rasmiy VertaFlow AI Technologies LLC korxonasi sifatida shartnoma asosida ishlaymiz.\n\nAgar tizimimiz 14 kun ichida sizga kamida 3 barobar ko'proq qiymat keltirmasa, bir so'm ham to'lamaysiz. Barcha xavf bizning zimmamizda.\n\nHoziroq sinab ko'rishga tayyormisiz?"`
       }
     ];
 
-    function selectObjection(idx) {
-      document.querySelectorAll('.obj-tab-btn').forEach((btn, i) => {
+    function pickObjection(idx) {
+      [0, 1, 2, 3].forEach(i => {
+        const btn = document.getElementById('obj-p-' + i);
         if (i === idx) {
-          btn.className = 'obj-tab-btn p-3 sm:p-4 rounded-xl text-left border border-pistachio bg-pistachio/10 text-pistachio font-bold text-xs sm:text-sm transition-all duration-200';
+          btn.className = 'p-3 rounded-xl text-left border border-[#B5F87B] bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-medium transition-all';
         } else {
-          btn.className = 'obj-tab-btn p-3 sm:p-4 rounded-xl text-left border border-white/10 bg-surface text-slate-300 hover:border-pistachio/40 font-bold text-xs sm:text-sm transition-all duration-200';
+          btn.className = 'p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all';
         }
       });
 
-      const data = objectionData[idx];
-      const disp = document.getElementById('objection-display');
-      disp.classList.remove('animate-glissade');
-      void disp.offsetWidth; // trigger reflow
-      disp.classList.add('animate-glissade');
+      const o = objections[idx];
+      const box = document.getElementById('obj-output-box');
+      box.classList.remove('tab-fade-in');
+      void box.offsetWidth;
+      box.classList.add('tab-fade-in');
 
-      document.getElementById('obj-title').textContent = data.title;
-      document.getElementById('obj-tactics').textContent = data.tactics;
-      document.getElementById('obj-psych').textContent = data.psych;
-      document.getElementById('obj-goal').textContent = data.goal;
-      document.getElementById('obj-response').textContent = data.response;
+      document.getElementById('obj-label').textContent = o.label;
+      document.getElementById('obj-method').textContent = o.method;
+      document.getElementById('obj-meaning').textContent = o.meaning;
+      document.getElementById('obj-strategy').textContent = o.strategy;
+      document.getElementById('obj-script').textContent = o.script;
     }
 
-    // ROI Calculator Function
-    function calculateROI() {
-      const leads = parseInt(document.getElementById('leads-range').value);
-      const check = parseInt(document.getElementById('check-range').value);
-
-      document.getElementById('leads-val').textContent = leads.toLocaleString() + ' ta';
-      document.getElementById('check-val').textContent = check.toLocaleString() + ' so'm';
-
-      // 15% recovered deals
-      const recoveredDeals = Math.round(leads * 0.15);
-      const recoveredRevenue = recoveredDeals * check;
-
-      document.getElementById('deals-result').textContent = recoveredDeals.toLocaleString() + ' ta';
-      document.getElementById('roi-result').textContent = recoveredRevenue.toLocaleString() + ' so'm';
+    function runROI() {
+      const leads = parseInt(document.getElementById('c-leads').value);
+      const check = parseInt(document.getElementById('c-check').value);
+      document.getElementById('calc-leads-lbl').textContent = leads.toLocaleString() + ' ta';
+      document.getElementById('calc-check-lbl').textContent = check.toLocaleString() + ' so'm';
+      const recovered = Math.round(leads * 0.15) * check;
+      document.getElementById('calc-result').textContent = recovered.toLocaleString() + ' so'm';
     }
 
-    // Pricing Duration Switcher
-    function changePeriod(months) {
-      [1, 3, 6, 12].forEach(m => {
-        const btn = document.getElementById('period-' + m);
-        if (m === months) {
-          btn.className = 'period-pill px-4 py-2 rounded-xl text-xs font-black transition-all bg-pistachio text-pistachioDark shadow-sm';
+    function setPeriod(m) {
+      [1, 3, 6, 12].forEach(p => {
+        const btn = document.getElementById('p-btn-' + p);
+        if (p === m) {
+          btn.className = 'px-3.5 py-1.5 rounded-lg font-medium text-[#08090C] bg-[#B5F87B] transition-all';
         } else {
-          btn.className = 'period-pill px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white';
+          btn.className = 'px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all';
         }
       });
 
-      let proRate = 490000;
-      let bizRate = 990000;
-      let savePro = '1 oy to'lovida';
-      let saveBiz = '1 oy to'lovida';
+      let pro = 490000;
+      let biz = 990000;
+      if (m === 3) { pro = Math.round(pro * 0.9); biz = Math.round(biz * 0.9); }
+      if (m === 6) { pro = Math.round(pro * 0.85); biz = Math.round(biz * 0.85); }
+      if (m === 12) { pro = Math.round(pro * 0.75); biz = Math.round(biz * 0.75); }
 
-      if (months === 3) {
-        proRate = Math.round(490000 * 0.9);
-        bizRate = Math.round(990000 * 0.9);
-        savePro = '10% tejaldi (3 oy)';
-        saveBiz = '10% tejaldi (3 oy)';
-      } else if (months === 6) {
-        proRate = Math.round(490000 * 0.85);
-        bizRate = Math.round(990000 * 0.85);
-        savePro = '15% tejaldi (6 oy)';
-        saveBiz = '15% tejaldi (6 oy)';
-      } else if (months === 12) {
-        proRate = Math.round(490000 * 0.75);
-        bizRate = Math.round(990000 * 0.75);
-        savePro = '25% tejaldi (Yillik)';
-        saveBiz = '25% tejaldi (Yillik)';
-      }
-
-      document.getElementById('price-pro').innerHTML = proRate.toLocaleString() + ' <span class="text-xs text-slate-400 font-normal">so'm / oy</span>';
-      document.getElementById('save-pro').textContent = savePro;
-      document.getElementById('price-biz').innerHTML = bizRate.toLocaleString() + ' <span class="text-xs text-slate-400 font-normal">so'm / oy</span>';
-      document.getElementById('save-biz').textContent = saveBiz;
-    }
-
-    // FAQ Toggle
-    function toggleFaq(idx) {
-      const ans = document.getElementById('faq-ans-' + idx);
-      const icon = document.getElementById('faq-icon-' + idx);
-      if (ans.classList.contains('hidden')) {
-        ans.classList.remove('hidden');
-        icon.style.transform = 'rotate(180deg)';
-      } else {
-        ans.classList.add('hidden');
-        icon.style.transform = 'rotate(0deg)';
-      }
+      document.getElementById('rate-pro').innerHTML = pro.toLocaleString() + ' <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>';
+      document.getElementById('rate-biz').innerHTML = biz.toLocaleString() + ' <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>';
     }
   </script>
 </body>
