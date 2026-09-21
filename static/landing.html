@@ -42,6 +42,13 @@
       font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       letter-spacing: -0.022em;
       overflow-x: hidden;
+      opacity: 0;
+      animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Architectural Subtle Lighting Grid */
@@ -80,8 +87,8 @@
       transform: translateY(-1px);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 30px -2px rgba(181, 248, 123, 0.6);
     }
-    .btn-pistachio:active {
-      transform: translateY(0);
+    .btn-pistachio:active, button:active, a:active {
+      transform: scale(0.97);
     }
 
     /* Custom Precision Range Slider */
@@ -110,24 +117,53 @@
 
     /* Tab Switch Animation */
     @keyframes fadeScale {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .tab-fade-in {
       animation: fadeScale 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Progress bar for smooth page transitions */
+    #page-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2.5px;
+      width: 0%;
+      background: #B5F87B;
+      z-index: 99999;
+      transition: width 0.3s ease, opacity 0.2s ease;
+      box-shadow: 0 0 10px #B5F87B;
+    }
+
+    /* Scroll Offset for Navigation */
+    section {
+      scroll-margin-top: 5.5rem;
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2.5s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
     }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-[#08090C] antialiased selection:bg-[#B5F87B] selection:text-black min-h-screen flex flex-col relative hero-grid">
 
+  <!-- Top Page Progress Loader Bar -->
+  <div id="page-loader"></div>
+
   <!-- Top Navigation Header -->
   <header class="sticky top-4 z-50 px-4 sm:px-6 max-w-6xl mx-auto w-full">
-    <div class="bg-[#0E1015]/80 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl">
+    <div class="bg-[#0E1015]/85 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl">
       <!-- Logo -->
-      <a href="/" class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-[#B5F87B] flex items-center justify-center text-[#08090C]">
-          <i data-lucide="zap" class="w-4 h-4 text-[#08090C]"></i>
+      <a href="/" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 rounded-lg bg-[#B5F87B] flex items-center justify-center text-[#08090C] shadow-sm group-hover:scale-105 transition-transform">
+          <svg class="w-4 h-4 text-[#08090C]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
         <div class="flex items-center gap-2">
           <span class="font-bold text-base tracking-tight text-white">VertaFlow</span>
@@ -147,12 +183,12 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-3">
-        <a href="/app" class="hidden sm:inline-flex text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 transition-colors">
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="hidden sm:inline-flex text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 transition-colors cursor-pointer">
           Kirish
         </a>
-        <a href="/app" class="btn-pistachio px-4 py-2 rounded-xl text-xs flex items-center gap-1.5">
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="btn-pistachio px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer">
           <span>Platformaga O'tish</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </a>
       </div>
     </div>
@@ -169,7 +205,7 @@
       <span class="text-[#B5F87B] font-medium">v2.4 Pro Nashri</span>
     </div>
 
-    <!-- Main Headline: Disciplined typography, no chunky font-black, tight tracking -->
+    <!-- Main Headline -->
     <h1 class="text-4xl sm:text-6xl font-semibold tracking-[-0.035em] text-white leading-[1.12] max-w-3xl">
       Har bir murojaatni <br class="hidden sm:inline" />
       <span class="text-[#B5F87B]">real savdoga</span> aylantiruvchi AI Agenti
@@ -182,12 +218,12 @@
 
     <!-- CTAs -->
     <div class="flex flex-col sm:flex-row items-center gap-3.5 mt-10 w-full sm:w-auto justify-center">
-      <a href="/app" class="btn-pistachio px-7 py-3.5 rounded-xl text-sm w-full sm:w-auto flex items-center justify-center gap-2">
+      <a href="/app" onclick="triggerPageTransition(event, '/app')" class="btn-pistachio px-7 py-3.5 rounded-xl text-sm w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer shadow-lg">
         <span>14 Kun Bepul Sinash</span>
-        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
       </a>
-      <a href="#console" class="px-6 py-3.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2">
-        <i data-lucide="terminal" class="w-4 h-4 text-zinc-400"></i>
+      <a href="#console" class="px-6 py-3.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer">
+        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 17l6-6-6-6m8 14h8"/></svg>
         <span>Jonli Tizim Simulyatori</span>
       </a>
     </div>
@@ -212,16 +248,17 @@
       <!-- Split Console Layout -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <!-- Left: Realistic Chat Stream -->
-        <div class="lg:col-span-7 bg-[#0A0C11] rounded-xl p-4 border border-white/5 flex flex-col justify-between h-[360px]">
+        <div class="lg:col-span-7 bg-[#0A0C11] rounded-xl p-4 border border-white/5 flex flex-col justify-between h-[370px]">
           <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/5 text-xs text-zinc-400">
             <span class="flex items-center gap-1.5 font-medium text-white">
-              <i data-lucide="message-square" class="w-3.5 h-3.5 text-zinc-400"></i> Instagram Direct
+              <svg class="w-3.5 h-3.5 text-pink-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              Instagram Direct
             </span>
             <span class="font-mono text-[10px] text-zinc-500">Mijoz: Sanjar R.</span>
           </div>
 
           <!-- Chat messages -->
-          <div class="space-y-3 overflow-y-auto text-xs leading-relaxed pr-1">
+          <div class="space-y-3 overflow-y-auto text-xs leading-relaxed pr-1 custom-scrollbar">
             <div class="flex justify-start">
               <div class="max-w-[85%] bg-zinc-800/70 border border-zinc-700/50 text-zinc-200 p-3 rounded-xl rounded-tl-none">
                 Salom, bu kursingiz qimmat ekan. Boshqa joyda 500 mingga o'rgatishyapti, sizlarda 1.4 mln so'm...
@@ -231,7 +268,8 @@
             <div class="flex justify-end">
               <div class="max-w-[90%] bg-[#121812] border border-[#B5F87B]/30 text-zinc-100 p-3.5 rounded-xl rounded-tr-none">
                 <div class="text-[10px] font-mono text-[#B5F87B] mb-1 font-semibold flex items-center gap-1">
-                  <i data-lucide="cpu" class="w-3 h-3"></i> Objection Defuser (Challenger Reframe)
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2m-6-2v2m6 16v2m-6-2v2M2 15h2M2 9h2m16 6h2m-2-6h2"/></svg>
+                  Objection Defuser (Challenger Reframe)
                 </div>
                 Salom, Sanjar aka! Narx masalasi muhim, albatta. Farq shundaki: arzon kurslar faqat nazariya berib, real amaliyotsiz tugaydi. Bizning dasturimizda esa 1-oyning o'zidayoq real buyurtmalar bilan ishlaysiz va shaxsiy mentor har bir vazifangizni tekshiradi. O'tgan oy 24 nafar bitiruvchimiz o'qish davomidayoq kurs pulini to'liq qoplagan. Agar 14 kun ichida natija ko'rmasangiz, pulingizni 100% qaytaramiz. Bugungi guruhga chegirma bilan joy band qilib qo'yaymi?
               </div>
@@ -246,9 +284,10 @@
             <div class="flex justify-end">
               <div class="max-w-[90%] bg-[#121812] border border-[#B5F87B]/30 text-zinc-100 p-3 rounded-xl rounded-tr-none">
                 <div class="text-[10px] font-mono text-[#B5F87B] mb-1 font-semibold flex items-center gap-1">
-                  <i data-lucide="credit-card" class="w-3 h-3"></i> Deal Closer & Payment
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  Deal Closer & Payment
                 </div>
-                Albatta! Mana profilingiz uchun maxsus to'lov havolasi: <span class="text-[#B5F87B] underline font-mono">click.uz/pay/verta-749</span>. To'lovdan so'ng guruhga darhol qo'shilasiz.
+                Albatta! Mana profilingiz uchun maxsus to'lov havolasi: <span class="text-[#B5F87B] underline font-mono cursor-pointer">click.uz/pay/verta-749</span>. To'lovdan so'ng guruhga darhol qo'shilasiz.
               </div>
             </div>
           </div>
@@ -260,23 +299,24 @@
         </div>
 
         <!-- Right: Telemetry Radar -->
-        <div class="lg:col-span-5 bg-[#0A0C11] rounded-xl p-4 border border-white/5 flex flex-col justify-between h-[360px]">
+        <div class="lg:col-span-5 bg-[#0A0C11] rounded-xl p-4 border border-white/5 flex flex-col justify-between h-[370px]">
           <div>
             <div class="flex items-center justify-between pb-2 mb-3 border-b border-white/5 text-xs text-zinc-400">
               <span class="font-medium text-white flex items-center gap-1.5">
-                <i data-lucide="activity" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Psixologik Telemetriya
+                <svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                Psixologik Telemetriya
               </span>
               <span class="font-mono text-[10px] text-[#B5F87B]">ACTIVE</span>
             </div>
 
-            <div class="space-y-3.5 text-xs">
+            <div class="space-y-3 text-xs">
               <div>
                 <div class="flex justify-between text-[11px] mb-1 font-mono">
                   <span class="text-zinc-400">BUYING_INTENT_SCORE:</span>
                   <span class="text-[#B5F87B] font-bold">96.4%</span>
                 </div>
                 <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                  <div class="bg-[#B5F87B] h-full rounded-full w-[96.4%]"></div>
+                  <div class="bg-[#B5F87B] h-full rounded-full w-[96.4%] transition-all duration-1000"></div>
                 </div>
               </div>
 
@@ -309,7 +349,7 @@
           </div>
 
           <div class="p-2.5 rounded-lg bg-[#0E150F] border border-[#B5F87B]/20 text-[11px] text-zinc-300 font-mono flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-4 h-4 text-[#B5F87B] shrink-0"></i>
+            <svg class="w-4 h-4 text-[#B5F87B] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>Inson omilisiz to'liq avtonom savdo bitimi.</span>
           </div>
         </div>
@@ -320,19 +360,19 @@
   <!-- Metrics Bar -->
   <section class="py-10 px-4 sm:px-6 max-w-5xl mx-auto w-full border-y border-white/5">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-      <div>
+      <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
         <div class="text-3xl font-semibold tracking-tight text-white font-mono">98.4%</div>
         <div class="text-xs text-zinc-400 mt-1 font-medium">E'tirozlarni Yopish</div>
       </div>
-      <div>
+      <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
         <div class="text-3xl font-semibold tracking-tight text-white font-mono">&lt; 0.8s</div>
         <div class="text-xs text-zinc-400 mt-1 font-medium">O'rtacha Javob Tezligi</div>
       </div>
-      <div>
+      <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
         <div class="text-3xl font-semibold tracking-tight text-[#B5F87B] font-mono">3.8x</div>
         <div class="text-xs text-zinc-400 mt-1 font-medium">Konversiya O'sishi</div>
       </div>
-      <div>
+      <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
         <div class="text-3xl font-semibold tracking-tight text-white font-mono">24/7</div>
         <div class="text-xs text-zinc-400 mt-1 font-medium">Uzluksiz Avtonom Rejim</div>
       </div>
@@ -355,7 +395,7 @@
       <div class="elite-card p-6 flex flex-col justify-between">
         <div>
           <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300 mb-5">
-            <i data-lucide="compass" class="w-5 h-5 text-[#B5F87B]"></i>
+            <svg class="w-5 h-5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
           </div>
           <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">01 // BOSQICH</div>
           <h3 class="text-lg font-semibold text-white mb-2">Discovery Agenti</h3>
@@ -372,7 +412,7 @@
       <div class="elite-card p-6 flex flex-col justify-between border-[#B5F87B]/30">
         <div>
           <div class="w-10 h-10 rounded-xl bg-[#B5F87B]/10 border border-[#B5F87B]/30 flex items-center justify-center text-[#B5F87B] mb-5">
-            <i data-lucide="shield" class="w-5 h-5"></i>
+            <svg class="w-5 h-5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <div class="text-[11px] font-mono text-[#B5F87B] uppercase tracking-wider mb-1">02 // ASOSIY BOSQICH</div>
           <h3 class="text-lg font-semibold text-white mb-2">Objection Defuser</h3>
@@ -389,7 +429,7 @@
       <div class="elite-card p-6 flex flex-col justify-between">
         <div>
           <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300 mb-5">
-            <i data-lucide="check-circle-2" class="w-5 h-5 text-[#B5F87B]"></i>
+            <svg class="w-5 h-5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">03 // BOSQICH</div>
           <h3 class="text-lg font-semibold text-white mb-2">Deal Closer</h3>
@@ -419,16 +459,16 @@
 
       <!-- Selector pills -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
-        <button onclick="pickObjection(0)" id="obj-p-0" class="p-3 rounded-xl text-left border border-[#B5F87B] bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-medium transition-all">
+        <button onclick="pickObjection(0)" id="obj-p-0" class="p-3 rounded-xl text-left border border-[#B5F87B] bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-medium transition-all cursor-pointer">
           1. "Qimmat ekan"
         </button>
-        <button onclick="pickObjection(1)" id="obj-p-1" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all">
+        <button onclick="pickObjection(1)" id="obj-p-1" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all cursor-pointer">
           2. "O'ylab ko'raman"
         </button>
-        <button onclick="pickObjection(2)" id="obj-p-2" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all">
+        <button onclick="pickObjection(2)" id="obj-p-2" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all cursor-pointer">
           3. "Boshqa joyda arzon"
         </button>
-        <button onclick="pickObjection(3)" id="obj-p-3" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all">
+        <button onclick="pickObjection(3)" id="obj-p-3" class="p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all cursor-pointer">
           4. "Kafolat bormi?"
         </button>
       </div>
@@ -457,12 +497,184 @@
           </div>
 
           <div class="md:col-span-8 p-4 rounded-xl bg-zinc-900/80 border border-[#B5F87B]/20 text-xs sm:text-sm text-zinc-100 leading-relaxed whitespace-pre-line font-medium" id="obj-script">
-            "To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi.
+"To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi.
 
 Bizning yechimimiz 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad keltirsa, 2.5 mln investitsiya qilish mantiqiy emasmi?
 
 Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?"
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Section: Nega AI Closer? -->
+  <section id="qiyos" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-mono mb-3 border border-[#B5F87B]/20">
+        QIYOSIY TAHLIL
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-white">
+        Oddiy Chatbotlar vs <span class="text-[#B5F87B]">VertaFlow AI Closer</span>
+      </h2>
+      <p class="text-zinc-400 text-sm mt-3">
+        Nega eski qoidali shablon botlar savdoni yo'qotadi, VertaFlow esa uni 3.8 barobarga oshiradi?
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Old bots -->
+      <div class="elite-card p-6 sm:p-8 border-rose-500/20 bg-gradient-to-b from-[#140F13]/50 to-[#0E1015]">
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            <div>
+              <div class="text-base font-semibold text-white">Oddiy Qoidali Botlar</div>
+              <div class="text-xs text-zinc-500">Shablon tugmali ManyChat va oddiy botlar</div>
+            </div>
+          </div>
+          <span class="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded font-mono font-medium">PAST KONVERSIYA</span>
+        </div>
+
+        <ul class="space-y-4 text-xs text-zinc-300">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>Faqat oldindan yozilgan qotib qolgan tugmalarni ko'rsatadi, insondek tabiiy muloqot qilolmaydi.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>Mijoz "Qimmat" yoki "O'ylab ko'raman" desa to'xtab qoladi, xaridor darhol sahifadan chiqib ketadi.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>Mijozning og'riqli nuqtasini aniqlamaydi, savdo psixologiyasi va SPIN metodidan butunlay bexabar.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>To'lov havolasini avtonom shakllantirolmaydi, baribir operator aralashuvini talab qiladi.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- VertaFlow AI Closer -->
+      <div class="elite-card p-6 sm:p-8 border-[#B5F87B]/40 bg-gradient-to-b from-[#0F1C12]/50 to-[#0E1015] shadow-2xl">
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#B5F87B]/10 text-[#B5F87B] flex items-center justify-center font-bold">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div class="text-base font-semibold text-white">VertaFlow AI Closer</div>
+              <div class="text-xs text-[#B5F87B]">Avtonom Sotuv Yopuvchi Agent</div>
+            </div>
+          </div>
+          <span class="text-[10px] bg-[#B5F87B]/10 text-[#B5F87B] px-2 py-0.5 rounded font-mono font-medium">3.8X KONVERSIYA</span>
+        </div>
+
+        <ul class="space-y-4 text-xs text-zinc-200">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-[#B5F87B] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <span>Har bir murojaatga jonli professional savdo menejeri kabi samimiy va erkin tilda javob beradi.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-[#B5F87B] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <span>"Qimmat" va "O'ylab ko'raman" e'tirozlarini Challenger va ROI hisob-kitoblari orqali zudlik bilan yopadi.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-[#B5F87B] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <span>Mijozning haqiqiy muammosini aniqlaydi va korxonangiz mahsulotini yagona to'g'ri yechim sifatida taqdim etadi.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-[#B5F87B] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <span>Click va Payme to'lov havolalarini generatsiya qilib, pul tushgach buyurtmani avtomat CRM ga kiritadi.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Omnichannel Integrations Section -->
+  <section id="kanallar" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.03] text-zinc-300 text-xs font-mono mb-3 border border-white/10">
+        OMNICHANNEL SAVDO
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-white">
+        Barcha Savdo Kanallaringiz <span class="text-[#B5F87B]">Bitta Boshqaruvda</span>
+      </h2>
+      <p class="text-zinc-400 text-sm mt-3">
+        Mijoz qayerdan yozishidan qat'i nazar, VertaFlow bir zumda unga javob beradi va savdoni yopadi.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Instagram -->
+      <div class="elite-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="w-10 h-10 rounded-xl bg-pink-500/10 text-pink-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1.5">Instagram Direct</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Direct xabarlar, Stories belgilashlari va post izohlaridan avtomat sotuv va to'lov.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-[#B5F87B] font-mono flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          24/7 Tayyor
+        </div>
+      </div>
+
+      <!-- Telegram -->
+      <div class="elite-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1.5">Telegram Bot</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            O'zbekistondagi eng ommabop kanalda yuqori tezlikda individual sotuv dialoglari.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-[#B5F87B] font-mono flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          24/7 Tayyor
+        </div>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="elite-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1.5">WhatsApp Business</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Xalqaro va korporativ mijozlar uchun ishonchli biznes muloqot va shartnomalar.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-[#B5F87B] font-mono flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          24/7 Tayyor
+        </div>
+      </div>
+
+      <!-- Web Widget & CRM -->
+      <div class="elite-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1.5">Web Widget & CRM</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Saytingizga 1 qator kod bilan o'rnatiladi. Bitrix24 va 1C bilan to'liq ikki tomonlama sinxron.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-[#B5F87B] font-mono flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          24/7 Tayyor
         </div>
       </div>
     </div>
@@ -506,12 +718,12 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
 
         <div class="lg:col-span-5 bg-[#0A0C11] p-6 rounded-xl border border-white/10 text-center">
           <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1">QUTQARILGAN OYLIK DAROMAD</div>
-          <div class="text-3xl sm:text-4xl font-semibold text-[#B5F87B] font-mono my-2" id="calc-result">90,000,000 so'm</div>
+          <div class="text-3xl sm:text-4xl font-semibold text-[#B5F87B] font-mono my-2 transition-all" id="calc-result">90,000,000 so'm</div>
           <div class="text-xs text-zinc-500 mb-6">Har oy korxona hisobiga sof qo'shimcha tushum</div>
 
-          <a href="/app" class="btn-pistachio w-full py-3 rounded-xl text-xs flex items-center justify-center gap-1.5">
+          <a href="/app" onclick="triggerPageTransition(event, '/app')" class="btn-pistachio w-full py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer">
             <span>Ushbu daromadni yoqish</span>
-            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </a>
         </div>
       </div>
@@ -530,16 +742,16 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
 
       <!-- Period switch -->
       <div class="mt-6 inline-flex p-1 bg-[#0E1015] border border-white/10 rounded-xl text-xs">
-        <button onclick="setPeriod(1)" id="p-btn-1" class="px-3.5 py-1.5 rounded-lg font-medium text-[#08090C] bg-[#B5F87B] transition-all">
+        <button onclick="setPeriod(1)" id="p-btn-1" class="px-3.5 py-1.5 rounded-lg font-medium text-[#08090C] bg-[#B5F87B] transition-all cursor-pointer">
           1 oy
         </button>
-        <button onclick="setPeriod(3)" id="p-btn-3" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all">
+        <button onclick="setPeriod(3)" id="p-btn-3" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all cursor-pointer">
           3 oy <span class="text-[#B5F87B] text-[10px] font-mono">-10%</span>
         </button>
-        <button onclick="setPeriod(6)" id="p-btn-6" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all">
+        <button onclick="setPeriod(6)" id="p-btn-6" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all cursor-pointer">
           6 oy <span class="text-[#B5F87B] text-[10px] font-mono">-15%</span>
         </button>
-        <button onclick="setPeriod(12)" id="p-btn-12" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all">
+        <button onclick="setPeriod(12)" id="p-btn-12" class="px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all cursor-pointer">
           12 oy <span class="text-[#B5F87B] text-[10px] font-mono">-25%</span>
         </button>
       </div>
@@ -555,19 +767,19 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
           <p class="text-xs text-zinc-400 mb-6">Tizim quvvati va konversiyani xavf-xatarsiz sinab ko'rish uchun.</p>
 
           <ul class="space-y-2.5 text-xs text-zinc-300 border-t border-white/5 pt-4">
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 100 ta savdo suhbati</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Telegram savdo boti</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 3 ta bilim manbai (RAG)</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 100 ta savdo suhbati</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Telegram savdo boti</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 3 ta bilim manbai (RAG)</li>
           </ul>
         </div>
 
-        <a href="/app" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all">
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all cursor-pointer">
           Boshlash
         </a>
       </div>
 
       <!-- Pro (Flagship) -->
-      <div class="elite-card p-6 flex flex-col justify-between border-[#B5F87B]/40 relative">
+      <div class="elite-card p-6 flex flex-col justify-between border-[#B5F87B]/40 relative shadow-2xl">
         <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#B5F87B] text-[#08090C] text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
           TAVSIYA ETILADI
         </div>
@@ -578,17 +790,16 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
           <p class="text-xs text-zinc-400 mb-6">Savdoni to'liq avtomatlashtirmoqchi bo'lgan bizneslar uchun.</p>
 
           <ul class="space-y-2.5 text-xs text-zinc-200 border-t border-white/5 pt-4">
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> <strong>Cheksiz</strong> savdo muloqotlari</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 3-Agentli Savdo Quvuri</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Instagram + Telegram + WhatsApp</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Few-Shot E'tiroz Yopish (SPIN)</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Click & Payme to'lov integratsiyasi</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cheksiz avtonom savdo suhbatlari</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Instagram, Telegram, WhatsApp, Widget</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Objection Defuser & Challenger Reframe</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Click & Payme to'lov integratsiyasi</li>
           </ul>
         </div>
 
-        <a href="/app" class="btn-pistachio mt-8 w-full py-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5">
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="btn-pistachio mt-8 w-full py-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 cursor-pointer">
           <span>Pro Rejani Faollashtirish</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </a>
       </div>
 
@@ -601,14 +812,14 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
           <p class="text-xs text-zinc-400 mb-6">Katta savdo bo'limlari, bir nechta filial va ERP integratsiyasi uchun.</p>
 
           <ul class="space-y-2.5 text-xs text-zinc-300 border-t border-white/5 pt-4">
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Ko'p sonli filial va workspace'lar</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Maxsus AI Persona va brend ohangi</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> 1C & Bitrix24 to'liq API integratsiya</li>
-            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-[#B5F87B]"></i> Shaxsiy server va 24/7 VIP SLA</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Ko'p sonli filial va workspace'lar</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Maxsus AI Persona va brend ohangi</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 1C & Bitrix24 to'liq API integratsiya</li>
+            <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[#B5F87B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Shaxsiy server va 24/7 VIP SLA</li>
           </ul>
         </div>
 
-        <a href="/app" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all">
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all cursor-pointer">
           Bog'lanish
         </a>
       </div>
@@ -626,61 +837,87 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
       <div class="flex items-center space-x-6 text-zinc-400">
         <a href="#pipeline" class="hover:text-white">Arxitektura</a>
         <a href="#tariflar" class="hover:text-white">Tariflar</a>
-        <a href="/app" class="text-[#B5F87B] hover:underline">Platformaga Kirish</a>
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="text-[#B5F87B] hover:underline cursor-pointer">Platformaga Kirish</a>
       </div>
     </div>
   </footer>
 
   <!-- Scripts -->
   <script>
-    if (window.lucide) lucide.createIcons();
+    // Smooth Page Transition Handler
+    function triggerPageTransition(e, url) {
+      if (e) e.preventDefault();
+      const loader = document.getElementById('page-loader');
+      if (loader) {
+        loader.style.width = '70%';
+      }
+      document.body.style.transition = 'opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      document.body.style.opacity = '0.4';
+      setTimeout(() => {
+        if (loader) loader.style.width = '100%';
+        window.location.href = url;
+      }, 180);
+    }
+
+    // Lucide Icon Initializer
+    function initIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+    document.addEventListener('DOMContentLoaded', initIcons);
+    window.addEventListener('load', initIcons);
 
     const objections = [
       {
-        label: '"Qimmat ekan, arzonroq bering"',
+        label: "\"Qimmat ekan, arzonroq bering\"",
         method: 'TACTIC: Challenger ROI Reframe',
-        meaning: 'Mijoz narxdan qo'rqayotgani yo'q, u ushbu xarajatdan olinadigan samaraning yetarli bo'lishiga ishonmayapti.',
-        strategy: 'Narxni emas, kutish natijasida har kuni yo'qotilayotgan daromadni ko'rsatish orqali xaridni foydali investitsiyaga aylantirish.',
-        script: `"To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi.\n\nBizning yechimimiz 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad keltirsa, 2.5 mln investitsiya qilish mantiqiy emasmi?\n\nBugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?"`
+        meaning: "Mijoz narxdan qo'rqayotgani yo'q, u ushbu xarajatdan olinadigan samaraning yetarli bo'lishiga ishonmayapti.",
+        strategy: "Narxni emas, kutish natijasida har kuni yo'qotilayotgan daromadni ko'rsatish orqali xaridni foydali investitsiyaga aylantirish.",
+        script: "To'g'ri tushunaman, narx masalasi har doim muhim. Lekin keling ochiq gaplashamiz: bozordagi arzonroq alternativlar odatda 2-3 oyda ishdan chiqib, ta'mir va yangisini sotib olishga 2 barobar ko'p xarajat talab qiladi.\n\nBizning yechimimiz 3 yillik rasmiy kafolat bilan keladi va o'tgan oy 50 dan ortiq mijozimizga har kuni kamida 3-5 ta qo'shimcha savdo olib keldi. Agar bu sizga oyiga 15 mln so'm qo'shimcha daromad keltirsa, 2.5 mln investitsiya qilish mantiqiy emasmi?\n\nBugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?"
       },
       {
-        label: '"Rahmat, o'ylab ko'rishim kerak"',
+        label: "\"Rahmat, o'ylab ko'rishim kerak\"",
         method: 'TACTIC: Urgency & Micro-Commitment',
-        meaning: 'Mijozda noaniq ikkilanish bor, lekin buni ochiq aytishdan qochib muloyim rad etyapti.',
-        strategy: 'Ikkilanish sababini samimiy aniqlab, darhol qaror qabul qilish uchun xavfsiz qadam taklif qilish.',
-        script: `"Albatta, bunday muhim qarorni o'ylab ko'rishingiz tabiiy!\n\nOdatda mijozlarimiz ikki narsani o'ylab ko'rishadi: bu tizim bizning biznesga mos kelarmikan yoki natija bermasa nima bo'ladi deb. Sizni aynan qaysi jihat ikkilantiryapti?\n\nBundan tashqari, 14 kunlik bepul sinovimizda bir so'm ham sarflamaysiz. Hoziroq xavf-xatarsiz ulab sinab ko'rsak-chi?"`
+        meaning: "Mijozda noaniq ikkilanish bor, lekin buni ochiq aytishdan qochib muloyim rad etyapti.",
+        strategy: "Ikkilanish sababini samimiy aniqlab, darhol qaror qabul qilish uchun xavfsiz qadam taklif qilish.",
+        script: "Albatta, bunday muhim qarorni o'ylab ko'rishingiz tabiiy!\n\nOdatda mijozlarimiz ikki narsani o'ylab ko'rishadi: bu tizim bizning biznesga mos kelarmikan yoki natija bermasa nima bo'ladi deb. Sizni aynan qaysi jihat ikkilantiryapti?\n\nBundan tashqari, 14 kunlik bepul sinovimizda bir so'm ham sarflamaysiz. Hoziroq xavf-xatarsiz ulab sinab ko'rsak-chi?"
       },
       {
-        label: '"Boshqa kompaniyada ancha arzon"',
+        label: "\"Boshqa kompaniyada ancha arzon\"",
         method: 'TACTIC: Hidden Cost Discovery',
-        meaning: 'Mijoz sirtqi narxni solishtirmoqda, lekin xizmat ko'rsatishdagi chuqur farqdan bexabar.',
-        strategy: 'Arzon yechimlarning mijozlarni yo'qotish xavfini ochib berish va sifat ustunligini isbotlash.',
-        script: `"Ha, bozorda arzonroq variantlar borligidan xabarimiz bor. Lekin farq shundaki: arzon botlar oddiy qolipli shablonlar bo'lib, kutilmagan savol kelganda to'xtab qoladi va qimmatli xaridorlarni yo'qotadi.\n\nVertaFlow esa har bir e'tirozni savdoga aylantiruvchi sun'iy intellekt bilan jihozlangan. Arzon bot bilan 30% xaridorni yo'qotish — VertaFlow uchun to'lanadigan puldan ancha qimmatga tushadi.\n\n14 kun sinab ko'ring, farqni o'zingiz his qilasiz!"`
+        meaning: "Mijoz sirtqi narxni solishtirmoqda, lekin xizmat ko'rsatishdagi chuqur farqdan bexabar.",
+        strategy: "Arzon yechimlarning mijozlarni yo'qotish xavfini ochib berish va sifat ustunligini isbotlash.",
+        script: "Ha, bozorda arzonroq variantlar borligidan xabarimiz bor. Lekin farq shundaki: arzon botlar oddiy qolipli shablonlar bo'lib, kutilmagan savol kelganda to'xtab qoladi va qimmatli xaridorlarni yo'qotadi.\n\nVertaFlow esa har bir e'tirozni savdoga aylantiruvchi sun'iy intellekt bilan jihozlangan. Arzon bot bilan 30% xaridorni yo'qotish — VertaFlow uchun to'lanadigan puldan ancha qimmatga tushadi.\n\n14 kun sinab ko'ring, farqni o'zingiz his qilasiz!"
       },
       {
-        label: '"Kafolat bormi, aldanib qolmaymanmi?"',
+        label: "\"Kafolat bormi, aldanib qolmaymanmi?\"",
         method: 'TACTIC: Risk Reversal & Legal SLA',
-        meaning: 'Onlayn firibgarliklardan xavotir va mahsulot sifatiga ishonchsizlik.',
-        strategy: 'Barcha moliyaviy xatarlarni o'z zimmamizga olish va 100% pulni qaytarish kafolatini berish.',
-        script: `"Xavotiringiz 100% o'rinli! Biz rasmiy VertaFlow AI Technologies LLC korxonasi sifatida shartnoma asosida ishlaymiz.\n\nAgar tizimimiz 14 kun ichida sizga kamida 3 barobar ko'proq qiymat keltirmasa, bir so'm ham to'lamaysiz. Barcha xavf bizning zimmamizda.\n\nHoziroq sinab ko'rishga tayyormisiz?"`
+        meaning: "Onlayn firibgarliklardan xavotir va mahsulot sifatiga ishonchsizlik.",
+        strategy: "Barcha moliyaviy xatarlarni o'z zimmamizga olish va 100% pulni qaytarish kafolatini berish.",
+        script: "Xavotiringiz 100% o'rinli! Biz rasmiy VertaFlow AI Technologies LLC korxonasi sifatida shartnoma asosida ishlaymiz.\n\nAgar tizimimiz 14 kun ichida sizga kamida 3 barobar ko'proq qiymat keltirmasa, bir so'm ham to'lamaysiz. Barcha xavf bizning zimmamizda.\n\nHoziroq sinab ko'rishga tayyormisiz?"
       }
     ];
 
     function pickObjection(idx) {
       [0, 1, 2, 3].forEach(i => {
         const btn = document.getElementById('obj-p-' + i);
-        if (i === idx) {
-          btn.className = 'p-3 rounded-xl text-left border border-[#B5F87B] bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-medium transition-all';
-        } else {
-          btn.className = 'p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all';
+        if (btn) {
+          if (i === idx) {
+            btn.className = 'p-3 rounded-xl text-left border border-[#B5F87B] bg-[#B5F87B]/10 text-[#B5F87B] text-xs font-medium transition-all cursor-pointer';
+          } else {
+            btn.className = 'p-3 rounded-xl text-left border border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/20 text-xs font-medium transition-all cursor-pointer';
+          }
         }
       });
 
       const o = objections[idx];
       const box = document.getElementById('obj-output-box');
-      box.classList.remove('tab-fade-in');
-      void box.offsetWidth;
-      box.classList.add('tab-fade-in');
+      if (box) {
+        box.classList.remove('tab-fade-in');
+        void box.offsetWidth;
+        box.classList.add('tab-fade-in');
+      }
 
       document.getElementById('obj-label').textContent = o.label;
       document.getElementById('obj-method').textContent = o.method;
@@ -690,21 +927,26 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
     }
 
     function runROI() {
-      const leads = parseInt(document.getElementById('c-leads').value);
-      const check = parseInt(document.getElementById('c-check').value);
+      const leads = parseInt(document.getElementById('c-leads').value) || 0;
+      const check = parseInt(document.getElementById('c-check').value) || 0;
       document.getElementById('calc-leads-lbl').textContent = leads.toLocaleString() + ' ta';
-      document.getElementById('calc-check-lbl').textContent = check.toLocaleString() + ' so'm';
+      document.getElementById('calc-check-lbl').textContent = check.toLocaleString() + " so'm";
       const recovered = Math.round(leads * 0.15) * check;
-      document.getElementById('calc-result').textContent = recovered.toLocaleString() + ' so'm';
+      const resEl = document.getElementById('calc-result');
+      resEl.textContent = recovered.toLocaleString() + " so'm";
+      resEl.style.transform = 'scale(1.04)';
+      setTimeout(() => { resEl.style.transform = 'scale(1)'; }, 150);
     }
 
     function setPeriod(m) {
       [1, 3, 6, 12].forEach(p => {
         const btn = document.getElementById('p-btn-' + p);
-        if (p === m) {
-          btn.className = 'px-3.5 py-1.5 rounded-lg font-medium text-[#08090C] bg-[#B5F87B] transition-all';
-        } else {
-          btn.className = 'px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all';
+        if (btn) {
+          if (p === m) {
+            btn.className = 'px-3.5 py-1.5 rounded-lg font-medium text-[#08090C] bg-[#B5F87B] transition-all cursor-pointer';
+          } else {
+            btn.className = 'px-3.5 py-1.5 rounded-lg font-medium text-zinc-400 hover:text-white transition-all cursor-pointer';
+          }
         }
       });
 
@@ -714,8 +956,8 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
       if (m === 6) { pro = Math.round(pro * 0.85); biz = Math.round(biz * 0.85); }
       if (m === 12) { pro = Math.round(pro * 0.75); biz = Math.round(biz * 0.75); }
 
-      document.getElementById('rate-pro').innerHTML = pro.toLocaleString() + ' <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>';
-      document.getElementById('rate-biz').innerHTML = biz.toLocaleString() + ' <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>';
+      document.getElementById('rate-pro').innerHTML = `${pro.toLocaleString()} <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>`;
+      document.getElementById('rate-biz').innerHTML = `${biz.toLocaleString()} <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>`;
     }
   </script>
 </body>

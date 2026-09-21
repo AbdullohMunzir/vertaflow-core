@@ -572,6 +572,7 @@ def delete_knowledge(item_id: int):
 # ----------------- AGENT PERSONA API -----------------
 
 @app.get("/api/agent/persona")
+@app.get("/api/persona")
 def get_persona():
     """Returns current AI agent persona and behavioral settings."""
     return db.get_agent_persona()
