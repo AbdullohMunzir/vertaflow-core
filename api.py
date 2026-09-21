@@ -764,6 +764,7 @@ if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/")
+@app.head("/")
 def serve_landing():
     """Public SEO-optimized Landing Page for visitors from Google and social media."""
     landing_file = os.path.join(static_dir, "landing.html")
