@@ -28,6 +28,8 @@ def run_all_api_tests():
     print("RUNNING COMPREHENSIVE DEEP API TEST SUITE")
     print("=" * 60)
     
+    requests.post(f"{BASE_URL}/api/test/reset_rate_limits")
+
     session = requests.Session()
     
     # 1. Unauthenticated /api/auth/me
@@ -61,6 +63,9 @@ def run_all_api_tests():
     log_test("Register Returns Session Cookie", "vertaflow_session" in session.cookies.get_dict())
     log_test("Password Hash Hidden in Register Response", "password_hash" not in reg_data.get("user", {}))
     
+    # Activate Pro via validated checkout so downstream tests have full quotas
+    session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "pro", "period_months": 1, "payment_method": "payme"})
+
     # 6. Verify /api/auth/me with newly created session
     res = session.get(f"{BASE_URL}/api/auth/me")
     me_data = res.json()
@@ -185,13 +190,13 @@ def run_all_api_tests():
     log_test("Update Agent Persona", res.status_code == 200 and res.json().get("status") == "success")
     
     # 19. Billing Checkout API (Pricing verification)
-    res = session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "free", "period": "month"})
+    res = session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "free", "period_months": 1, "payment_method": "free"})
     log_test("Checkout Free Plan (0 so'm)", res.status_code == 200 and res.json().get("total_amount") == 0)
     
-    res = session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "pro", "period": "month"})
+    res = session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "pro", "period_months": 1, "payment_method": "payme"})
     log_test("Checkout Pro Plan (249,000 so'm)", res.status_code == 200 and res.json().get("total_amount") == 249000)
     
-    res = session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "business", "period": "month"})
+    res = session.post(f"{BASE_URL}/api/billing/checkout", json={"plan_id": "business", "period_months": 1, "payment_method": "click"})
     log_test("Checkout Business Plan (590,000 so'm)", res.status_code == 200 and res.json().get("total_amount") == 590000)
     
     # 20. Workspaces API

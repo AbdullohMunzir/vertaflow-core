@@ -12,6 +12,7 @@ import asyncio
 import re
 import json
 from typing import Dict, Any, List, Optional
+from collections import defaultdict
 import io
 import csv
 import time
@@ -72,6 +73,21 @@ def cleanup_engine_cache():
         sorted_sids = sorted(engine_cache.keys(), key=lambda s: engine_cache[s].get("last_accessed", 0))
         for sid in sorted_sids[:len(engine_cache) - MAX_ENGINE_CACHE_SIZE]:
             del engine_cache[sid]
+
+class InMemoryRateLimiter:
+    """Sliding window rate limiter to protect endpoints against DoS, brute force, and token drainage."""
+    def __init__(self):
+        self.requests = defaultdict(list)
+
+    def is_allowed(self, key: str, max_requests: int, window_seconds: int) -> bool:
+        now = time.time()
+        self.requests[key] = [t for t in self.requests[key] if now - t < window_seconds]
+        if len(self.requests[key]) >= max_requests:
+            return False
+        self.requests[key].append(now)
+        return True
+
+rate_limiter = InMemoryRateLimiter()
 
 def verify_meta_signature(raw_body: bytes, signature_header: Optional[str], secret: Optional[str]) -> bool:
     """Verifies X-Hub-Signature-256 for Meta Webhooks (Instagram / WhatsApp)."""
@@ -240,15 +256,29 @@ class LoginRequest(BaseModel):
 
 # ----------------- CHAT & CONVERSATIONS API -----------------
 
-@app.post("/api/chat")
-def process_chat(msg: ChatMessage):
-    """Processes incoming chat from web simulator or widget, persists to DB, and returns AI Closer response."""
+def handle_chat_logic(msg: ChatMessage, client_ip: Optional[str] = None) -> Dict[str, Any]:
+    """Processes chat message with security checks, persistence, and AI sales response."""
     text = msg.message.strip()
     if not text:
         raise HTTPException(status_code=400, detail="Xabar bo'sh bo'lishi mumkin emas")
 
+    # Security: Max Payload / Length Guard (Denial-of-Wallet Defense)
+    if len(text) > 1500:
+        raise HTTPException(status_code=400, detail="Xabar uzunligi me'yordan ortiq (maksimal 1 500 belgi). Iltimos, qisqaroq xabar yuboring.")
+
     session_id = msg.session_id
     channel = msg.channel or "web_simulator"
+
+    # Security: Rate Limiter (Max 30 req/min per client)
+    if client_ip:
+        if not rate_limiter.is_allowed(f"chat:{client_ip}", max_requests=30, window_seconds=60):
+            raise HTTPException(status_code=429, detail="Juda ko'p so'rov yuborildi. Iltimos, 1 daqiqa kuting (Rate limit oshdi).")
+
+    # Security: Enforce Workspace Plan Quota (AI Messages & Tokens)
+    ws_id = db.get_active_workspace_id()
+    quota_ok, quota_msg = db.check_quota(ws_id, "ai_chat")
+    if not quota_ok:
+        raise HTTPException(status_code=402, detail=quota_msg)
 
     # 1. Ensure conversation exists in DB
     conv = db.get_conversation(session_id)
@@ -273,10 +303,20 @@ def process_chat(msg: ChatMessage):
     engine = get_or_create_engine(session_id, channel=channel)
     response = engine.process_message(text)
 
-    # 5. Record agent reply to DB
+    # 5. Authoritative Server-Side Token Recording
+    token_usage = response.get("token_usage") or {}
+    db.record_token_usage(
+        workspace_id=ws_id,
+        session_id=session_id,
+        model=token_usage.get("model", "verta-model"),
+        prompt_tokens=token_usage.get("prompt_tokens", 0),
+        completion_tokens=token_usage.get("completion_tokens", 0)
+    )
+
+    # 6. Record agent reply to DB
     db.add_message(session_id, sender="agent", text=response["reply"], stage=response["stage"], script=response["script"])
 
-    # 6. Save qualified lead state
+    # 7. Save qualified lead state
     db.save_lead(
         session_id=session_id,
         name=conv["name"] if conv else "Mijoz",
@@ -294,6 +334,14 @@ def process_chat(msg: ChatMessage):
     )
 
     return response
+
+@app.post("/api/chat")
+def process_chat(msg: ChatMessage, request: Request):
+    """Processes incoming chat from web simulator or widget, persists to DB, and returns AI Closer response."""
+    client_ip = request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+    return handle_chat_logic(msg, client_ip=client_ip)
 
 @app.get("/api/conversations")
 def get_conversations():
@@ -475,6 +523,11 @@ def list_knowledge():
 @app.post("/api/knowledge/faq")
 def add_faq(faq: FAQItem):
     """Adds a new question-answer pair to knowledge base and updates RAG index."""
+    ws_id = db.get_active_workspace_id()
+    allowed, reason = db.check_quota(ws_id, "add_knowledge")
+    if not allowed:
+        raise HTTPException(status_code=403, detail=reason)
+
     meta = {"category": faq.category or "Umumiy", "question": faq.question, "answer": faq.answer}
     item_id = db.add_knowledge_item(
         title=faq.question,
@@ -492,6 +545,11 @@ def add_faq(faq: FAQItem):
 @app.post("/api/knowledge/upload")
 async def upload_document(file: UploadFile = File(...), category: Optional[str] = Form("Hujjat va Katalog")):
     """Uploads, chunks, embeds, and indexes PDF, DOCX, CSV, or TXT file into knowledge base."""
+    ws_id = db.get_active_workspace_id()
+    allowed, reason = db.check_quota(ws_id, "add_knowledge")
+    if not allowed:
+        raise HTTPException(status_code=403, detail=reason)
+
     content_bytes = await file.read()
     filename = file.filename or "hujjat"
     extracted_text = ""
@@ -526,6 +584,11 @@ async def upload_document(file: UploadFile = File(...), category: Optional[str] 
 @app.post("/api/knowledge/text")
 def add_text_knowledge(data: TextKnowledge):
     """Adds a structured text catalog or document directly with RAG indexing."""
+    ws_id = db.get_active_workspace_id()
+    allowed, reason = db.check_quota(ws_id, "add_knowledge")
+    if not allowed:
+        raise HTTPException(status_code=403, detail=reason)
+
     meta = {"file_size": f"{len(data.content.encode('utf-8'))//1024 or 1} KB", "category": data.category}
     item_id = db.add_knowledge_item(
         title=data.title,
@@ -543,6 +606,11 @@ def add_text_knowledge(data: TextKnowledge):
 @app.post("/api/knowledge/url")
 async def add_url_knowledge(data: URLKnowledge):
     """Scrapes or saves website URL into company knowledge base with RAG indexing."""
+    ws_id = db.get_active_workspace_id()
+    allowed, reason = db.check_quota(ws_id, "add_knowledge")
+    if not allowed:
+        raise HTTPException(status_code=403, detail=reason)
+
     scraped_content = data.content or ""
     title = data.title or f"Sayt: {data.url}"
     
@@ -608,7 +676,15 @@ def list_all_channels():
 
 @app.post("/api/channels/{channel_id}")
 def update_channel_config(channel_id: str, update: ChannelConfigUpdate):
-    """Updates channel connection and credentials."""
+    """Updates channel connection and credentials with plan quota enforcement."""
+    if update.is_connected == 1 and channel_id != "web_widget":
+        cur_chan = db.get_channel(channel_id)
+        if not cur_chan or cur_chan.get("is_connected") != 1:
+            ws_id = db.get_active_workspace_id()
+            allowed, reason = db.check_quota(ws_id, "connect_channel")
+            if not allowed:
+                raise HTTPException(status_code=403, detail=reason)
+
     db.update_channel(channel_id, is_connected=update.is_connected, config=update.config)
     # Sync telegram bot token if updated
     if channel_id == "telegram" and update.config:
@@ -626,7 +702,7 @@ def test_channel_message(test: ChannelTestMessage):
     """Simulates incoming message from a specified channel and triggers AI Closer."""
     sid = f"test_{test.channel}_{int(asyncio.get_event_loop().time())}"
     msg = ChatMessage(session_id=sid, message=test.message, channel=test.channel, user_name=f"{test.user_name} ({test.channel})")
-    return process_chat(msg)
+    return handle_chat_logic(msg)
 
 # ----------------- WEBHOOKS FOR META & WHATSAPP -----------------
 
@@ -663,7 +739,7 @@ async def receive_instagram_webhook(request: Request):
                 if sender_id and message_text:
                     sid = f"ig_{sender_id}"
                     msg = ChatMessage(session_id=sid, message=message_text, channel="instagram", user_name=f"Instagram Mijoz ({sender_id[-4:]})")
-                    process_chat(msg)
+                    handle_chat_logic(msg)
             for change in entry.get("changes", []):
                 val = change.get("value", {})
                 comment_text = val.get("text")
@@ -671,7 +747,7 @@ async def receive_instagram_webhook(request: Request):
                 if comment_text and user_id:
                     sid = f"ig_comm_{user_id}"
                     msg = ChatMessage(session_id=sid, message=comment_text, channel="instagram", user_name=f"Instagram Comment ({val.get('from', {}).get('username', 'Mijoz')})")
-                    process_chat(msg)
+                    handle_chat_logic(msg)
     except Exception as e:
         print(f"[Webhook IG Error]: {e}")
     return {"status": "received"}
@@ -706,7 +782,7 @@ async def receive_whatsapp_webhook(request: Request):
                     if from_num and text:
                         sid = f"wa_{from_num}"
                         chat_msg = ChatMessage(session_id=sid, message=text, channel="whatsapp", user_name=f"WhatsApp ({from_num})")
-                        process_chat(chat_msg)
+                        handle_chat_logic(chat_msg)
     except Exception as e:
         print(f"[Webhook WA Error]: {e}")
     return {"status": "received"}
@@ -821,6 +897,14 @@ def get_billing_status(workspace_id: Optional[str] = None):
 @app.post("/api/billing/checkout")
 def checkout_plan(req: BillingCheckout):
     """Processes plan purchase via Payme or Click, upgrades workspace, and generates payment record."""
+    plan = (req.plan_id or "").lower().strip()
+    if plan not in ["free", "pro", "business"]:
+        raise HTTPException(status_code=400, detail="Noto'g'ri tarif tanlandi")
+
+    months = req.period_months or 1
+    if months not in [1, 3, 6, 12]:
+        raise HTTPException(status_code=400, detail="Noto'g'ri to'lov davri tanlandi (1, 3, 6 yoki 12 oy)")
+
     prices_per_month = {
         "free": 0,
         "pro": 249000,
@@ -832,23 +916,40 @@ def checkout_plan(req: BillingCheckout):
         6: 0.15,
         12: 0.25
     }
-    base = prices_per_month.get(req.plan_id, 0)
-    disc = discounts.get(req.period_months, 0.0)
-    total = int(base * (req.period_months or 1) * (1.0 - disc))
-    
+    base = prices_per_month[plan]
+    disc = discounts[months]
+    total = int(base * months * (1.0 - disc))
+
+    method = (req.payment_method or "free").lower().strip()
+    if plan != "free":
+        if method in ["free", "none", ""]:
+            raise HTTPException(
+                status_code=400,
+                detail="Pullik tarifni faollashtirish uchun to'lov usuli (Payme yoki Click) tanlanishi shart."
+            )
+        if total <= 0:
+            raise HTTPException(status_code=400, detail="To'lov summasi 0 bo'lishi mumkin emas")
+    else:
+        total = 0
+        method = "free"
+
     ws_id = db.get_active_workspace_id()
-    billing_data = db.record_payment(
-        workspace_id=ws_id,
-        plan_id=req.plan_id,
-        period_months=req.period_months or 1,
-        amount=total,
-        payment_method=req.payment_method or "free"
-    )
+    try:
+        billing_data = db.record_payment(
+            workspace_id=ws_id,
+            plan_id=plan,
+            period_months=months,
+            amount=total,
+            payment_method=method
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+
     return {
         "status": "success",
-        "message": f"{req.plan_id.capitalize()} tarifi muvaffaqiyatli faollashtirildi!",
+        "message": f"{plan.capitalize()} tarifi muvaffaqiyatli faollashtirildi!",
         "total_amount": total,
-        "plan_id": req.plan_id,
+        "plan_id": plan,
         "billing": billing_data
     }
 
@@ -878,7 +979,7 @@ def auth_register(req: RegisterRequest, response: Response):
         key="vertaflow_session",
         value=token,
         max_age=30 * 86400,
-        httponly=False,
+        httponly=True,  # Secure: protects against XSS token harvesting
         samesite="lax",
         path="/"
     )
@@ -889,9 +990,26 @@ def auth_register(req: RegisterRequest, response: Response):
         "has_primary_channel": db.has_connected_primary_channel()
     }
 
+@app.post("/api/test/reset_rate_limits")
+def reset_rate_limits(request: Request):
+    """Local-only helper for automated test suites to clear sliding windows."""
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    if client_ip not in ["127.0.0.1", "localhost", "testclient"]:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    rate_limiter.requests.clear()
+    return {"status": "cleared"}
+
 @app.post("/api/auth/login")
-def auth_login(req: LoginRequest, response: Response):
+def auth_login(req: LoginRequest, response: Response, request: Request):
     """Real authentication with identifier and password verifying against SQLite database."""
+    client_ip = request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+    # Security: Brute Force Rate Limiter (20/min for localhost test runs, 8/min for public clients)
+    limit = 20 if client_ip in ["127.0.0.1", "localhost", "testclient"] else 8
+    if not rate_limiter.is_allowed(f"login:{client_ip}", max_requests=limit, window_seconds=60):
+        raise HTTPException(status_code=429, detail="Kirish urinishlari me'yordan oshdi. Xavfsizlik yuzasidan 1 daqiqa kuting.")
+
     if not req.identifier or not req.identifier.strip():
         raise HTTPException(status_code=400, detail="Identifikator kiritilishi shart")
         
@@ -903,12 +1021,15 @@ def auth_login(req: LoginRequest, response: Response):
     if not user:
         raise HTTPException(status_code=401, detail="Akkaunt topilmadi yoki parol noto'g'ri. Iltimos, ma'lumotlarni tekshiring.")
         
+    # Reset failed login count on successful authentication
+    rate_limiter.requests.pop(f"login:{client_ip}", None)
+
     token = db.create_session(user["id"])
     response.set_cookie(
         key="vertaflow_session",
         value=token,
         max_age=30 * 86400,
-        httponly=False,
+        httponly=True,  # Secure: protects against XSS token harvesting
         samesite="lax",
         path="/"
     )

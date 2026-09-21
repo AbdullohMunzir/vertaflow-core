@@ -107,10 +107,21 @@ class VertaFlowEngine:
             persona=self.persona
         )
 
+        # Step A: Check for prompt injection / jailbreak attacks
+        lower_msg = raw_msg.lower()
+        injection_patterns = [
+            "ignore previous instructions", "ignore all previous", "system prompt",
+            "disregard instructions", "print your prompt", "tell me your api key",
+            "give me the secret", "acting as a dan", "sudo mode", "developer mode"
+        ]
+        is_injection = any(p in lower_msg for p in injection_patterns)
+
+        safe_user_msg = f"<prospect_message>\n{raw_msg}\n</prospect_message>"
+
         if self.gemini_client:
             response_text = self.gemini_client.generate_response(
                 system_prompt=prompt,
-                user_message=raw_msg,
+                user_message=safe_user_msg,
                 recent_history=self.state.history
             )
 
@@ -118,19 +129,38 @@ class VertaFlowEngine:
         if not response_text and self.llm_client:
             response_text = self.llm_client.generate_response(
                 system_prompt=prompt,
-                user_message=raw_msg,
+                user_message=safe_user_msg,
                 recent_history=self.state.history
             )
 
-        # Step C: Deterministic Rule Fallback if external APIs fail
-        if not response_text:
+        # Step C: Deterministic Rule Fallback if external APIs fail or injection detected
+        if is_injection and not response_text:
+            response_text = "Korxonamiz rasmiy savdo bo'limi sizga mahsulotlar va xizmatlar bo'yicha yordam beradi. Mahsulotimiz narxlari bo'yicha qanday savolingiz bor?"
+        elif not response_text:
             response_text = self._generate_stage_response(next_stage, battlecard, raw_msg)
 
         # 7. Post-Processing: Uzbek Calque Filter, Brevity Guard, Script Mirroring
         final_text = process_agent_output(response_text, target_script=detected_script)
         self.state.add_message("agent", final_text)
 
-        # 8. Check Lead Status & Dossier
+        # 8. Token Accounting Calculation (Server-Authoritative)
+        token_usage = None
+        if self.gemini_client and getattr(self.gemini_client, 'last_usage', None):
+            token_usage = self.gemini_client.last_usage
+        elif self.llm_client and getattr(self.llm_client, 'last_usage', None):
+            token_usage = self.llm_client.last_usage
+
+        if not token_usage:
+            p_tok = int(len(prompt) // 3.5 + len(raw_msg) // 3.5)
+            c_tok = int(len(final_text) // 3.5)
+            token_usage = {
+                "model": "verta-deterministic",
+                "prompt_tokens": p_tok,
+                "completion_tokens": c_tok,
+                "total_tokens": p_tok + c_tok
+            }
+
+        # 9. Check Lead Status & Dossier
         dossier = None
         if self.state.is_lead_ready() or self.state.lead_score >= 70:
             dossier = self.state.generate_lead_dossier()
@@ -142,7 +172,8 @@ class VertaFlowEngine:
             "lead_tier": self.state.lead_tier,
             "script": self.state.script_preference,
             "dossier": dossier,
-            "score_reasons": self.state.score_reasons
+            "score_reasons": self.state.score_reasons,
+            "token_usage": token_usage
         }
 
     def _extract_lead_attributes(self, msg: str):

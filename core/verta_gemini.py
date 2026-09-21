@@ -19,6 +19,7 @@ DEFAULT_GEMINI_KEY = "your_gemini_api_key_here"
 class VertaGeminiClient:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY") or DEFAULT_GEMINI_KEY
+        self.last_usage = None
 
     def generate_response(
         self,
@@ -78,6 +79,13 @@ class VertaGeminiClient:
             resp = requests.post(url, headers=headers, json=payload, timeout=timeout_seconds)
             if resp.status_code == 200:
                 data = resp.json()
+                usage = data.get("usageMetadata", {})
+                self.last_usage = {
+                    "model": "gemini-2.5-flash",
+                    "prompt_tokens": usage.get("promptTokenCount", 0),
+                    "completion_tokens": usage.get("candidatesTokenCount", 0),
+                    "total_tokens": usage.get("totalTokenCount", 0)
+                }
                 candidates = data.get("candidates", [])
                 if candidates and "content" in candidates[0]:
                     parts = candidates[0]["content"].get("parts", [])

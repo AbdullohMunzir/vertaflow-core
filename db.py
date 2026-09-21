@@ -9,7 +9,7 @@ import sqlite3
 import json
 import os
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "vertaflow.db")
 
@@ -84,6 +84,21 @@ def init_db():
         expires_at TIMESTAMP
     );
     """)
+
+    # Server-Authoritative Token Usage & Audit Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS token_usage (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        workspace_id TEXT NOT NULL,
+        session_id TEXT,
+        model TEXT,
+        prompt_tokens INTEGER DEFAULT 0,
+        completion_tokens INTEGER DEFAULT 0,
+        total_tokens INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_token_usage_ws_time ON token_usage(workspace_id, created_at DESC);")
 
     # 2. Conversations Table
     cursor.execute("""
@@ -899,41 +914,9 @@ def get_billing_info(workspace_id: Optional[str] = None) -> Dict[str, Any]:
         "pro": "Pro",
         "business": "Biznes"
     }
-    
-    limits = {
-        "free": {
-            "knowledge_max": 3,
-            "catalog_max": 10,
-            "ai_responses_max": "Qo'lda",
-            "broadcast_max": 0,
-            "instagram_max": 1,
-            "telegram_max": 1,
-            "reels_ai": False,
-            "smart_model": False
-        },
-        "pro": {
-            "knowledge_max": 25,
-            "catalog_max": 50,
-            "ai_responses_max": "1 000 ta",
-            "broadcast_max": 200,
-            "instagram_max": 1,
-            "telegram_max": 1,
-            "reels_ai": True,
-            "smart_model": False
-        },
-        "business": {
-            "knowledge_max": 9999,
-            "catalog_max": 300,
-            "ai_responses_max": "3 000 ta (3x)",
-            "broadcast_max": 1000,
-            "instagram_max": 3,
-            "telegram_max": 3,
-            "reels_ai": True,
-            "smart_model": True
-        }
-    }
 
-    cur_limit = limits.get(plan_id, limits["free"])
+    cur_limit = PLAN_LIMITS.get(plan_id, PLAN_LIMITS["free"])
+    token_stats = get_token_usage_stats(workspace_id)
 
     return {
         "workspace_id": workspace_id,
@@ -947,13 +930,167 @@ def get_billing_info(workspace_id: Optional[str] = None) -> Dict[str, Any]:
             "catalog": {"current": catalog_count, "max": cur_limit["catalog_max"]},
             "instagram": {"current": ig_connected, "max": cur_limit["instagram_max"]},
             "telegram": {"current": tg_connected, "max": cur_limit["telegram_max"]},
+            "tokens": {"current": token_stats["total_tokens"], "max": cur_limit["tokens_max"]},
+            "ai_responses": {"current": token_stats["requests_count"], "max": cur_limit["ai_responses_max"]},
             "reels_active": cur_limit["reels_ai"],
             "smart_model": cur_limit["smart_model"]
         },
         "payments": payments
     }
 
+PLAN_LIMITS = {
+    "free": {
+        "knowledge_max": 3,
+        "catalog_max": 10,
+        "ai_responses_max": 100,
+        "tokens_max": 25000,
+        "broadcast_max": 0,
+        "instagram_max": 1,
+        "telegram_max": 1,
+        "channels_max": 1,
+        "reels_ai": False,
+        "smart_model": False
+    },
+    "pro": {
+        "knowledge_max": 25,
+        "catalog_max": 50,
+        "ai_responses_max": 1000,
+        "tokens_max": 500000,
+        "broadcast_max": 200,
+        "instagram_max": 1,
+        "telegram_max": 1,
+        "channels_max": 2,
+        "reels_ai": True,
+        "smart_model": False
+    },
+    "business": {
+        "knowledge_max": 9999,
+        "catalog_max": 300,
+        "ai_responses_max": 3000,
+        "tokens_max": 2000000,
+        "broadcast_max": 1000,
+        "instagram_max": 3,
+        "telegram_max": 3,
+        "channels_max": 99,
+        "reels_ai": True,
+        "smart_model": True
+    }
+}
+
+def record_token_usage(
+    workspace_id: str,
+    session_id: str,
+    model: str,
+    prompt_tokens: int,
+    completion_tokens: int
+) -> int:
+    """Authoritative server-side recording of tokens used by AI responses into an audit ledger."""
+    p_tok = max(0, int(prompt_tokens or 0))
+    c_tok = max(0, int(completion_tokens or 0))
+    t_tok = p_tok + c_tok
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO token_usage (workspace_id, session_id, model, prompt_tokens, completion_tokens, total_tokens)
+        VALUES (?, ?, ?, ?, ?, ?);
+    """, (workspace_id, session_id, model, p_tok, c_tok, t_tok))
+    row_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return row_id
+
+def get_token_usage_stats(workspace_id: Optional[str] = None) -> Dict[str, Any]:
+    """Returns current month token usage statistics for workspace."""
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
+    conn = get_connection()
+    cursor = conn.cursor()
+    row = cursor.execute("""
+        SELECT 
+            COALESCE(SUM(prompt_tokens), 0),
+            COALESCE(SUM(completion_tokens), 0),
+            COALESCE(SUM(total_tokens), 0),
+            COUNT(*)
+        FROM token_usage
+        WHERE workspace_id = ?
+          AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now');
+    """, (workspace_id,)).fetchone()
+    conn.close()
+    return {
+        "workspace_id": workspace_id,
+        "prompt_tokens": row[0] if row else 0,
+        "completion_tokens": row[1] if row else 0,
+        "total_tokens": row[2] if row else 0,
+        "requests_count": row[3] if row else 0
+    }
+
+def check_quota(workspace_id: str, action_type: str) -> Tuple[bool, str]:
+    """
+    Enforces business logic quotas across plans.
+    Guards against free overuse of tokens, knowledge base, channels, and AI responses.
+    """
+    ws = get_workspace(workspace_id)
+    plan_id = (ws.get("plan_id") if ws else "free") or "free"
+    limits = PLAN_LIMITS.get(plan_id, PLAN_LIMITS["free"])
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    if action_type == "ai_chat":
+        token_stats = get_token_usage_stats(workspace_id)
+        msg_count = cursor.execute("""
+            SELECT COUNT(*) FROM messages 
+            WHERE sender = 'agent' 
+              AND strftime('%Y-%m', timestamp) = strftime('%Y-%m', 'now');
+        """).fetchone()[0]
+        conn.close()
+        
+        if msg_count >= limits["ai_responses_max"]:
+            return False, f"Tarif bo'yicha oylik AI javoblar limiti tugadi ({plan_id.capitalize()} tarifi: {limits['ai_responses_max']} ta). Iltimos, tarifingizni yangilang."
+        if token_stats["total_tokens"] >= limits["tokens_max"]:
+            return False, f"Tarif bo'yicha oylik tokenlar limiti tugadi ({limits['tokens_max']:,} token). Iltimos, tarifingizni oshiring."
+        return True, "OK"
+        
+    elif action_type == "add_knowledge":
+        k_count = cursor.execute("SELECT COUNT(*) FROM knowledge_items;").fetchone()[0]
+        conn.close()
+        if k_count >= limits["knowledge_max"]:
+            return False, f"Tarif bo'yicha bilimlar bazasi limiti tugadi ({plan_id.capitalize()} tarifi: {limits['knowledge_max']} ta). Yangi bilim qo'shish uchun tarifni oshiring."
+        return True, "OK"
+        
+    elif action_type == "connect_channel":
+        c_count = cursor.execute("SELECT COUNT(*) FROM channels WHERE is_connected = 1 AND channel_id != 'web_widget';").fetchone()[0]
+        conn.close()
+        if c_count >= limits["channels_max"]:
+            return False, f"Tarif bo'yicha ulangan kanallar limiti tugadi ({plan_id.capitalize()} tarifi: {limits['channels_max']} ta). Boshqa kanal ulash uchun tarifni oshiring."
+        return True, "OK"
+        
+    conn.close()
+    return True, "OK"
+
 def record_payment(workspace_id: str, plan_id: str, period_months: int, amount: int, payment_method: str) -> Dict[str, Any]:
+    plan_id = (plan_id or "").lower().strip()
+    if plan_id not in ["free", "pro", "business"]:
+        raise ValueError(f"Noto'g'ri tarif tanlandi: {plan_id}")
+    if period_months not in [1, 3, 6, 12]:
+        raise ValueError(f"Noto'g'ri to'lov davri: {period_months}")
+        
+    prices = {"free": 0, "pro": 249000, "business": 590000}
+    discounts = {1: 0.0, 3: 0.10, 6: 0.15, 12: 0.25}
+    expected_base = prices[plan_id]
+    expected_disc = discounts[period_months]
+    expected_total = int(expected_base * period_months * (1.0 - expected_disc))
+    
+    # Security: If paid plan, strictly verify payment method and amount
+    if plan_id != "free":
+        if not payment_method or payment_method.lower() in ["free", "none", ""]:
+            raise ValueError("Pullik tarifni bepul to'lov usuli bilan faollashtirish taqiqlanadi.")
+        if amount < expected_total:
+            raise ValueError(f"To'lov summasi yetarli emas. Kutilgan summa: {expected_total} so'm, yuborilgan summa: {amount} so'm.")
+    else:
+        amount = 0
+        payment_method = "free"
+        
     expires = (datetime.now() + timedelta(days=period_months * 30)).strftime("%Y-%m-%d %H:%M:%S")
     conn = get_connection()
     cursor = conn.cursor()
@@ -1003,8 +1140,26 @@ def register_user(auth_method: str, identifier: str, full_name: str = "", passwo
         VALUES (?, ?, ?, ?, ?, ?, 'default');
     """, (user_id, auth_method, clean_id, display_name, pwd_hash, selected_plan))
     
-    # Also update active workspace plan
-    cursor.execute("UPDATE businesses SET plan_id = ? WHERE id = 'default'", (selected_plan,))
+    # SECURITY HARDENING:
+    # A user cannot gain paid 'pro' or 'business' tier for free on the workspace simply by registering!
+    # The selected_plan is recorded as user preference, but the active workspace remains 'free'
+    # until paid checkout is completed.
+    if selected_plan == "free":
+        cursor.execute("UPDATE businesses SET plan_id = 'free' WHERE id = 'default'")
+    
+    conn.commit()
+    conn.close()
+    return {
+        "status": "created",
+        "user": {
+            "id": user_id,
+            "auth_method": auth_method,
+            "identifier": clean_id,
+            "full_name": display_name,
+            "selected_plan": selected_plan,
+            "active_workspace_id": "default"
+        }
+    }
     
     conn.commit()
     conn.close()

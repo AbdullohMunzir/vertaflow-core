@@ -31,6 +31,7 @@ class VertaLLMClient:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY") or os.getenv("OPENROUTER_API_KEY")
         self.model = model or DEFAULT_MODELS.get(self.provider, "gpt-4o-mini")
         self.endpoint = PROVIDER_ENDPOINTS.get(self.provider, PROVIDER_ENDPOINTS["openai"])
+        self.last_usage = None
 
     def generate_response(
         self,
@@ -74,6 +75,13 @@ class VertaLLMClient:
             resp = requests.post(self.endpoint, headers=headers, json=payload, timeout=timeout_seconds)
             if resp.status_code == 200:
                 data = resp.json()
+                usage = data.get("usage", {})
+                self.last_usage = {
+                    "model": self.model,
+                    "prompt_tokens": usage.get("prompt_tokens", 0),
+                    "completion_tokens": usage.get("completion_tokens", 0),
+                    "total_tokens": usage.get("total_tokens", 0)
+                }
                 reply = data["choices"][0]["message"]["content"].strip()
                 return reply
             else:
