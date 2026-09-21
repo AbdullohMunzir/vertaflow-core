@@ -129,6 +129,21 @@ def init_db():
     );
     """)
 
+    # 9. Knowledge Chunks Table (Production RAG with Embeddings)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS knowledge_chunks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        parent_id INTEGER NOT NULL,
+        chunk_index INTEGER NOT NULL,
+        content TEXT NOT NULL,
+        embedding TEXT, -- JSON array of floats (gemini-embedding-001)
+        metadata TEXT,  -- JSON
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (parent_id) REFERENCES knowledge_items(id) ON DELETE CASCADE
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_chunks_parent ON knowledge_chunks(parent_id);")
+
     conn.commit()
 
     # Seed default business if not exists
@@ -535,9 +550,109 @@ def add_knowledge_item(title: str, item_type: str, content: str, metadata: Optio
 
 def delete_knowledge_item(item_id: int):
     conn = get_connection()
+    conn.execute("DELETE FROM knowledge_chunks WHERE parent_id = ?;", (item_id,))
     conn.execute("DELETE FROM knowledge_items WHERE id = ?;", (item_id,))
     conn.commit()
     conn.close()
+
+# ----------------- KNOWLEDGE CHUNKS (RAG) HELPERS -----------------
+
+def add_chunk(
+    parent_id: int,
+    chunk_index: int,
+    content: str,
+    embedding: Optional[List[float]] = None,
+    metadata: Optional[Dict[str, Any]] = None
+) -> int:
+    conn = get_connection()
+    cursor = conn.cursor()
+    emb_json = json.dumps(embedding) if embedding else None
+    meta_json = json.dumps(metadata or {})
+    cursor.execute("""
+        INSERT INTO knowledge_chunks (parent_id, chunk_index, content, embedding, metadata)
+        VALUES (?, ?, ?, ?, ?);
+    """, (parent_id, chunk_index, content, emb_json, meta_json))
+    chunk_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return chunk_id
+
+def add_chunks_batch(chunks: List[Dict[str, Any]]):
+    if not chunks:
+        return
+    conn = get_connection()
+    cursor = conn.cursor()
+    data = []
+    for c in chunks:
+        emb_json = json.dumps(c.get("embedding")) if c.get("embedding") else None
+        meta_json = json.dumps(c.get("metadata") or {})
+        data.append((
+            c["parent_id"],
+            c["chunk_index"],
+            c["content"],
+            emb_json,
+            meta_json
+        ))
+    cursor.executemany("""
+        INSERT INTO knowledge_chunks (parent_id, chunk_index, content, embedding, metadata)
+        VALUES (?, ?, ?, ?, ?);
+    """, data)
+    conn.commit()
+    conn.close()
+
+def delete_chunks_for_item(parent_id: int):
+    conn = get_connection()
+    conn.execute("DELETE FROM knowledge_chunks WHERE parent_id = ?;", (parent_id,))
+    conn.commit()
+    conn.close()
+
+def get_all_chunks() -> List[Dict[str, Any]]:
+    """Retrieves all indexed chunks with decoded embeddings and metadata for RAG."""
+    conn = get_connection()
+    rows = conn.execute("SELECT id, parent_id, chunk_index, content, embedding, metadata, created_at FROM knowledge_chunks ORDER BY parent_id, chunk_index;").fetchall()
+    conn.close()
+    chunks = []
+    for r in rows:
+        emb_val = None
+        if r["embedding"]:
+            try:
+                emb_val = json.loads(r["embedding"])
+            except Exception:
+                emb_val = None
+        meta_val = {}
+        if r["metadata"]:
+            try:
+                meta_val = json.loads(r["metadata"])
+            except Exception:
+                meta_val = {}
+        chunks.append({
+            "id": r["id"],
+            "parent_id": r["parent_id"],
+            "chunk_index": r["chunk_index"],
+            "content": r["content"],
+            "embedding": emb_val,
+            "metadata": meta_val,
+            "created_at": r["created_at"]
+        })
+    return chunks
+
+def get_chunks_for_item(parent_id: int) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    rows = conn.execute("SELECT id, parent_id, chunk_index, content, embedding, metadata FROM knowledge_chunks WHERE parent_id = ? ORDER BY chunk_index;", (parent_id,)).fetchall()
+    conn.close()
+    res = []
+    for r in rows:
+        d = dict(r)
+        d["embedding"] = json.loads(d["embedding"]) if d["embedding"] else None
+        d["metadata"] = json.loads(d["metadata"]) if d["metadata"] else {}
+        res.append(d)
+    return res
+
+def get_chunks_count() -> int:
+    conn = get_connection()
+    row = conn.execute("SELECT COUNT(*) FROM knowledge_chunks;").fetchone()
+    conn.close()
+    return row[0] if row else 0
 
 def get_all_knowledge_text() -> str:
     """Concatenates all knowledge items into structured text for LLM injection."""

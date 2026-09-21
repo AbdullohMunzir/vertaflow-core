@@ -31,9 +31,20 @@ from verta_llm import VertaLLMClient
 from verta_gemini import VertaGeminiClient
 from verta_battlecards import Battlecard, BattlecardEngine
 from verta_evaluator import VertaEvaluator
+from verta_rag import get_rag_engine
 from telegram_bot import bot_instance
 
 app = FastAPI(title="VertaFlow AI Platform API", version="2.5.0")
+
+@app.on_event("startup")
+async def startup_event():
+    """Initializes DB and ensures all knowledge items are indexed with RAG vectors."""
+    db.init_db()
+    try:
+        rag = get_rag_engine()
+        rag.sync_all_knowledge()
+    except Exception as e:
+        print(f"[RAG] Startup indexing error: {e}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -401,19 +412,24 @@ def list_knowledge():
 
 @app.post("/api/knowledge/faq")
 def add_faq(faq: FAQItem):
-    """Adds a new question-answer pair to knowledge base."""
+    """Adds a new question-answer pair to knowledge base and updates RAG index."""
+    meta = {"category": faq.category or "Umumiy", "question": faq.question, "answer": faq.answer}
     item_id = db.add_knowledge_item(
         title=faq.question,
         item_type="faq",
         content=faq.answer,
-        metadata={"category": faq.category or "Umumiy", "question": faq.question, "answer": faq.answer}
+        metadata=meta
     )
+    try:
+        get_rag_engine().index_document(parent_id=item_id, title=faq.question, item_type="faq", content=faq.answer, metadata=meta)
+    except Exception as e:
+        print(f"[RAG] Index error on FAQ: {e}")
     engine_cache.clear()
-    return {"status": "success", "id": item_id, "message": "Yangi FAQ bilimi saqlandi!"}
+    return {"status": "success", "id": item_id, "message": "Yangi FAQ bilimi saqlandi va RAG indeksiga kiritildi!"}
 
 @app.post("/api/knowledge/upload")
 async def upload_document(file: UploadFile = File(...), category: Optional[str] = Form("Hujjat va Katalog")):
-    """Uploads and processes PDF, DOCX, CSV, or TXT file into knowledge base."""
+    """Uploads, chunks, embeds, and indexes PDF, DOCX, CSV, or TXT file into knowledge base."""
     content_bytes = await file.read()
     filename = file.filename or "hujjat"
     extracted_text = ""
@@ -431,30 +447,40 @@ async def upload_document(file: UploadFile = File(...), category: Optional[str] 
     if not extracted_text.strip():
         extracted_text = f"Fayl: {filename}"
 
+    meta = {"file_size": f"{len(content_bytes)//1024 or 1} KB", "category": category}
     item_id = db.add_knowledge_item(
         title=filename,
         item_type="file",
         content=extracted_text,
-        metadata={"file_size": f"{len(content_bytes)//1024 or 1} KB", "category": category}
+        metadata=meta
     )
+    try:
+        get_rag_engine().index_document(parent_id=item_id, title=filename, item_type="file", content=extracted_text, metadata=meta)
+    except Exception as e:
+        print(f"[RAG] Index error on file upload: {e}")
     engine_cache.clear()
-    return {"status": "success", "id": item_id, "filename": filename, "message": f"'{filename}' fayli yuklandi va agent miyasiga o'rnatildi!"}
+    return {"status": "success", "id": item_id, "filename": filename, "message": f"'{filename}' fayli yuklandi, bo'laklandi va RAG indeksiga kiritildi!"}
 
 @app.post("/api/knowledge/text")
 def add_text_knowledge(data: TextKnowledge):
-    """Adds a structured text catalog or document directly."""
+    """Adds a structured text catalog or document directly with RAG indexing."""
+    meta = {"file_size": f"{len(data.content.encode('utf-8'))//1024 or 1} KB", "category": data.category}
     item_id = db.add_knowledge_item(
         title=data.title,
         item_type="file",
         content=data.content,
-        metadata={"file_size": f"{len(data.content.encode('utf-8'))//1024 or 1} KB", "category": data.category}
+        metadata=meta
     )
+    try:
+        get_rag_engine().index_document(parent_id=item_id, title=data.title, item_type="file", content=data.content, metadata=meta)
+    except Exception as e:
+        print(f"[RAG] Index error on text knowledge: {e}")
     engine_cache.clear()
-    return {"status": "success", "id": item_id, "message": f"'{data.title}' bilimi saqlandi!"}
+    return {"status": "success", "id": item_id, "message": f"'{data.title}' bilimi saqlandi va RAG indeksiga qo'shildi!"}
 
 @app.post("/api/knowledge/url")
 async def add_url_knowledge(data: URLKnowledge):
-    """Scrapes or saves website URL into company knowledge base."""
+    """Scrapes or saves website URL into company knowledge base with RAG indexing."""
     scraped_content = data.content or ""
     title = data.title or f"Sayt: {data.url}"
     
@@ -470,21 +496,30 @@ async def add_url_knowledge(data: URLKnowledge):
         except Exception:
             scraped_content = f"Rasmiy veb-sayt: {data.url}. Korxona mahsulotlari va aloqa ma'lumotlari."
 
+    meta = {"url": data.url, "status": "Faol"}
     item_id = db.add_knowledge_item(
         title=title,
         item_type="url",
         content=scraped_content or f"Sayt havolasi: {data.url}",
-        metadata={"url": data.url, "status": "Faol"}
+        metadata=meta
     )
+    try:
+        get_rag_engine().index_document(parent_id=item_id, title=title, item_type="url", content=scraped_content, metadata=meta)
+    except Exception as e:
+        print(f"[RAG] Index error on URL knowledge: {e}")
     engine_cache.clear()
-    return {"status": "success", "id": item_id, "message": f"'{data.url}' havolasi bilimlarga qo'shildi!"}
+    return {"status": "success", "id": item_id, "message": f"'{data.url}' havolasi bilimlarga va RAG indeksiga qo'shildi!"}
 
 @app.delete("/api/knowledge/{item_id}")
 def delete_knowledge(item_id: int):
-    """Deletes a knowledge item from database."""
+    """Deletes a knowledge item and its vector chunks from database."""
     db.delete_knowledge_item(item_id)
+    try:
+        get_rag_engine().refresh_cache()
+    except Exception:
+        pass
     engine_cache.clear()
-    return {"status": "success", "message": "Bilim muvaffaqiyatli o'chirildi!"}
+    return {"status": "success", "message": "Bilim va uning vektorlari muvaffaqiyatli o'chirildi!"}
 
 # ----------------- AGENT PERSONA API -----------------
 

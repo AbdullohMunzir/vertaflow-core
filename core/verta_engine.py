@@ -20,6 +20,11 @@ from verta_prompt import build_sales_closer_prompt
 from verta_gemini import VertaGeminiClient
 from verta_llm import VertaLLMClient
 
+try:
+    from verta_rag import get_rag_engine
+except ImportError:
+    from core.verta_rag import get_rag_engine
+
 class VertaFlowEngine:
     def __init__(
         self,
@@ -81,7 +86,16 @@ class VertaFlowEngine:
         self.state.questions_asked += 1
 
         # 6. Response Construction:
-        # Step A: Try Google Gemini 2.5 Flash
+        # Step A: Targeted RAG Context Retrieval (Dense + Sparse + RRF)
+        rag_context = ""
+        try:
+            rag_engine = get_rag_engine()
+            rag_context = rag_engine.assemble_context(raw_msg, top_k=3)
+        except Exception:
+            rag_context = ""
+
+        effective_knowledge = rag_context if rag_context else (self.knowledge_text if len(self.knowledge_text) < 1200 else "")
+
         response_text = None
         prompt = build_sales_closer_prompt(
             business_profile=self.business_profile,
@@ -89,7 +103,7 @@ class VertaFlowEngine:
             collected_attributes=self.state.collected_attributes,
             detected_script=detected_script,
             battlecard=battlecard,
-            knowledge_text=self.knowledge_text,
+            knowledge_text=effective_knowledge,
             persona=self.persona
         )
 
