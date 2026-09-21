@@ -27,7 +27,9 @@ class VertaFlowEngine:
         channel: str = "telegram",
         business_profile: Optional[Dict[str, Any]] = None,
         gemini_client: Optional[VertaGeminiClient] = None,
-        llm_client: Optional[VertaLLMClient] = None
+        llm_client: Optional[VertaLLMClient] = None,
+        knowledge_text: str = "",
+        persona: Optional[Dict[str, Any]] = None
     ):
         self.state = VertaLeadState(session_id=session_id, channel=channel)
         self.battlecards = BattlecardEngine()
@@ -39,6 +41,8 @@ class VertaFlowEngine:
         }
         self.gemini_client = gemini_client or VertaGeminiClient()
         self.llm_client = llm_client or VertaLLMClient()
+        self.knowledge_text = knowledge_text or ""
+        self.persona = persona or {}
 
     def process_message(self, user_message: str) -> Dict[str, Any]:
         """
@@ -84,7 +88,9 @@ class VertaFlowEngine:
             stage_name=next_stage.value,
             collected_attributes=self.state.collected_attributes,
             detected_script=detected_script,
-            battlecard=battlecard
+            battlecard=battlecard,
+            knowledge_text=self.knowledge_text,
+            persona=self.persona
         )
 
         if self.gemini_client:

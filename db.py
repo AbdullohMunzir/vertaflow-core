@@ -106,6 +106,29 @@ def init_db():
     );
     """)
 
+    # 7. Knowledge Items Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS knowledge_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        item_type TEXT NOT NULL, -- 'file', 'url', 'faq', 'text'
+        content TEXT NOT NULL,
+        metadata TEXT, -- JSON
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # 8. Channels Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS channels (
+        channel_id TEXT PRIMARY KEY, -- 'instagram', 'telegram', 'whatsapp', 'web_widget'
+        channel_name TEXT NOT NULL,
+        is_connected INTEGER DEFAULT 0,
+        config TEXT, -- JSON
+        last_sync TIMESTAMP
+    );
+    """)
+
     conn.commit()
 
     # Seed default business if not exists
@@ -146,6 +169,103 @@ def init_db():
             INSERT INTO battlecards (name, keywords, their_strength, their_weakness, reframe_talk_track, landmine_question)
             VALUES (?, ?, ?, ?, ?, ?);
         """, default_cards)
+
+    # Seed default knowledge items if not exists
+    cursor.execute("SELECT COUNT(*) FROM knowledge_items;")
+    if cursor.fetchone()[0] == 0:
+        default_knowledge = [
+            (
+                "Mebel Mahsulotlari va Narxlari 2026.pdf",
+                "file",
+                "Oshxona mebellari: 1 pogon metri 2 500 000 so'mdan 6 000 000 so'mgacha (MDF, Akril, Shpon va bo'yalgan emal). Yotoqxona to'plamlari (krovat, shkaf, tumba, tryumo): 8 000 000 so'mdan 25 000 000 so'mgacha. Shkaf-kupe: 1 metri 1 800 000 so'mdan boshlanadi. Buyurtma asosida 7-10 ish kunida tayyorlanadi. Bepul o'lchov olish (zamer) xizmati mavjud.",
+                json.dumps({"file_size": "245 KB", "category": "Katalog va Narxlar"}, ensure_ascii=False)
+            ),
+            (
+                "Yetkazib berish va o'rnatish shartlari qanday?",
+                "faq",
+                "Toshkent shahri bo'ylab bepul yetkazib va professional ustalarimiz tomonidan o'rnatib beriladi. Viloyatlarga masofaga qarab kelishilgan hamyonbop narxda yetkaziladi.",
+                json.dumps({"category": "Yetkazib berish"}, ensure_ascii=False)
+            ),
+            (
+                "To'lov usullari va bo'lib to'lash (muddatli to'lov) bormi?",
+                "faq",
+                "Naqd pul, Payme, Click va bank hisob raqamiga o'tkazma (perechislenie) qabul qilinadi. Shuningdek, 3 oydan 12 oygacha ortiqcha foizsiz muddatli to'lov (rassrochka) imkoniyati mavjud.",
+                json.dumps({"category": "To'lov"}, ensure_ascii=False)
+            ),
+            (
+                "Mahsulotlarga kafolat bormi va materiallar qayerdan?",
+                "faq",
+                "Barcha mebellarimizga 5 yillik rasmiy kafolat beramiz. Furnituralar Turkiya va Avstriya (Blum, Samet), laminat va MDF plitalar Rossiya va Yevropaning sertifikatlangan zavodlaridan keltiriladi.",
+                json.dumps({"category": "Kafolat va Sifat"}, ensure_ascii=False)
+            ),
+            (
+                "Rasmiy Sayt: mebelfabrika.uz",
+                "url",
+                "Mebel Fabrikasi — Toshkent shahridagi zamonaviy korxona. Biz 2018-yildan buyon 10,000 dan ortiq xonadon va ofislarga mebel yetkazib berdik. Manzil: Toshkent sh., Chilonzor 9-mavze, 12-uy. Ish vaqti: Har kuni 09:00 dan 20:00 gacha. Telefon: +998 (71) 200-00-00.",
+                json.dumps({"url": "https://mebelfabrika.uz", "status": "Faol"}, ensure_ascii=False)
+            )
+        ]
+        cursor.executemany("""
+            INSERT INTO knowledge_items (title, item_type, content, metadata)
+            VALUES (?, ?, ?, ?);
+        """, default_knowledge)
+
+    # Seed default channels if not exists
+    cursor.execute("SELECT COUNT(*) FROM channels;")
+    if cursor.fetchone()[0] == 0:
+        default_channels = [
+            (
+                "instagram",
+                "Instagram Direct",
+                0,
+                json.dumps({
+                    "account_name": "@mebel_premium_uz",
+                    "page_id": "",
+                    "access_token": "",
+                    "verify_token": "verta_ig_token_99",
+                    "auto_reply_comments": True,
+                    "auto_reply_direct": True,
+                    "webhook_url": "http://127.0.0.1:8000/api/webhooks/instagram"
+                }, ensure_ascii=False)
+            ),
+            (
+                "telegram",
+                "Telegram Bot",
+                0,
+                json.dumps({
+                    "bot_token": "",
+                    "bot_username": "@vertaflow_bot",
+                    "manager_chat_id": ""
+                }, ensure_ascii=False)
+            ),
+            (
+                "whatsapp",
+                "WhatsApp Business",
+                0,
+                json.dumps({
+                    "phone_number": "+998 90 123 45 67",
+                    "status": "disconnected",
+                    "qr_code": "verta_wa_qr_sim",
+                    "webhook_url": "http://127.0.0.1:8000/api/webhooks/whatsapp"
+                }, ensure_ascii=False)
+            ),
+            (
+                "web_widget",
+                "Web Chat Vidjet",
+                1,
+                json.dumps({
+                    "theme_color": "#B5F87B",
+                    "title": "Mebel Fabrikasi",
+                    "subtitle": "24/7 AI Maslahatchi",
+                    "widget_url": "http://127.0.0.1:8000/static/widget.js",
+                    "position": "right"
+                }, ensure_ascii=False)
+            )
+        ]
+        cursor.executemany("""
+            INSERT INTO channels (channel_id, channel_name, is_connected, config)
+            VALUES (?, ?, ?, ?);
+        """, default_channels)
 
     # Seed sample conversations and leads if empty
     cursor.execute("SELECT COUNT(*) FROM conversations;")
@@ -386,6 +506,138 @@ def get_all_settings() -> Dict[str, str]:
     rows = conn.execute("SELECT key, value FROM settings;").fetchall()
     conn.close()
     return {r["key"]: r["value"] for r in rows}
+
+# ----------------- KNOWLEDGE BASE HELPERS -----------------
+
+def list_knowledge_items() -> List[Dict[str, Any]]:
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM knowledge_items ORDER BY id DESC;").fetchall()
+    conn.close()
+    items = []
+    for r in rows:
+        d = dict(r)
+        d["metadata"] = json.loads(d["metadata"] or "{}")
+        items.append(d)
+    return items
+
+def add_knowledge_item(title: str, item_type: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> int:
+    conn = get_connection()
+    meta_json = json.dumps(metadata or {}, ensure_ascii=False)
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO knowledge_items (title, item_type, content, metadata)
+        VALUES (?, ?, ?, ?);
+    """, (title, item_type, content, meta_json))
+    item_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return item_id
+
+def delete_knowledge_item(item_id: int):
+    conn = get_connection()
+    conn.execute("DELETE FROM knowledge_items WHERE id = ?;", (item_id,))
+    conn.commit()
+    conn.close()
+
+def get_all_knowledge_text() -> str:
+    """Concatenates all knowledge items into structured text for LLM injection."""
+    items = list_knowledge_items()
+    if not items:
+        return ""
+    blocks = ["### KORXONA RASMIY BILIMLAR BAZASI (FAQ, NARXLAR, KATALOG):"]
+    for item in items:
+        blocks.append(f"📌 [{item['item_type'].upper()}] {item['title']}:\n{item['content']}")
+    return "\n\n".join(blocks)
+
+# ----------------- CHANNELS HELPERS -----------------
+
+def list_channels() -> List[Dict[str, Any]]:
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM channels ORDER BY channel_id ASC;").fetchall()
+    conn.close()
+    chans = []
+    for r in rows:
+        d = dict(r)
+        d["config"] = json.loads(d["config"] or "{}")
+        chans.append(d)
+    return chans
+
+def get_channel(channel_id: str) -> Optional[Dict[str, Any]]:
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM channels WHERE channel_id = ?;", (channel_id,)).fetchone()
+    conn.close()
+    if not row:
+        return None
+    d = dict(row)
+    d["config"] = json.loads(d["config"] or "{}")
+    return d
+
+def update_channel(channel_id: str, is_connected: Optional[int] = None, config: Optional[Dict[str, Any]] = None):
+    conn = get_connection()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current = get_channel(channel_id)
+    if not current:
+        conn.close()
+        return
+    new_conn = is_connected if is_connected is not None else current["is_connected"]
+    new_conf = current["config"]
+    if config is not None:
+        new_conf.update(config)
+    
+    conn.execute("""
+        UPDATE channels
+        SET is_connected = ?, config = ?, last_sync = ?
+        WHERE channel_id = ?;
+    """, (new_conn, json.dumps(new_conf, ensure_ascii=False), now, channel_id))
+    conn.commit()
+    conn.close()
+
+# ----------------- AGENT PERSONA HELPERS -----------------
+
+def get_agent_persona() -> Dict[str, Any]:
+    raw = get_setting("agent_persona")
+    if raw:
+        try:
+            return json.loads(raw)
+        except Exception:
+            pass
+    return {
+        "name": "Madina",
+        "role": "Sotuv bo'yicha bosh maslahatchi",
+        "avatar": "👩‍💼",
+        "tone": "friendly_closer",
+        "tone_label": "Samimiy & Savdo yopuvchi",
+        "greeting": "Assalomu alaykum! Fabrikamizga xush kelibsiz. Sizga qaysi turdagi mebel kerak: oshxona, yotoqxona yoki shkaf-kupe?",
+        "max_discount": "10%",
+        "rules": {
+            "on_operator_request": True,
+            "on_complaint": True,
+            "on_payment_receipt": True
+        }
+    }
+
+def update_agent_persona(persona: Dict[str, Any]):
+    set_setting("agent_persona", json.dumps(persona, ensure_ascii=False))
+
+# ----------------- DASHBOARD STATS HELPERS -----------------
+
+def get_dashboard_stats() -> Dict[str, Any]:
+    conn = get_connection()
+    total_convs = conn.execute("SELECT COUNT(*) FROM conversations;").fetchone()[0]
+    total_leads = conn.execute("SELECT COUNT(*) FROM leads;").fetchone()[0]
+    hot_leads = conn.execute("SELECT COUNT(*) FROM leads WHERE score >= 70;").fetchone()[0]
+    total_msgs = conn.execute("SELECT COUNT(*) FROM messages;").fetchone()[0]
+    active_chans = conn.execute("SELECT COUNT(*) FROM channels WHERE is_connected = 1;").fetchone()[0]
+    conn.close()
+    return {
+        "total_conversations": total_convs,
+        "total_leads": total_leads,
+        "hot_leads": hot_leads,
+        "total_messages": total_msgs,
+        "active_channels": active_chans,
+        "avg_response_time": "1.1s",
+        "conversion_rate": f"{round((hot_leads / max(total_convs, 1)) * 100, 1)}%"
+    }
 
 # Initialize database on module import
 init_db()

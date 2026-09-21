@@ -62,8 +62,11 @@ class VertaGeminiClient:
             "contents": contents,
             "generationConfig": {
                 "temperature": 0.3,
-                "maxOutputTokens": 200,
-                "topP": 0.9
+                "maxOutputTokens": 1000,
+                "topP": 0.9,
+                "thinkingConfig": {
+                    "thinkingBudget": 0
+                }
             }
         }
 

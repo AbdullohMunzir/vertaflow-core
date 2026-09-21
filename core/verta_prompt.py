@@ -55,11 +55,27 @@ def build_sales_closer_prompt(
     collected_attributes: Dict[str, Any],
     detected_script: str,
     battlecard: Optional[Any] = None,
-    history_summary: str = ""
+    history_summary: str = "",
+    knowledge_text: str = "",
+    persona: Optional[Dict[str, Any]] = None
 ) -> str:
     """
     Constructs the master prompt for the LLM closer agent.
     """
+    persona = persona or {}
+    agent_name = persona.get("name", "Madina")
+    agent_role = persona.get("role", "Sotuv bo'yicha maslahatchi")
+    agent_tone = persona.get("tone", "friendly_closer")
+    max_discount = persona.get("max_discount", "10%")
+
+    tone_instruction = "Samimiy, do'stona va mehmondo'st, mijozga g'amxo'rlik bilan xaridga yo'naltiring."
+    if agent_tone == "corporate_formal":
+        tone_instruction = "Jiddiy, B2B ishchan va rasmiy korporativ uslubda gapiring."
+    elif agent_tone == "direct_closer":
+        tone_instruction = "Faol, aniq va savdoni chaqqon yopuvchi ohangda gapiring."
+    elif agent_tone == "concise":
+        tone_instruction = "Maksimal qisqa, aniq raqamlar va faktlar bilan javob bering."
+
     biz_name = business_profile.get("business_name", "Kompaniya")
     biz_desc = business_profile.get("business_desc", "Mahsulot va xizmatlar")
     avg_check = business_profile.get("avg_check", "O'rtacha narx")
@@ -78,10 +94,16 @@ def build_sales_closer_prompt(
             f"- Landmine (Tuzoq) savoli: {battlecard.landmine_question}\n"
         )
 
+    knowledge_section = ""
+    if knowledge_text:
+        knowledge_section = f"\nKORXONA RASMIY BILIMLAR BAZASI VA NARXLAR:\n{knowledge_text}\n"
+
     script_rule = "LOTIN ALIFBOSIDA" if detected_script == "latin" else "КИРИЛЛ АЛИФБОСИДА (ЎЗБЕК КИРИЛЛИЦАСИ)"
 
-    prompt = f"""Siz — {biz_name} korxonasining professional va mohir "AI Sales Closer" (savdo yopuvchi) agentisiz.
+    prompt = f"""Siz — {biz_name} korxonasining {agent_role}si — {agent_name}siz.
 Siz shunchaki ma'lumot beruvchi bot emassiz. Sizning maqsadingiz — mijoz bilan qisqa, jonli va professional muloqot qilib, uning og'rig'ini aniqlash va xaridga yo'naltirish.
+MULOQOT OHANGI: {tone_instruction}
+MAKSIMAL CHEGIRMA CHEGARASI: {max_discount}
 
 BIZNES HAQIDA:
 - Korxona: {biz_name}
@@ -89,7 +111,7 @@ BIZNES HAQIDA:
 - O'rtacha chek: {avg_check}
 - Bilimlar bazasi (FAQ):
 {faq_text}
-
+{knowledge_section}
 HOZIRGI SOTUV BOSQICHI:
 {stage_guide}
 {battlecard_guide}
@@ -105,6 +127,6 @@ QAT'IY QOIDALAR (BU QOIDALARNI BUZISH TAQIQLANADI):
 2. YAKUNLASH: Xabaringiz oxirida FAQAT BITTA aniq savol bo'lishi shart (hech qachon 2 ta savol bermang).
 3. ALIFBO: Siz faqat va faqat {script_rule} yozishingiz shart! Agar mijoz kirillda yozsa - kirillda, lotinda yozsa - lotinda.
 4. SOXTA SO'ZLAR: Ruscha yoki sun'iy kalka so'zlarni (masalan: "iltimos qilaman", "albatta o'rtoq") ishlatmang. Tabiiy, o'zbekona biznes tilda gapiring.
-5. MIJOZGA YORDAM: Agar mijoz narx so'rasa, boshlang'ich narxni aytib, darhol vaziyatni bilish savolini bering.
+5. MIJOZGA YORDAM: Agar mijoz narx so'rasa, rasmiy bilimlar bazasidagi narxni aytib, darhol vaziyatni bilish savolini bering. Bazada yo'q narsani to'qimang!
 """
     return prompt

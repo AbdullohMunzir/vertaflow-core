@@ -9,10 +9,12 @@ AI Settings, Telegram Bot Lifecycle, Battlecards, and Self-Improving Evaluator.
 import sys
 import os
 import asyncio
+import re
+import json
 from typing import Dict, Any, List, Optional
 import io
 import csv
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
@@ -55,12 +57,17 @@ def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> Ver
         model = db.get_setting("llm_model")
         llm_client = VertaLLMClient(api_key=api_key, provider=provider, model=model)
 
+        knowledge_text = db.get_all_knowledge_text()
+        persona = db.get_agent_persona()
+
         engine = VertaFlowEngine(
             session_id=session_id,
             channel=channel,
             business_profile=biz_profile,
             gemini_client=gemini_client,
-            llm_client=llm_client
+            llm_client=llm_client,
+            knowledge_text=knowledge_text,
+            persona=persona
         )
 
         # Sync battlecards from database
@@ -80,8 +87,10 @@ def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> Ver
 
         engine_cache[session_id] = engine
 
-    # Always ensure business profile is up-to-date
+    # Always ensure business profile, knowledge, and persona are up-to-date
     engine_cache[session_id].business_profile = db.get_business_profile()
+    engine_cache[session_id].knowledge_text = db.get_all_knowledge_text()
+    engine_cache[session_id].persona = db.get_agent_persona()
     return engine_cache[session_id]
 
 # Request Models
@@ -121,6 +130,40 @@ class SettingsData(BaseModel):
 
 class RecommendationApply(BaseModel):
     id: str
+
+class FAQItem(BaseModel):
+    question: str
+    answer: str
+    category: Optional[str] = "Umumiy"
+
+class URLKnowledge(BaseModel):
+    url: str
+    title: Optional[str] = None
+    content: Optional[str] = None
+
+class TextKnowledge(BaseModel):
+    title: str
+    content: str
+    category: Optional[str] = "Katalog va Narxlar"
+
+class PersonaUpdate(BaseModel):
+    name: str
+    role: Optional[str] = "Sotuv bo'yicha maslahatchi"
+    avatar: Optional[str] = "👩‍💼"
+    tone: Optional[str] = "friendly_closer"
+    tone_label: Optional[str] = "Samimiy & Savdo yopuvchi"
+    greeting: Optional[str] = "Assalomu alaykum! Fabrikamizga xush kelibsiz. Qaysi mebel turi sizga ma'qul bo'lyapti?"
+    max_discount: Optional[str] = "10%"
+    rules: Optional[Dict[str, bool]] = None
+
+class ChannelConfigUpdate(BaseModel):
+    is_connected: Optional[int] = None
+    config: Optional[Dict[str, Any]] = None
+
+class ChannelTestMessage(BaseModel):
+    channel: str
+    message: str
+    user_name: Optional[str] = "Mijoz"
 
 # ----------------- CHAT & CONVERSATIONS API -----------------
 
@@ -341,7 +384,216 @@ def apply_evaluator_recommendation(req: RecommendationApply):
         engine_cache.clear()
         return {"status": "applied", "message": "Yangi FAQ bilimi saqlandi!"}
 
-    return {"status": "applied", "message": "Tavsiya tatbiq etildi!"}
+# ----------------- DASHBOARD & STATS API -----------------
+
+@app.get("/api/dashboard/stats")
+def get_dashboard_stats():
+    """Returns aggregated business KPIs for the main dashboard."""
+    return db.get_dashboard_stats()
+
+# ----------------- KNOWLEDGE BASE API -----------------
+
+@app.get("/api/knowledge")
+def list_knowledge():
+    """Returns all company knowledge base documents, FAQs, and URLs."""
+    items = db.list_knowledge_items()
+    return {"items": items, "total": len(items)}
+
+@app.post("/api/knowledge/faq")
+def add_faq(faq: FAQItem):
+    """Adds a new question-answer pair to knowledge base."""
+    item_id = db.add_knowledge_item(
+        title=faq.question,
+        item_type="faq",
+        content=faq.answer,
+        metadata={"category": faq.category or "Umumiy", "question": faq.question, "answer": faq.answer}
+    )
+    engine_cache.clear()
+    return {"status": "success", "id": item_id, "message": "Yangi FAQ bilimi saqlandi!"}
+
+@app.post("/api/knowledge/upload")
+async def upload_document(file: UploadFile = File(...), category: Optional[str] = Form("Hujjat va Katalog")):
+    """Uploads and processes PDF, DOCX, CSV, or TXT file into knowledge base."""
+    content_bytes = await file.read()
+    filename = file.filename or "hujjat"
+    extracted_text = ""
+    
+    if filename.lower().endswith(".pdf"):
+        try:
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(content_bytes))
+            extracted_text = "\n".join([p.extract_text() or "" for p in reader.pages])
+        except Exception:
+            extracted_text = f"PDF fayl: {filename} (hajmi: {len(content_bytes)} bayt)"
+    else:
+        extracted_text = content_bytes.decode("utf-8", errors="ignore")
+    
+    if not extracted_text.strip():
+        extracted_text = f"Fayl: {filename}"
+
+    item_id = db.add_knowledge_item(
+        title=filename,
+        item_type="file",
+        content=extracted_text,
+        metadata={"file_size": f"{len(content_bytes)//1024 or 1} KB", "category": category}
+    )
+    engine_cache.clear()
+    return {"status": "success", "id": item_id, "filename": filename, "message": f"'{filename}' fayli yuklandi va agent miyasiga o'rnatildi!"}
+
+@app.post("/api/knowledge/text")
+def add_text_knowledge(data: TextKnowledge):
+    """Adds a structured text catalog or document directly."""
+    item_id = db.add_knowledge_item(
+        title=data.title,
+        item_type="file",
+        content=data.content,
+        metadata={"file_size": f"{len(data.content.encode('utf-8'))//1024 or 1} KB", "category": data.category}
+    )
+    engine_cache.clear()
+    return {"status": "success", "id": item_id, "message": f"'{data.title}' bilimi saqlandi!"}
+
+@app.post("/api/knowledge/url")
+async def add_url_knowledge(data: URLKnowledge):
+    """Scrapes or saves website URL into company knowledge base."""
+    scraped_content = data.content or ""
+    title = data.title or f"Sayt: {data.url}"
+    
+    if not scraped_content:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(data.url, timeout=aiohttp.ClientTimeout(total=4)) as resp:
+                    if resp.status == 200:
+                        html = await resp.text()
+                        clean = re.sub(r'<[^>]+>', ' ', html)
+                        clean = ' '.join(clean.split())[:3000]
+                        scraped_content = clean
+        except Exception:
+            scraped_content = f"Rasmiy veb-sayt: {data.url}. Korxona mahsulotlari va aloqa ma'lumotlari."
+
+    item_id = db.add_knowledge_item(
+        title=title,
+        item_type="url",
+        content=scraped_content or f"Sayt havolasi: {data.url}",
+        metadata={"url": data.url, "status": "Faol"}
+    )
+    engine_cache.clear()
+    return {"status": "success", "id": item_id, "message": f"'{data.url}' havolasi bilimlarga qo'shildi!"}
+
+@app.delete("/api/knowledge/{item_id}")
+def delete_knowledge(item_id: int):
+    """Deletes a knowledge item from database."""
+    db.delete_knowledge_item(item_id)
+    engine_cache.clear()
+    return {"status": "success", "message": "Bilim muvaffaqiyatli o'chirildi!"}
+
+# ----------------- AGENT PERSONA API -----------------
+
+@app.get("/api/agent/persona")
+def get_persona():
+    """Returns current AI agent persona and behavioral settings."""
+    return db.get_agent_persona()
+
+@app.post("/api/agent/persona")
+def update_persona(p: PersonaUpdate):
+    """Updates AI agent name, avatar, tone, greeting message, and handoff rules."""
+    data = p.dict()
+    db.update_agent_persona(data)
+    engine_cache.clear()
+    return {"status": "success", "persona": db.get_agent_persona(), "message": "Agent personasi saqlandi!"}
+
+# ----------------- CHANNELS & INTEGRATIONS API -----------------
+
+@app.get("/api/channels")
+def list_all_channels():
+    """Returns status and configuration of all channels (Instagram, Telegram, WhatsApp, Web)."""
+    return {"channels": db.list_channels()}
+
+@app.post("/api/channels/{channel_id}")
+def update_channel_config(channel_id: str, update: ChannelConfigUpdate):
+    """Updates channel connection and credentials."""
+    db.update_channel(channel_id, is_connected=update.is_connected, config=update.config)
+    # Sync telegram bot token if updated
+    if channel_id == "telegram" and update.config:
+        if "bot_token" in update.config and update.config["bot_token"]:
+            bot_instance.token = update.config["bot_token"]
+            db.set_setting("telegram_bot_token", update.config["bot_token"])
+        if "manager_chat_id" in update.config and update.config["manager_chat_id"]:
+            bot_instance.manager_chat_id = update.config["manager_chat_id"]
+            db.set_setting("sales_manager_chat_id", update.config["manager_chat_id"])
+
+    return {"status": "success", "channel": db.get_channel(channel_id), "message": f"{channel_id.capitalize()} sozlamalari yangilandi!"}
+
+@app.post("/api/channels/test")
+def test_channel_message(test: ChannelTestMessage):
+    """Simulates incoming message from a specified channel and triggers AI Closer."""
+    sid = f"test_{test.channel}_{int(asyncio.get_event_loop().time())}"
+    msg = ChatMessage(session_id=sid, message=test.message, channel=test.channel, user_name=f"{test.user_name} ({test.channel})")
+    return process_chat(msg)
+
+# ----------------- WEBHOOKS FOR META & WHATSAPP -----------------
+
+@app.get("/api/webhooks/instagram")
+def verify_instagram_webhook(request: Request):
+    """Meta Webhook Challenge verification for Instagram Direct."""
+    mode = request.query_params.get("hub.mode")
+    token = request.query_params.get("hub.verify_token")
+    challenge = request.query_params.get("hub.challenge")
+    chan = db.get_channel("instagram")
+    expected_token = chan["config"].get("verify_token", "verta_ig_token_99") if chan else "verta_ig_token_99"
+    if mode == "subscribe" and token == expected_token:
+        return Response(content=str(challenge or ""), media_type="text/plain")
+    raise HTTPException(status_code=403, detail="Verification token mismatch")
+
+@app.post("/api/webhooks/instagram")
+async def receive_instagram_webhook(request: Request):
+    """Receives Instagram Direct messages and Reels/Post comments from Meta Graph API."""
+    try:
+        data = await request.json()
+        for entry in data.get("entry", []):
+            for messaging in entry.get("messaging", []):
+                sender_id = messaging.get("sender", {}).get("id")
+                message_text = messaging.get("message", {}).get("text")
+                if sender_id and message_text:
+                    sid = f"ig_{sender_id}"
+                    msg = ChatMessage(session_id=sid, message=message_text, channel="instagram", user_name=f"Instagram Mijoz ({sender_id[-4:]})")
+                    process_chat(msg)
+            for change in entry.get("changes", []):
+                val = change.get("value", {})
+                comment_text = val.get("text")
+                user_id = val.get("from", {}).get("id")
+                if comment_text and user_id:
+                    sid = f"ig_comm_{user_id}"
+                    msg = ChatMessage(session_id=sid, message=comment_text, channel="instagram", user_name=f"Instagram Comment ({val.get('from', {}).get('username', 'Mijoz')})")
+                    process_chat(msg)
+    except Exception:
+        pass
+    return {"status": "received"}
+
+@app.get("/api/webhooks/whatsapp")
+def verify_whatsapp_webhook(request: Request):
+    mode = request.query_params.get("hub.mode")
+    challenge = request.query_params.get("hub.challenge")
+    if mode == "subscribe" and challenge:
+        return Response(content=str(challenge), media_type="text/plain")
+    return Response(content="ok", media_type="text/plain")
+
+@app.post("/api/webhooks/whatsapp")
+async def receive_whatsapp_webhook(request: Request):
+    try:
+        data = await request.json()
+        for entry in data.get("entry", []):
+            for change in entry.get("changes", []):
+                val = change.get("value", {})
+                for msg in val.get("messages", []):
+                    from_num = msg.get("from")
+                    text = msg.get("text", {}).get("body")
+                    if from_num and text:
+                        sid = f"wa_{from_num}"
+                        chat_msg = ChatMessage(session_id=sid, message=text, channel="whatsapp", user_name=f"WhatsApp ({from_num})")
+                        process_chat(chat_msg)
+    except Exception:
+        pass
+    return {"status": "received"}
 
 # ----------------- SETTINGS & TELEGRAM LIFECYCLE -----------------
 
