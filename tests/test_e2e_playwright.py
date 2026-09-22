@@ -244,15 +244,13 @@ def run_e2e():
         record_test("Connecting Instagram Automatically Unlocks Platform", lock_hidden)
         capture_evidence(page, "10_app_dashboard_unlocked.png", "Full platform unlocked after connecting Instagram")
 
-        # ==========================================
-        # 4. NAVIGATION ACROSS ALL 8 TABS
-        # ==========================================
-        print("\n--- 4. Testing Navigation Across All 8 Tabs ---")
+        print("\n--- 4. Testing Navigation Across All Tabs ---")
         tabs = [
             ("dashboard", "#tab-dashboard"),
             ("channels", "#tab-channels"),
             ("knowledge", "#tab-knowledge"),
             ("agent", "#tab-agent"),
+            ("templates", "#tab-templates"),
             ("inbox", "#tab-inbox"),
             ("crm", "#tab-crm"),
             ("billing", "#tab-billing"),
@@ -270,6 +268,34 @@ def run_e2e():
                 capture_evidence(page, f"11_tab_{tab_name}.png", f"{tab_name.capitalize()} tab view")
             else:
                 record_test(f"Tab Button {tab_name}", False, "Button not found")
+
+        # ==========================================
+        # 4.1 CREATOR MODE & CUSTOM MODAL/TOAST
+        # ==========================================
+        print("\n--- 4.1 Testing Creator Mode & Modern Dialogs ---")
+        page.click("#nav-templates")
+        time.sleep(0.6)
+        card_count = page.locator("#templates-grid-container > div").count()
+        record_test("Niche Templates Rendered with Modern Cards", card_count >= 6, f"{card_count} templates")
+        capture_evidence(page, "11_creator_niche_templates.png", "Creator niche templates grid with modern SVG badges")
+
+        apply_btn = page.locator("#templates-grid-container button").first
+        if apply_btn.is_visible():
+            apply_btn.click()
+            time.sleep(0.4)
+            confirm_modal = page.locator("#modal-custom-confirm")
+            record_test("Modern Custom Confirm Dialog Opened", confirm_modal.is_visible())
+            capture_evidence(page, "11_custom_confirm_modal.png", "Custom confirm dialog with feature checklist")
+
+            confirm_ok = page.locator("#confirm-dialog-ok-btn")
+            if confirm_ok.is_visible():
+                confirm_ok.click()
+                try:
+                    toast_el = page.wait_for_selector("#toast-container div", timeout=8000)
+                    record_test("Modern Toast Notification Shown", toast_el is not None and toast_el.is_visible())
+                except Exception as e:
+                    record_test("Modern Toast Notification Shown", False, str(e))
+                capture_evidence(page, "11_custom_toast_notification.png", "Floating toast notification for success")
 
         # ==========================================
         # 5. INBOX & CHAT OPERATOR TESTING
@@ -380,6 +406,11 @@ def run_e2e():
         logout_btn = page.locator("button[onclick*='handleLogout']").first
         if logout_btn.is_visible():
             logout_btn.click()
+            time.sleep(0.4)
+            # Modern custom confirm modal
+            custom_ok = page.locator("#confirm-dialog-ok-btn")
+            if custom_ok.is_visible():
+                custom_ok.click()
             page.wait_for_url("**/onboarding**", timeout=6000)
             record_test("Logout Button Redirects to /onboarding", "/onboarding" in page.url)
             capture_evidence(page, "17_after_logout.png", "Returned to login after logout")

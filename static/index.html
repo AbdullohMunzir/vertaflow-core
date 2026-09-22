@@ -2174,8 +2174,197 @@
     </div>
   </div>
 
+  <!-- ================= MODERN CONFIRMATION DIALOG ================= -->
+  <div id="modal-custom-confirm" class="fixed inset-0 bg-black/50 backdrop-blur-md z-[99998] hidden items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white border border-gray-100 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl space-y-5 transform transition-all duration-300 scale-95 opacity-0" id="modal-custom-confirm-card">
+      <div class="flex items-start gap-4">
+        <div id="confirm-dialog-icon-container" class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/80 shadow-xs">
+          <svg id="confirm-dialog-icon" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </div>
+        <div class="space-y-1">
+          <h3 id="confirm-dialog-title" class="text-base font-extrabold text-gray-900 leading-tight">Tasdiqlash</h3>
+          <p id="confirm-dialog-subtitle" class="text-xs text-gray-500 leading-relaxed">Ushbu amalni bajarishni tasdiqlaysizmi?</p>
+        </div>
+      </div>
+
+      <!-- Feature Checklist / Details Pill (Optional) -->
+      <div id="confirm-dialog-details" class="hidden bg-slate-50 border border-slate-200/70 rounded-2xl p-3.5 text-xs text-gray-700 space-y-2">
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+        <button type="button" id="confirm-dialog-cancel-btn" onclick="closeConfirmDialog()" class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold transition-all cursor-pointer">
+          Bekor qilish
+        </button>
+        <button type="button" id="confirm-dialog-ok-btn" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-md shadow-purple-200 cursor-pointer flex items-center gap-1.5">
+          <span id="confirm-dialog-ok-text">Tasdiqlash</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODERN FLOATING TOAST CONTAINER ================= -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[99999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"></div>
+
   <!-- ================= JAVASCRIPT CONTROLLER ================= -->
   <script>
+    // Modern Toast Notification Engine (No crude native alerts)
+    function showToast(title, message, type = 'info', duration = 3500) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto bg-white/95 backdrop-blur-md border border-gray-200/90 shadow-2xl rounded-2xl p-4 flex items-start gap-3 transform transition-all duration-300 translate-y-2 opacity-0';
+
+      const icons = {
+        success: {
+          bg: 'bg-emerald-50 border-emerald-200/80 text-emerald-600',
+          svg: '<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+        },
+        error: {
+          bg: 'bg-red-50 border-red-200/80 text-red-600',
+          svg: '<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>'
+        },
+        warning: {
+          bg: 'bg-amber-50 border-amber-200/80 text-amber-600',
+          svg: '<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'
+        },
+        info: {
+          bg: 'bg-purple-50 border-purple-200/80 text-purple-600',
+          svg: '<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        }
+      };
+
+      const iconCfg = icons[type] || icons.info;
+
+      toast.innerHTML = `
+        <div class="w-8 h-8 rounded-xl ${iconCfg.bg} border flex items-center justify-center shrink-0">
+          ${iconCfg.svg}
+        </div>
+        <div class="flex-1 min-w-0 pr-1">
+          <div class="text-xs font-black text-gray-900 truncate">${title}</div>
+          <div class="text-[11px] text-gray-600 leading-snug mt-0.5 break-words">${message}</div>
+        </div>
+        <button class="text-gray-400 hover:text-gray-700 transition-colors p-1" onclick="this.closest('.pointer-events-auto').remove()">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+      });
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    // Override native browser alert to prevent crude browser dialogs
+    window.alert = function(msg) {
+      showToast("Bildirishnoma", String(msg), "info");
+    };
+
+    // Modern Confirm Dialog Engine (No crude native confirm prompts)
+    let currentConfirmCallback = null;
+
+    function showConfirmDialog({
+      title,
+      subtitle,
+      details = [],
+      confirmText = "Tasdiqlash",
+      cancelText = "Bekor qilish",
+      theme = "purple", // 'purple' | 'danger' | 'emerald'
+      iconSvg = null,
+      onConfirm
+    }) {
+      const modal = document.getElementById('modal-custom-confirm');
+      const card = document.getElementById('modal-custom-confirm-card');
+      const titleEl = document.getElementById('confirm-dialog-title');
+      const subEl = document.getElementById('confirm-dialog-subtitle');
+      const detailsEl = document.getElementById('confirm-dialog-details');
+      const iconCont = document.getElementById('confirm-dialog-icon-container');
+      const okBtn = document.getElementById('confirm-dialog-ok-btn');
+      const okText = document.getElementById('confirm-dialog-ok-text');
+      const cancelBtn = document.getElementById('confirm-dialog-cancel-btn');
+
+      if (!modal || !card) return;
+
+      titleEl.textContent = title;
+      subEl.innerHTML = subtitle;
+      cancelBtn.textContent = cancelText;
+      okText.textContent = confirmText;
+
+      if (theme === 'danger') {
+        iconCont.className = 'w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100 shadow-xs';
+        okBtn.className = 'px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-md shadow-red-200 cursor-pointer flex items-center gap-1.5';
+        iconCont.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
+      } else if (theme === 'emerald') {
+        iconCont.className = 'w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-xs';
+        okBtn.className = 'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-200 cursor-pointer flex items-center gap-1.5';
+        iconCont.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+      } else {
+        iconCont.className = 'w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100 shadow-xs';
+        okBtn.className = 'px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-md shadow-purple-200 cursor-pointer flex items-center gap-1.5';
+        iconCont.innerHTML = iconSvg || '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>';
+      }
+
+      if (details && details.length > 0) {
+        detailsEl.innerHTML = details.map(d => `
+          <div class="flex items-center gap-2">
+            <span class="w-4 h-4 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+            <span class="text-gray-700 font-medium">${d}</span>
+          </div>
+        `).join('');
+        detailsEl.classList.remove('hidden');
+      } else {
+        detailsEl.classList.add('hidden');
+      }
+
+      currentConfirmCallback = onConfirm;
+
+      okBtn.onclick = async () => {
+        if (currentConfirmCallback) {
+          const prev = okText.textContent;
+          okText.textContent = "Bajarilmoqda...";
+          okBtn.disabled = true;
+          try {
+            await currentConfirmCallback();
+          } finally {
+            okText.textContent = prev;
+            okBtn.disabled = false;
+            closeConfirmDialog();
+          }
+        } else {
+          closeConfirmDialog();
+        }
+      };
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      requestAnimationFrame(() => {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      });
+    }
+
+    function closeConfirmDialog() {
+      const modal = document.getElementById('modal-custom-confirm');
+      const card = document.getElementById('modal-custom-confirm-card');
+      if (!modal || !card) return;
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        currentConfirmCallback = null;
+      }, 200);
+    }
+
     // State management
     let activeTab = 'dashboard';
     let currentSessionId = null;
@@ -2236,13 +2425,21 @@
       }
     }
 
-    async function handleLogout() {
-      if (!confirm("Haqiqatan ham hisobdan chiqmoqchimisiz?")) return;
-      try {
-        await fetch('/api/auth/logout', { method: 'POST' });
-      } catch (e) {}
-      localStorage.removeItem('vertaflow_user');
-      window.location.href = '/onboarding';
+    function handleLogout() {
+      showConfirmDialog({
+        title: "Hisobdan Chiqish",
+        subtitle: "Haqiqatan ham platformadagi hisobingizdan chiqmoqchimisiz?",
+        confirmText: "Ha, Chiqish",
+        cancelText: "Bekor qilish",
+        theme: "danger",
+        onConfirm: async () => {
+          try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+          } catch (e) {}
+          localStorage.removeItem('vertaflow_user');
+          window.location.href = '/onboarding';
+        }
+      });
     }
 
     // Init on load
@@ -2380,11 +2577,58 @@
       setTimeout(refreshIcons, 40);
     }
 
-    // Creator Mode: Industry Templates Functions
+    // Creator Mode: Industry Templates Functions with Modern SVG Badges & High-End Cards
     async function loadNicheTemplates() {
       const container = document.getElementById('templates-grid-container');
       if (!container) return;
       container.innerHTML = '<div class="col-span-full py-12 text-center text-xs text-gray-400">Andozalar yuklanmoqda...</div>';
+
+      const nicheMeta = {
+        mebel: {
+          iconSvg: '<svg class="w-6 h-6 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 11v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H7v-2a2 2 0 0 0-4 0Z"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>',
+          badgeBg: 'bg-violet-50 border-violet-200/80',
+          pillBg: 'bg-violet-50 text-violet-700 border-violet-200',
+          accent: 'from-violet-500 to-purple-600'
+        },
+        oqim_kurs: {
+          iconSvg: '<svg class="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-.838L12.83 2.18a2 2 0 0 0-1.66 0L2.6 10.08a1 1 0 0 0 0 1.832l8.57 7.908a2 2 0 0 0 1.66 0l8.57-7.908a1 1 0 0 0 .02-.99"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+          badgeBg: 'bg-blue-50 border-blue-200/80',
+          pillBg: 'bg-blue-50 text-blue-700 border-blue-200',
+          accent: 'from-blue-500 to-indigo-600'
+        },
+        klinika: {
+          iconSvg: '<svg class="w-6 h-6 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+          badgeBg: 'bg-emerald-50 border-emerald-200/80',
+          pillBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          accent: 'from-emerald-500 to-teal-600'
+        },
+        avto: {
+          iconSvg: '<svg class="w-6 h-6 text-cyan-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
+          badgeBg: 'bg-cyan-50 border-cyan-200/80',
+          pillBg: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+          accent: 'from-cyan-500 to-sky-600'
+        },
+        kiyim: {
+          iconSvg: '<svg class="w-6 h-6 text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+          badgeBg: 'bg-pink-50 border-pink-200/80',
+          pillBg: 'bg-pink-50 text-pink-700 border-pink-200',
+          accent: 'from-pink-500 to-rose-600'
+        },
+        real_estate: {
+          iconSvg: '<svg class="w-6 h-6 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>',
+          badgeBg: 'bg-amber-50 border-amber-200/80',
+          pillBg: 'bg-amber-50 text-amber-700 border-amber-200',
+          accent: 'from-amber-500 to-orange-600'
+        }
+      };
+
+      const defaultMeta = {
+        iconSvg: '<svg class="w-6 h-6 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+        badgeBg: 'bg-purple-50 border-purple-200/80',
+        pillBg: 'bg-purple-50 text-purple-700 border-purple-200',
+        accent: 'from-purple-500 to-indigo-600'
+      };
+
       try {
         const res = await fetch('/api/creator/templates');
         const data = await res.json();
@@ -2393,55 +2637,79 @@
           container.innerHTML = '<div class="col-span-full py-12 text-center text-xs text-gray-400">Andozalar topilmadi.</div>';
           return;
         }
-        container.innerHTML = tpls.map(t => `
-          <div class="card-clean rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-purple-300 transition-all border border-gray-200">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <span class="text-2xl">${t.icon || '💼'}</span>
-                  <div>
-                    <h3 class="font-extrabold text-sm text-gray-900">${t.name}</h3>
-                    <span class="text-[10px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">${t.category}</span>
+
+        container.innerHTML = tpls.map(t => {
+          const meta = nicheMeta[t.id] || defaultMeta;
+          return `
+            <div class="bg-white rounded-3xl p-6 border border-gray-200/90 hover:border-purple-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group space-y-5 relative overflow-hidden shadow-xs">
+              <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${meta.accent}"></div>
+              
+              <div class="space-y-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl ${meta.badgeBg} border flex items-center justify-center shrink-0 shadow-xs transition-transform group-hover:scale-105">
+                      ${meta.iconSvg}
+                    </div>
+                    <div>
+                      <h3 class="font-extrabold text-sm text-gray-900 group-hover:text-purple-700 transition-colors">${t.name}</h3>
+                      <span class="text-[10px] font-bold ${meta.pillBg} px-2.5 py-0.5 rounded-full border inline-block mt-0.5">${t.category}</span>
+                    </div>
                   </div>
                 </div>
+
+                <p class="text-xs text-gray-600 leading-relaxed">${t.description}</p>
+
+                <div class="grid grid-cols-2 gap-2 text-[11px] bg-slate-50/80 p-3 rounded-2xl border border-slate-100">
+                  <div><span class="text-gray-400 font-medium">O'rtacha chek:</span> <b class="text-gray-900 font-bold">${t.avg_check || 'Noma\'lum'}</b></div>
+                  <div><span class="text-gray-400 font-medium">Savollar (FAQ):</span> <b class="text-emerald-700 font-bold">${t.faq_count} ta</b></div>
+                  <div class="col-span-2"><span class="text-gray-400 font-medium">Raqobatchi battlecardi:</span> <b class="text-purple-700 font-bold">${t.battlecard_count} ta tayyor</b></div>
+                </div>
               </div>
-              <p class="text-xs text-gray-600 leading-relaxed">${t.description}</p>
-              <div class="grid grid-cols-2 gap-2 text-[11px] bg-[#F8FAFC] p-2.5 rounded-xl border border-gray-100">
-                <div><span class="text-gray-400">O'rtacha chek:</span> <b class="text-gray-800">${t.avg_check || 'Noma\'lum'}</b></div>
-                <div><span class="text-gray-400">Savollar (FAQ):</span> <b class="text-emerald-700">${t.faq_count} ta</b></div>
-                <div class="col-span-2"><span class="text-gray-400">Raqobatchi battlecardi:</span> <b class="text-sky-700">${t.battlecard_count} ta</b></div>
-              </div>
+
+              <button onclick="confirmApplyNicheTemplate('${t.id}', '${t.name.replace(/'/g, "\\'")}', '${t.category}')" class="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-purple-200 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <span>Ushbu Andozani Qo'llash</span>
+              </button>
             </div>
-            <button onclick="applyNicheTemplate('${t.id}', '${t.name.replace(/'/g, "\\'")}')" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
-              <span>⚡ Ushbu Andozani Qo'llash</span>
-            </button>
-          </div>
-        `).join('');
+          `;
+        }).join('');
         refreshIcons();
       } catch (err) {
         container.innerHTML = `<div class="col-span-full py-12 text-center text-xs text-red-500">Yuklashda xatolik: ${err.message}</div>`;
       }
     }
 
-    async function applyNicheTemplate(templateId, templateName) {
-      if (!confirm("Haqiqatan ham '" + templateName + "' andozasini joriy loyihaga tatbiq etmoqchimisiz?\n\nBiznes profili, agent personasi, tez-tez beriladigan savollar va raqobatchi battlecardlari avtomatik yangilanadi.")) {
-        return;
-      }
-      try {
-        const res = await fetch('/api/creator/templates/' + templateId + '/apply', { method: 'POST' });
-        const data = await res.json();
-        if (data.status === 'applied') {
-          alert("✅ " + data.message);
-          loadPersona();
-          loadKnowledge();
-          loadDashboardStats();
-          switchTab('dashboard');
-        } else {
-          alert("Xatolik: " + (data.detail || "Andozani qo'llashda muammo yuz berdi"));
+    function confirmApplyNicheTemplate(templateId, templateName, category) {
+      showConfirmDialog({
+        title: "Andozani Qo'llash",
+        subtitle: `Haqiqatan ham <b class="text-purple-700 font-bold">'${templateName}'</b> andozasini joriy loyihaga tatbiq etmoqchimisiz?`,
+        details: [
+          "🏢 Korxona profili va o'rtacha chek avtomatik yangilanadi",
+          "🤖 AI sotuv agenti personasi va savdo skriptlari moslashtiriladi",
+          "📚 Ushbu nitsaga oid 4 ta tekshirilgan FAQ bilimlar bazasiga kiritiladi",
+          "🛡️ Raqobatchilar va e'tirozlarga qarshi battlecardlar o'rnatiladi"
+        ],
+        confirmText: "⚡ Ha, Andozani Faollashtirish",
+        cancelText: "Bekor qilish",
+        theme: "purple",
+        onConfirm: async () => {
+          try {
+            const res = await fetch('/api/creator/templates/' + templateId + '/apply', { method: 'POST' });
+            const data = await res.json();
+            if (data.status === 'applied') {
+              showToast("Muvaffaqiyatli!", `'${templateName}' andozasi joriy loyihaga to'liq tatbiq etildi! 🚀`, "success");
+              loadPersona();
+              loadKnowledge();
+              loadDashboardStats();
+              setTimeout(() => switchTab('dashboard'), 600);
+            } else {
+              showToast("Xatolik", data.detail || "Andozani qo'llashda muammo yuz berdi", "error");
+            }
+          } catch (err) {
+            showToast("Ulanish xatosi", err.message, "error");
+          }
         }
-      } catch (err) {
-        alert("Ulanish xatosi: " + err.message);
-      }
+      });
     }
 
     // Modal Helpers
@@ -2568,15 +2836,15 @@
       let config = {};
       if (channelType === 'instagram') {
         const val = document.getElementById('lock-ig-input').value.trim();
-        if (!val) { alert('Instagram akkaunt nomini kiriting (masalan: @sizning_brendingiz)'); return; }
+        if (!val) { showToast('Diqqat', 'Instagram akkaunt nomini kiriting (masalan: @sizning_brendingiz)', 'warning'); return; }
         config = { account_name: val.startsWith('@') ? val : '@' + val };
       } else if (channelType === 'telegram') {
         const val = document.getElementById('lock-tg-input').value.trim();
-        if (!val) { alert('Telegram bot username yoki tokenini kiriting'); return; }
+        if (!val) { showToast('Diqqat', 'Telegram bot username yoki tokenini kiriting', 'warning'); return; }
         config = { bot_username: val.startsWith('@') ? val : '@' + val };
       } else if (channelType === 'whatsapp') {
         const val = document.getElementById('lock-wa-input').value.trim();
-        if (!val) { alert('WhatsApp telefon raqamini kiriting (masalan: +998 90 123 45 67)'); return; }
+        if (!val) { showToast('Diqqat', 'WhatsApp telefon raqamini kiriting (masalan: +998 90 123 45 67)', 'warning'); return; }
         config = { phone_number: val };
       }
 
@@ -2598,9 +2866,9 @@
 
         await loadChannels();
         await checkAuthSession();
-        alert(`${channelType.toUpperCase()} muvaffaqiyatli ulandi! Barcha bo'limlar ochildi 🎉`);
+        showToast('Ulandi!', `${channelType.toUpperCase()} muvaffaqiyatli ulandi! Barcha bo'limlar ochildi 🎉`, 'success');
       } catch (e) {
-        alert('Kanalni ulashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        showToast('Xatolik', 'Kanalni ulashda xatolik yuz berdi. Qaytadan urinib ko\'ring.', 'error');
       }
     }
 
@@ -2678,7 +2946,7 @@
       closeModal('modal-instagram');
       loadChannels();
       loadDashboardStats();
-      alert('Instagram sozlamalari muvaffaqiyatli saqlandi!');
+      showToast('Saqlandi!', 'Instagram sozlamalari muvaffaqiyatli saqlandi!', 'success');
     }
 
     async function saveTelegramSettings() {
@@ -2706,7 +2974,7 @@
       closeModal('modal-telegram');
       loadChannels();
       loadDashboardStats();
-      alert('Telegram bot ishga tushirildi!');
+      showToast('Ishga tushdi!', 'Telegram bot ishga tushirildi!', 'success');
     }
 
     async function stopTelegramBot() {
@@ -2718,7 +2986,7 @@
       });
       closeModal('modal-telegram');
       loadChannels();
-      alert('Telegram bot to\'xtatildi.');
+      showToast('To\'xtatildi', 'Telegram bot to\'xtatildi.', 'info');
     }
 
     async function openWhatsAppModal() {
@@ -2793,12 +3061,12 @@
         });
         const data = await res.json();
         if (res.ok) {
-          alert(`🤖 AI Closer WhatsApp Javobi:\n\n"${data.reply}"\n\n(Bosqich: ${data.stage}, Ball: ${data.lead_score})`);
+          showToast('WhatsApp AI Javobi', `"${data.reply}" (Bosqich: ${data.stage}, Ball: ${data.lead_score})`, 'success', 5000);
         } else {
-          alert('Xatolik yuz berdi: ' + (data.detail || 'Noma\'lum xato'));
+          showToast('Xatolik', data.detail || 'Noma\'lum xato', 'error');
         }
       } catch (err) {
-        alert('So\'rov yuborishda xatolik: ' + err.message);
+        showToast('Ulanish xatosi', 'So\'rov yuborishda xatolik: ' + err.message, 'error');
       }
     }
 
@@ -2830,13 +3098,13 @@
         if (res.ok) {
           closeModal('modal-whatsapp');
           loadChannels();
-          alert('✓ WhatsApp muvaffaqiyatli ulandi va sozlamalar saqlandi!');
+          showToast('Muvaffaqiyatli!', 'WhatsApp muvaffaqiyatli ulandi va sozlamalar saqlandi!', 'success');
         } else {
           const err = await res.json();
-          alert('Xatolik: ' + (err.detail || 'Sozlamalarni saqlashda xatolik yuz berdi'));
+          showToast('Xatolik', err.detail || 'Sozlamalarni saqlashda xatolik yuz berdi', 'error');
         }
       } catch (e) {
-        alert('Serverga ulanishda xatolik: ' + e.message);
+        showToast('Server xatosi', 'Serverga ulanishda xatolik: ' + e.message, 'error');
       }
     }
 
@@ -2852,7 +3120,7 @@
     function copyWidgetCode() {
       const code = document.getElementById('widget-embed-code').textContent;
       navigator.clipboard.writeText(code);
-      alert('Web Vidjet kodi nusxalandi! Saytingizga joylashtirishingiz mumkin.');
+      showToast('Nusxalandi!', 'Web Vidjet kodi nusxalandi! Saytingizga joylashtirishingiz mumkin.', 'success');
     }
 
     // 3. KNOWLEDGE BASE
@@ -2897,7 +3165,7 @@
       const fileInput = document.getElementById('upload-file-input');
       const cat = document.getElementById('upload-category-input').value;
       if (!fileInput.files || !fileInput.files[0]) {
-        alert('Iltimos, faylni tanlang!');
+        showToast("Fayl tanlanmadi", "Iltimos, yuklash uchun faylni tanlang!", "warning");
         return;
       }
 
@@ -2905,14 +3173,18 @@
       formData.append('file', fileInput.files[0]);
       formData.append('category', cat);
 
-      const res = await fetch('/api/knowledge/upload', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-      closeModal('modal-upload');
-      loadKnowledge();
-      alert(data.message || 'Fayl yuklandi!');
+      try {
+        const res = await fetch('/api/knowledge/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        closeModal('modal-upload');
+        loadKnowledge();
+        showToast("Muvaffaqiyatli", data.message || "Fayl muvaffaqiyatli yuklandi!", "success");
+      } catch(e) {
+        showToast("Xatolik", "Fayl yuklashda xatolik yuz berdi: " + e.message, "error");
+      }
     }
 
     async function submitAddFaq() {
@@ -2920,46 +3192,67 @@
       const a = document.getElementById('faq-answer-input').value.trim();
       const cat = document.getElementById('faq-category-input').value.trim();
       if (!q || !a) {
-        alert('Savol va javobni to\'liq kiriting!');
+        showToast("Ma'lumot yetarli emas", "Savol va javob maydonlarini to'liq kiriting!", "warning");
         return;
       }
 
-      await fetch('/api/knowledge/faq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, answer: a, category: cat })
-      });
-      document.getElementById('faq-question-input').value = '';
-      document.getElementById('faq-answer-input').value = '';
-      closeModal('modal-faq');
-      loadKnowledge();
-      alert('Yangi FAQ saqlandi!');
+      try {
+        await fetch('/api/knowledge/faq', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q, answer: a, category: cat })
+        });
+        document.getElementById('faq-question-input').value = '';
+        document.getElementById('faq-answer-input').value = '';
+        closeModal('modal-faq');
+        loadKnowledge();
+        showToast("Saqlandi", "Yangi FAQ bilimlar bazasiga muvaffaqiyatli qo'shildi!", "success");
+      } catch(e) {
+        showToast("Xatolik", "FAQ saqlashda xatolik: " + e.message, "error");
+      }
     }
 
     async function submitAddUrl() {
       const url = document.getElementById('url-address-input').value.trim();
       const title = document.getElementById('url-title-input').value.trim();
       if (!url) {
-        alert('Sayt URL manzilini kiriting!');
+        showToast("Havola kiritilmadi", "Veb-sayt URL manzilini kiriting!", "warning");
         return;
       }
 
-      await fetch('/api/knowledge/url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url, title: title })
-      });
-      document.getElementById('url-address-input').value = '';
-      document.getElementById('url-title-input').value = '';
-      closeModal('modal-url');
-      loadKnowledge();
-      alert('Sayt havolasi qo\'shildi!');
+      try {
+        await fetch('/api/knowledge/url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url, title: title })
+        });
+        document.getElementById('url-address-input').value = '';
+        document.getElementById('url-title-input').value = '';
+        closeModal('modal-url');
+        loadKnowledge();
+        showToast("Qo'shildi", "Veb-sayt havolasi bilimlar bazasiga qo'shildi!", "success");
+      } catch(e) {
+        showToast("Xatolik", "Havola qo'shishda xatolik: " + e.message, "error");
+      }
     }
 
-    async function deleteKnowledgeItem(id) {
-      if (!confirm('Ushbu bilimni o\'chirishni tasdiqlaysizmi?')) return;
-      await fetch(`/api/knowledge/${id}`, { method: 'DELETE' });
-      loadKnowledge();
+    function deleteKnowledgeItem(id) {
+      showConfirmDialog({
+        title: "Bilimni O'chirish",
+        subtitle: "Ushbu bilim manbasini bazadan o'chirishni tasdiqlaysizmi?",
+        confirmText: "O'chirish",
+        cancelText: "Bekor qilish",
+        theme: "danger",
+        onConfirm: async () => {
+          try {
+            await fetch(`/api/knowledge/${id}`, { method: 'DELETE' });
+            showToast("O'chirildi", "Bilim muvaffaqiyatli o'chirildi.", "info");
+            loadKnowledge();
+          } catch(e) {
+            showToast("Xatolik", "O'chirishda xatolik: " + e.message, "error");
+          }
+        }
+      });
     }
 
     // 4. AGENT PERSONA
@@ -3849,27 +4142,35 @@
         await loadWorkspaces();
         await loadBilling();
         loadDashboardStats();
-        alert('Yangi loyiha muvaffaqiyatli yaratildi va faollashtirildi!');
+        showToast("Loyiha Yaratildi", "Yangi loyiha muvaffaqiyatli yaratildi va faollashtirildi! 🎉", "success");
       } catch (err) {
-        alert('Loyiha yaratishda xatolik yuz berdi: ' + err);
+        showToast("Xatolik", "Loyiha yaratishda xatolik: " + err, "error");
       }
     }
 
-    async function handleDeleteWorkspace() {
+    function handleDeleteWorkspace() {
       if (currentWorkspaceId === 'default') {
-        alert('Asosiy (Default) loyihani o\'chirish mumkin emas.');
+        showToast("Cheklov", "Asosiy (Default) loyihani o'chirish mumkin emas.", "warning");
         return;
       }
-      if (!confirm('Haqiqatan ham bu loyihani o\'chirmoqchimisiz?')) return;
-
-      try {
-        await fetch('/api/workspaces/' + currentWorkspaceId, { method: 'DELETE' });
-        closeModal('modal-workspace-settings');
-        await loadWorkspaces();
-        await loadBilling();
-      } catch (err) {
-        alert('Loyihani o\'chirishda xatolik: ' + err);
-      }
+      showConfirmDialog({
+        title: "Loyihani O'chirish",
+        subtitle: "Haqiqatan ham ushbu loyihani o'chirmoqchimisiz? Barcha sozlamalar o'chiriladi.",
+        confirmText: "O'chirish",
+        cancelText: "Bekor qilish",
+        theme: "danger",
+        onConfirm: async () => {
+          try {
+            await fetch('/api/workspaces/' + currentWorkspaceId, { method: 'DELETE' });
+            closeModal('modal-workspace-settings');
+            await loadWorkspaces();
+            await loadBilling();
+            showToast("O'chirildi", "Loyiha muvaffaqiyatli o'chirildi.", "info");
+          } catch (err) {
+            showToast("Xatolik", "Loyihani o'chirishda xatolik: " + err, "error");
+          }
+        }
+      });
     }
 
     // ================= BILLING & PLANS =================
@@ -4164,9 +4465,9 @@
         closeModal('modal-checkout');
         await loadBilling();
         await loadWorkspaces();
-        alert(`Tabriklaymiz! ${selectedCheckoutPlan.toUpperCase()} tarifi ${currentBillingPeriod} oyga muvaffaqiyatli faollashtirildi! Chek Telegram akkauntingizga yuborildi.`);
+        showToast("Tabriklaymiz! 🎉", `${selectedCheckoutPlan.toUpperCase()} tarifi ${currentBillingPeriod} oyga muvaffaqiyatli faollashtirildi! Chek yuborildi.`, "success", 5000);
       } catch (err) {
-        alert('To\'lovda xatolik yuz berdi: ' + err);
+        showToast("To'lov xatosi", "To'lovda xatolik yuz berdi: " + err, "error");
       } finally {
         if (btn) {
           btn.disabled = false;

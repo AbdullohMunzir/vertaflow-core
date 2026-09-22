@@ -47,6 +47,7 @@ def run_security_audit():
     db.set_active_workspace_id("default")
     conn = db.get_connection()
     conn.execute("UPDATE businesses SET plan_id = 'free', billing_period = 1;")
+    conn.execute("DELETE FROM token_usage;")
     conn.commit()
     conn.close()
 
