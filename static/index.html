@@ -2616,7 +2616,7 @@
       const waEl = document.getElementById('wa-webhook-url');
       if (waEl) waEl.textContent = `${origin}/api/webhooks/whatsapp`;
       const widgetEl = document.getElementById('widget-embed-code');
-      if (widgetEl) widgetEl.textContent = `<script src="${origin}/static/widget.js" data-verta-biz="default"></script>`;
+      if (widgetEl) widgetEl.textContent = `<script src="${origin}/static/widget.js" data-verta-biz="default"><` + `/script>`;
     }
 
     function openInstagramModal() {
