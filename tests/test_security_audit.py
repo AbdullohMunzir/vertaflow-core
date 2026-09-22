@@ -157,6 +157,10 @@ def run_security_audit():
     })
     log_test("Feature Gate: 4th knowledge item on Free plan rejected with 403 Forbidden",
              res.status_code == 403 and "bilimlar bazasi limiti tugadi" in res.text)
+    conn = db.get_connection()
+    conn.execute("DELETE FROM knowledge_items WHERE title = 'Test Doc' OR title = 'Limitdan oshgan 4-savol?';")
+    conn.commit()
+    conn.close()
 
     # Test 5.2: Multi-channel limit on Free plan (max 1 channel)
     db.update_channel("instagram", is_connected=1, config={"account_name": "@brand_uz"})

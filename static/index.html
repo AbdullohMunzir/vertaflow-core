@@ -965,15 +965,28 @@
 
         <!-- Knowledge Items List -->
         <div class="card-clean rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h2 class="text-sm font-bold text-gray-900">Yuklangan Bilimlar va Hujjatlar Ro'yxati</h2>
-            <span id="knowledge-total-label" class="text-xs text-gray-500 font-medium">Jami: 5 ta manba</span>
+            <div class="flex items-center gap-3">
+              <!-- Batch Actions Toolbar -->
+              <div id="knowledge-batch-actions" class="hidden items-center gap-2">
+                <span id="knowledge-selected-count" class="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">0 ta tanlandi</span>
+                <button onclick="confirmBatchDeleteKnowledge()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  <span>Tanlanganlarni O'chirish</span>
+                </button>
+              </div>
+              <span id="knowledge-total-label" class="text-xs text-gray-500 font-medium">Jami: 0 ta manba</span>
+            </div>
           </div>
 
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead class="bg-[#F9FAFB] text-gray-500 font-semibold border-b border-gray-200">
                 <tr>
+                  <th class="py-2.5 px-3 w-10 text-center">
+                    <input type="checkbox" id="select-all-knowledge" onchange="toggleSelectAllKnowledge(this.checked)" class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer w-4 h-4">
+                  </th>
                   <th class="py-2.5 px-3">Turi</th>
                   <th class="py-2.5 px-3">Sarlavha / Manba</th>
                   <th class="py-2.5 px-3">Hajmi / Kategoriya</th>
@@ -1025,11 +1038,21 @@
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-2">Agent Avatari</label>
                 <div class="flex items-center gap-3" id="persona-avatar-picker">
-                  <div onclick="selectAvatar('👩‍💼')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-pistachio bg-pistachio/20 flex items-center justify-center text-2xl cursor-pointer">👩‍💼</div>
-                  <div onclick="selectAvatar('👨‍💼')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center text-2xl cursor-pointer">👨‍💼</div>
-                  <div onclick="selectAvatar('🤖')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center text-2xl cursor-pointer">🤖</div>
-                  <div onclick="selectAvatar('👩‍💻')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center text-2xl cursor-pointer">👩‍💻</div>
-                  <div onclick="selectAvatar('🌟')" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center text-2xl cursor-pointer">🌟</div>
+                  <div onclick="selectAvatar('female_consultant')" data-avatar="female_consultant" class="avatar-opt w-12 h-12 rounded-xl border-2 border-pistachio bg-pistachio/20 flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all ring-2 ring-pistachio/50 scale-105" title="Ayol maslahatchi">
+                    <svg class="w-full h-full text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M6 9a4 4 0 0 1 8-2"/></svg>
+                  </div>
+                  <div onclick="selectAvatar('male_consultant')" data-avatar="male_consultant" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all hover:scale-105" title="Erkak maslahatchi">
+                    <svg class="w-full h-full text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M12 11v4"/><path d="M10 13h4"/></svg>
+                  </div>
+                  <div onclick="selectAvatar('ai_bot')" data-avatar="ai_bot" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all hover:scale-105" title="AI Robot maslahatchi">
+                    <svg class="w-full h-full text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/></svg>
+                  </div>
+                  <div onclick="selectAvatar('tech_expert')" data-avatar="tech_expert" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all hover:scale-105" title="IT / Texnik mutaxassis">
+                    <svg class="w-full h-full text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2z"/><polyline points="8 10 10 12 8 14"/><line x1="12" y1="14" x2="15" y2="14"/><line x1="1" y1="21" x2="23" y2="21"/></svg>
+                  </div>
+                  <div onclick="selectAvatar('vip_star')" data-avatar="vip_star" class="avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all hover:scale-105" title="VIP / Premium agent">
+                    <svg class="w-full h-full text-amber-500" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1139,8 +1162,8 @@
               <!-- Simulated Chat Bubble -->
               <div class="bg-[#F9FAFB] rounded-2xl p-4 border border-gray-200 space-y-3">
                 <div class="flex items-center gap-2.5 pb-2 border-b border-gray-200">
-                  <div id="preview-avatar" class="w-9 h-9 rounded-full bg-pistachio flex items-center justify-center text-xl">
-                    👩‍💼
+                  <div id="preview-avatar" class="w-9 h-9 rounded-full bg-pistachio/30 p-2 flex items-center justify-center shrink-0 border border-pistachio/40 shadow-xs">
+                    <svg class="w-full h-full text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M6 9a4 4 0 0 1 8-2"/></svg>
                   </div>
                   <div>
                     <div id="preview-name" class="font-bold text-xs text-gray-900">Madina</div>
@@ -2314,12 +2337,24 @@
       }
 
       if (details && details.length > 0) {
-        detailsEl.innerHTML = details.map(d => `
-          <div class="flex items-center gap-2">
-            <span class="w-4 h-4 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
-            <span class="text-gray-700 font-medium">${d}</span>
-          </div>
-        `).join('');
+        detailsEl.innerHTML = details.map(d => {
+          if (typeof d === 'object' && d !== null && d.icon && d.text) {
+            return `
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 p-1">
+                  ${d.icon}
+                </span>
+                <span class="text-gray-700 font-medium">${d.text}</span>
+              </div>
+            `;
+          }
+          return `
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+              <span class="text-gray-700 font-medium">${d}</span>
+            </div>
+          `;
+        }).join('');
         detailsEl.classList.remove('hidden');
       } else {
         detailsEl.classList.add('hidden');
@@ -2372,7 +2407,31 @@
     let conversationsData = [];
     let leadsData = [];
     let channelsData = [];
-    let selectedAvatar = '👩‍💼';
+    const AVATAR_SVGS = {
+      female_consultant: '<svg class="w-full h-full text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M6 9a4 4 0 0 1 8-2"/></svg>',
+      male_consultant: '<svg class="w-full h-full text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M12 11v4"/><path d="M10 13h4"/></svg>',
+      ai_bot: '<svg class="w-full h-full text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/></svg>',
+      tech_expert: '<svg class="w-full h-full text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2z"/><polyline points="8 10 10 12 8 14"/><line x1="12" y1="14" x2="15" y2="14"/><line x1="1" y1="21" x2="23" y2="21"/></svg>',
+      vip_star: '<svg class="w-full h-full text-amber-500" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+    };
+
+    function normalizeAvatar(av) {
+      if (!av) return 'female_consultant';
+      if (av === '👩‍💼') return 'female_consultant';
+      if (av === '👨‍💼') return 'male_consultant';
+      if (av === '🤖') return 'ai_bot';
+      if (av === '👩‍💻') return 'tech_expert';
+      if (av === '🌟') return 'vip_star';
+      if (AVATAR_SVGS[av]) return av;
+      return 'female_consultant';
+    }
+
+    function getAvatarSvg(av) {
+      const key = normalizeAvatar(av);
+      return AVATAR_SVGS[key] || AVATAR_SVGS.female_consultant;
+    }
+
+    let selectedAvatar = 'female_consultant';
     let selectedTone = 'friendly_closer';
     let playgroundSessionId = 'play_' + Date.now();
     let currentUser = null;
@@ -2591,7 +2650,7 @@
           accent: 'from-violet-500 to-purple-600'
         },
         oqim_kurs: {
-          iconSvg: '<svg class="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-.838L12.83 2.18a2 2 0 0 0-1.66 0L2.6 10.08a1 1 0 0 0 0 1.832l8.57 7.908a2 2 0 0 0 1.66 0l8.57-7.908a1 1 0 0 0 .02-.99"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+          iconSvg: '<svg class="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c0 3 6 3 6 3s6 0 6-3v-5"/></svg>',
           badgeBg: 'bg-blue-50 border-blue-200/80',
           pillBg: 'bg-blue-50 text-blue-700 border-blue-200',
           accent: 'from-blue-500 to-indigo-600'
@@ -2621,6 +2680,7 @@
           accent: 'from-amber-500 to-orange-600'
         }
       };
+      window.nicheMetaMap = nicheMeta;
 
       const defaultMeta = {
         iconSvg: '<svg class="w-6 h-6 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
@@ -2680,16 +2740,32 @@
     }
 
     function confirmApplyNicheTemplate(templateId, templateName, category) {
+      const templateMeta = window.nicheMetaMap?.[templateId];
+      const nicheIconSvg = templateMeta ? templateMeta.iconSvg : null;
+
       showConfirmDialog({
         title: "Andozani Qo'llash",
         subtitle: `Haqiqatan ham <b class="text-purple-700 font-bold">'${templateName}'</b> andozasini joriy loyihaga tatbiq etmoqchimisiz?`,
+        iconSvg: nicheIconSvg,
         details: [
-          "🏢 Korxona profili va o'rtacha chek avtomatik yangilanadi",
-          "🤖 AI sotuv agenti personasi va savdo skriptlari moslashtiriladi",
-          "📚 Ushbu nitsaga oid 4 ta tekshirilgan FAQ bilimlar bazasiga kiritiladi",
-          "🛡️ Raqobatchilar va e'tirozlarga qarshi battlecardlar o'rnatiladi"
+          {
+            icon: `<svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5m-4 0h4"/></svg>`,
+            text: "Korxona profili va o'rtacha chek avtomatik yangilanadi"
+          },
+          {
+            icon: `<svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
+            text: "AI sotuv agenti personasi va savdo skriptlari moslashtiriladi"
+          },
+          {
+            icon: `<svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`,
+            text: "Ushbu sohaga oid 4 ta tekshirilgan FAQ bilimlar bazasiga kiritiladi"
+          },
+          {
+            icon: `<svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`,
+            text: "Raqobatchilar va e'tirozlarga qarshi battlecardlar o'rnatiladi"
+          }
         ],
-        confirmText: "⚡ Ha, Andozani Faollashtirish",
+        confirmText: "Andozani Faollashtirish",
         cancelText: "Bekor qilish",
         theme: "purple",
         onConfirm: async () => {
@@ -2697,9 +2773,9 @@
             const res = await fetch('/api/creator/templates/' + templateId + '/apply', { method: 'POST' });
             const data = await res.json();
             if (data.status === 'applied') {
-              showToast("Muvaffaqiyatli!", `'${templateName}' andozasi joriy loyihaga to'liq tatbiq etildi! 🚀`, "success");
-              loadPersona();
-              loadKnowledge();
+              showToast("Muvaffaqiyatli!", `'${templateName}' andozasi joriy loyihaga to'liq tatbiq etildi!`, "success");
+              await loadPersona();
+              await loadKnowledge();
               loadDashboardStats();
               setTimeout(() => switchTab('dashboard'), 600);
             } else {
@@ -3130,27 +3206,50 @@
         const data = await res.json();
         const items = data.items || [];
         
-        document.getElementById('badge-knowledge-count').textContent = `${items.length} ta`;
+        const countBadge = document.getElementById('badge-knowledge-count');
+        if (countBadge) countBadge.textContent = `${items.length} ta`;
         if (window.lucide) lucide.createIcons();
-        document.getElementById('knowledge-total-label').textContent = `Jami: ${items.length} ta manba`;
+        const totalLabel = document.getElementById('knowledge-total-label');
+        if (totalLabel) totalLabel.textContent = `Jami: ${items.length} ta manba`;
+
+        const masterCb = document.getElementById('select-all-knowledge');
+        if (masterCb) {
+          masterCb.checked = false;
+          masterCb.indeterminate = false;
+        }
+        onKnowledgeItemCbChange();
 
         const tbody = document.getElementById('knowledge-table-body');
         if (!tbody) return;
 
+        if (items.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" class="py-10 text-center text-xs text-gray-400">
+                Ushbu loyihada hali bilim manbalari mavjud emas. Yuqoridagi tugmalar orqali fayl, FAQ yoki havola qo'shing.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
         const typeBadges = {
-          file: '<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold">PDF / Hujjat</span>',
-          faq: '<span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-bold">FAQ Savol</span>',
-          url: '<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold">Sayt URL</span>'
+          file: '<span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-bold border border-blue-100">PDF / Hujjat</span>',
+          faq: '<span class="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 font-bold border border-purple-100">FAQ Savol</span>',
+          url: '<span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">Sayt URL</span>'
         };
 
         tbody.innerHTML = items.map(it => `
-          <tr class="hover:bg-gray-50/50">
+          <tr class="hover:bg-gray-50/70 transition-colors">
+            <td class="py-3 px-3 text-center">
+              <input type="checkbox" class="knowledge-item-cb rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer w-4 h-4" value="${it.id}" onchange="onKnowledgeItemCbChange()">
+            </td>
             <td class="py-3 px-3">${typeBadges[it.item_type] || it.item_type}</td>
             <td class="py-3 px-3 font-bold text-gray-900">${it.title}</td>
             <td class="py-3 px-3 text-gray-500">${it.metadata?.file_size || it.metadata?.category || it.metadata?.status || '-'}</td>
             <td class="py-3 px-3 text-gray-600 max-w-xs truncate">${it.content}</td>
             <td class="py-3 px-3 text-right">
-              <button onclick="deleteKnowledgeItem(${it.id})" class="text-red-500 hover:text-red-700 font-bold">
+              <button onclick="deleteKnowledgeItem(${it.id})" class="text-red-500 hover:text-red-700 font-bold transition-colors cursor-pointer">
                 O'chirish
               </button>
             </td>
@@ -3159,6 +3258,79 @@
       } catch (err) {
         console.error('Knowledge load error', err);
       }
+    }
+
+    function onKnowledgeItemCbChange() {
+      const checkboxes = document.querySelectorAll('.knowledge-item-cb');
+      const checked = document.querySelectorAll('.knowledge-item-cb:checked');
+      const batchToolbar = document.getElementById('knowledge-batch-actions');
+      const countLabel = document.getElementById('knowledge-selected-count');
+      const selectAll = document.getElementById('select-all-knowledge');
+
+      if (countLabel) countLabel.textContent = `${checked.length} ta tanlandi`;
+      if (batchToolbar) {
+        if (checked.length > 0) {
+          batchToolbar.classList.remove('hidden');
+          batchToolbar.classList.add('flex');
+        } else {
+          batchToolbar.classList.add('hidden');
+          batchToolbar.classList.remove('flex');
+        }
+      }
+      if (selectAll) {
+        selectAll.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
+        selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+      }
+    }
+
+    function toggleSelectAllKnowledge(masterChecked) {
+      const checkboxes = document.querySelectorAll('.knowledge-item-cb');
+      checkboxes.forEach(cb => { cb.checked = masterChecked; });
+      onKnowledgeItemCbChange();
+    }
+
+    function confirmBatchDeleteKnowledge() {
+      const checked = Array.from(document.querySelectorAll('.knowledge-item-cb:checked')).map(cb => parseInt(cb.value)).filter(Boolean);
+      if (!checked.length) {
+        showToast("Tanlanmagan", "Iltimos, o'chirish uchun kamida bitta bilimni tanlang!", "warning");
+        return;
+      }
+
+      showConfirmDialog({
+        title: "Tanlangan Bilimlarni O'chirish",
+        subtitle: `Haqiqatan ham tanlangan <b>${checked.length} ta</b> bilim manbasini o'chirmoqchimisiz?`,
+        details: [
+          {
+            icon: `<svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`,
+            text: `${checked.length} ta hujjat/savol bazadan butunlay o'chiriladi`
+          },
+          {
+            icon: `<svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+            text: "AI sotuv agenti ushbu ma'lumotlarni javob berishda ishlatmaydi"
+          }
+        ],
+        confirmText: "Ha, Barchasini O'chirish",
+        cancelText: "Bekor qilish",
+        theme: "danger",
+        onConfirm: async () => {
+          try {
+            const res = await fetch('/api/knowledge/batch-delete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ item_ids: checked })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+              showToast("O'chirildi", `${data.deleted_count} ta bilim muvaffaqiyatli o'chirildi.`, "success");
+              await loadKnowledge();
+            } else {
+              showToast("Xatolik", data.detail || "O'chirishda xatolik yuz berdi", "error");
+            }
+          } catch (e) {
+            showToast("Xatolik", "Server bilan ulanishda xato: " + e.message, "error");
+          }
+        }
+      });
     }
 
     async function submitUploadFile() {
@@ -3266,7 +3438,7 @@
         document.getElementById('persona-greeting-input').value = p.greeting || '';
         document.getElementById('persona-discount-input').value = p.max_discount || '10%';
         
-        selectAvatar(p.avatar || '👩‍💼', false);
+        selectAvatar(p.avatar || 'female_consultant', false);
         selectTone(p.tone || 'friendly_closer', false);
 
         if (p.rules) {
@@ -3282,12 +3454,13 @@
     }
 
     function selectAvatar(av, update = true) {
-      selectedAvatar = av;
+      selectedAvatar = normalizeAvatar(av);
       document.querySelectorAll('.avatar-opt').forEach(el => {
-        if (el.textContent.trim() === av) {
-          el.className = 'avatar-opt w-12 h-12 rounded-xl border-2 border-pistachio bg-pistachio/20 flex items-center justify-center text-2xl cursor-pointer';
+        const key = el.getAttribute('data-avatar');
+        if (key === selectedAvatar) {
+          el.className = 'avatar-opt w-12 h-12 rounded-xl border-2 border-pistachio bg-pistachio/20 flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all ring-2 ring-pistachio/50 scale-105';
         } else {
-          el.className = 'avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center text-2xl cursor-pointer';
+          el.className = 'avatar-opt w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-pistachio flex items-center justify-center p-2.5 cursor-pointer shadow-xs transition-all hover:scale-105';
         }
       });
       updatePersonaPreview();
@@ -3316,9 +3489,19 @@
       const topLabel = document.getElementById('topbar-agent-label');
 
       if (pName) pName.textContent = name;
-      if (pAv) pAv.textContent = selectedAvatar;
+      if (pAv) {
+        pAv.className = 'w-9 h-9 rounded-full bg-pistachio/30 p-2 flex items-center justify-center shrink-0 border border-pistachio/40 shadow-xs';
+        pAv.innerHTML = getAvatarSvg(selectedAvatar);
+      }
       if (pBubble && greeting) pBubble.textContent = greeting;
-      if (topLabel) topLabel.textContent = `${selectedAvatar} ${name} (${role})`;
+      if (topLabel) {
+        topLabel.innerHTML = `
+          <span class="w-5 h-5 rounded-full bg-emerald-50 p-0.5 flex items-center justify-center shrink-0 border border-emerald-100">
+            ${getAvatarSvg(selectedAvatar)}
+          </span>
+          <span class="truncate">${name} (${role})</span>
+        `;
+      }
     }
 
     async function saveAgentPersona() {
@@ -4116,6 +4299,7 @@
         await loadKnowledge();
         await loadLeads();
         await loadConversations();
+        await loadPersona();
         loadDashboardStats();
       } catch (err) {
         console.error('Failed to switch workspace:', err);
@@ -4141,6 +4325,11 @@
         document.getElementById('new-ws-name').value = '';
         await loadWorkspaces();
         await loadBilling();
+        await loadChannels();
+        await loadKnowledge();
+        await loadLeads();
+        await loadConversations();
+        await loadPersona();
         loadDashboardStats();
         showToast("Loyiha Yaratildi", "Yangi loyiha muvaffaqiyatli yaratildi va faollashtirildi! 🎉", "success");
       } catch (err) {

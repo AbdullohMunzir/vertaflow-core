@@ -14,11 +14,11 @@ from typing import Dict, Any, List, Optional, Tuple
 DB_PATH = os.path.join(os.path.dirname(__file__), "vertaflow.db")
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH, timeout=10.0)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     try:
         conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA busy_timeout=30000;")
         conn.execute("PRAGMA foreign_keys=ON;")
     except Exception:
         pass
@@ -165,6 +165,7 @@ def init_db():
         their_weakness TEXT,
         reframe_talk_track TEXT,
         landmine_question TEXT,
+        workspace_id TEXT DEFAULT 'default',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
@@ -203,6 +204,7 @@ def init_db():
         item_type TEXT NOT NULL, -- 'file', 'url', 'faq', 'text'
         content TEXT NOT NULL,
         metadata TEXT, -- JSON
+        workspace_id TEXT DEFAULT 'default',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
@@ -236,6 +238,18 @@ def init_db():
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_conversations_channel_time ON conversations(channel, updated_at DESC);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_leads_tier_score ON leads(tier, score DESC, created_at DESC);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_items(item_type);")
+
+    # Migrations for existing DBs
+    try:
+        cursor.execute("ALTER TABLE knowledge_items ADD COLUMN workspace_id TEXT DEFAULT 'default';")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE battlecards ADD COLUMN workspace_id TEXT DEFAULT 'default';")
+    except Exception:
+        pass
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_ws ON knowledge_items(workspace_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_battlecards_ws ON battlecards(workspace_id);")
 
     conn.commit()
 
@@ -439,15 +453,17 @@ def seed_sample_data(cursor):
 
 # Database Helper Functions
 
-def get_business_profile(biz_id: str = "default") -> Dict[str, Any]:
+def get_business_profile(biz_id: Optional[str] = None) -> Dict[str, Any]:
+    if not biz_id:
+        biz_id = get_active_workspace_id()
     conn = get_connection()
     row = conn.execute("SELECT * FROM businesses WHERE id = ?;", (biz_id,)).fetchone()
     conn.close()
     if not row:
         return {
-            "business_name": "Mebel Fabrikasi",
-            "business_desc": "Oshxona va uy mebellari ishlab chiqarish",
-            "avg_check": "5 000 000 so'm",
+            "business_name": "Mening Korxonam",
+            "business_desc": "AI sotuv agenti bilan jihozlangan korxona",
+            "avg_check": "1 000 000 so'm",
             "faq_list": []
         }
     return {
@@ -457,7 +473,9 @@ def get_business_profile(biz_id: str = "default") -> Dict[str, Any]:
         "faq_list": json.loads(row["faq_list"] or "[]")
     }
 
-def update_business_profile(name: str, desc: str, avg_check: str, faq_list: Optional[List[Dict[str, str]]] = None, biz_id: str = "default"):
+def update_business_profile(name: str, desc: str, avg_check: str, faq_list: Optional[List[Dict[str, str]]] = None, biz_id: Optional[str] = None):
+    if not biz_id:
+        biz_id = get_active_workspace_id()
     conn = get_connection()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     faqs_json = json.dumps(faq_list or [], ensure_ascii=False)
@@ -566,9 +584,13 @@ def get_leads() -> List[Dict[str, Any]]:
         result.append(d)
     return result
 
-def get_battlecards() -> List[Dict[str, Any]]:
+def get_battlecards(workspace_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
     conn = get_connection()
-    rows = conn.execute("SELECT * FROM battlecards ORDER BY id ASC;").fetchall()
+    rows = conn.execute("SELECT * FROM battlecards WHERE workspace_id = ? ORDER BY id ASC;", (workspace_id,)).fetchall()
+    if not rows and workspace_id != "default":
+        rows = conn.execute("SELECT * FROM battlecards WHERE workspace_id = 'default' ORDER BY id ASC;").fetchall()
     conn.close()
     cards = []
     for r in rows:
@@ -583,12 +605,14 @@ def get_battlecards() -> List[Dict[str, Any]]:
         })
     return cards
 
-def add_battlecard(name: str, keywords: List[str], weakness: str, reframe: str, landmine: str, strength: str = "Past narx"):
+def add_battlecard(name: str, keywords: List[str], weakness: str, reframe: str, landmine: str, strength: str = "Past narx", workspace_id: Optional[str] = None):
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
     conn = get_connection()
     conn.execute("""
-        INSERT INTO battlecards (name, keywords, their_strength, their_weakness, reframe_talk_track, landmine_question)
-        VALUES (?, ?, ?, ?, ?, ?);
-    """, (name, json.dumps(keywords, ensure_ascii=False), strength, weakness, reframe, landmine))
+        INSERT INTO battlecards (name, keywords, their_strength, their_weakness, reframe_talk_track, landmine_question, workspace_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?);
+    """, (name, json.dumps(keywords, ensure_ascii=False), strength, weakness, reframe, landmine, workspace_id))
     conn.commit()
     conn.close()
 
@@ -615,9 +639,11 @@ def get_all_settings() -> Dict[str, str]:
 
 # ----------------- KNOWLEDGE BASE HELPERS -----------------
 
-def list_knowledge_items() -> List[Dict[str, Any]]:
+def list_knowledge_items(workspace_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
     conn = get_connection()
-    rows = conn.execute("SELECT * FROM knowledge_items ORDER BY id DESC;").fetchall()
+    rows = conn.execute("SELECT * FROM knowledge_items WHERE workspace_id = ? ORDER BY id DESC;", (workspace_id,)).fetchall()
     conn.close()
     items = []
     for r in rows:
@@ -626,25 +652,44 @@ def list_knowledge_items() -> List[Dict[str, Any]]:
         items.append(d)
     return items
 
-def add_knowledge_item(title: str, item_type: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> int:
+def add_knowledge_item(title: str, item_type: str, content: str, metadata: Optional[Dict[str, Any]] = None, workspace_id: Optional[str] = None) -> int:
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
     conn = get_connection()
     meta_json = json.dumps(metadata or {}, ensure_ascii=False)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO knowledge_items (title, item_type, content, metadata)
-        VALUES (?, ?, ?, ?);
-    """, (title, item_type, content, meta_json))
+        INSERT INTO knowledge_items (title, item_type, content, metadata, workspace_id)
+        VALUES (?, ?, ?, ?, ?);
+    """, (title, item_type, content, meta_json, workspace_id))
     item_id = cursor.lastrowid
     conn.commit()
     conn.close()
     return item_id
 
-def delete_knowledge_item(item_id: int):
+def delete_knowledge_item(item_id: int, workspace_id: Optional[str] = None):
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
     conn = get_connection()
-    conn.execute("DELETE FROM knowledge_chunks WHERE parent_id = ?;", (item_id,))
-    conn.execute("DELETE FROM knowledge_items WHERE id = ?;", (item_id,))
+    conn.execute("DELETE FROM knowledge_chunks WHERE parent_id IN (SELECT id FROM knowledge_items WHERE id = ? AND workspace_id = ?);", (item_id, workspace_id))
+    conn.execute("DELETE FROM knowledge_items WHERE id = ? AND workspace_id = ?;", (item_id, workspace_id))
     conn.commit()
     conn.close()
+
+def delete_knowledge_items_batch(item_ids: List[int], workspace_id: Optional[str] = None) -> int:
+    if not item_ids:
+        return 0
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
+    conn = get_connection()
+    placeholders = ",".join("?" for _ in item_ids)
+    params = list(item_ids) + [workspace_id]
+    conn.execute(f"DELETE FROM knowledge_chunks WHERE parent_id IN (SELECT id FROM knowledge_items WHERE id IN ({placeholders}) AND workspace_id = ?);", params)
+    cur = conn.execute(f"DELETE FROM knowledge_items WHERE id IN ({placeholders}) AND workspace_id = ?;", params)
+    deleted_count = cur.rowcount
+    conn.commit()
+    conn.close()
+    return deleted_count
 
 # ----------------- KNOWLEDGE CHUNKS (RAG) HELPERS -----------------
 
@@ -800,20 +845,26 @@ def update_channel(channel_id: str, is_connected: Optional[int] = None, config: 
 
 # ----------------- AGENT PERSONA HELPERS -----------------
 
-def get_agent_persona() -> Dict[str, Any]:
-    raw = get_setting("agent_persona")
+def get_agent_persona(workspace_id: Optional[str] = None) -> Dict[str, Any]:
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
+    raw = get_setting(f"agent_persona_{workspace_id}")
+    if not raw and workspace_id == "default":
+        raw = get_setting("agent_persona")
     if raw:
         try:
             return json.loads(raw)
         except Exception:
             pass
+    ws = get_workspace(workspace_id)
+    ws_name = ws.get("name", "Mening Korxonam") if ws else "Mening Korxonam"
     return {
         "name": "Madina",
         "role": "Sotuv bo'yicha bosh maslahatchi",
-        "avatar": "👩‍💼",
+        "avatar": "female_consultant",
         "tone": "friendly_closer",
         "tone_label": "Samimiy & Savdo yopuvchi",
-        "greeting": "Assalomu alaykum! Fabrikamizga xush kelibsiz. Sizga qaysi turdagi mebel kerak: oshxona, yotoqxona yoki shkaf-kupe?",
+        "greeting": f"Assalomu alaykum! {ws_name}ga xush kelibsiz. Sizga qanday yordam bera olaman?",
         "max_discount": "10%",
         "rules": {
             "on_operator_request": True,
@@ -822,8 +873,12 @@ def get_agent_persona() -> Dict[str, Any]:
         }
     }
 
-def update_agent_persona(persona: Dict[str, Any]):
-    set_setting("agent_persona", json.dumps(persona, ensure_ascii=False))
+def update_agent_persona(persona: Dict[str, Any], workspace_id: Optional[str] = None):
+    if not workspace_id:
+        workspace_id = get_active_workspace_id()
+    set_setting(f"agent_persona_{workspace_id}", json.dumps(persona, ensure_ascii=False))
+    if workspace_id == "default":
+        set_setting("agent_persona", json.dumps(persona, ensure_ascii=False))
 
 # ----------------- DASHBOARD STATS HELPERS -----------------
 
@@ -897,6 +952,9 @@ def delete_workspace(workspace_id: str) -> bool:
     if workspace_id == "default":
         return False
     conn = get_connection()
+    conn.execute("DELETE FROM knowledge_chunks WHERE parent_id IN (SELECT id FROM knowledge_items WHERE workspace_id = ?);", (workspace_id,))
+    conn.execute("DELETE FROM knowledge_items WHERE workspace_id = ?;", (workspace_id,))
+    conn.execute("DELETE FROM battlecards WHERE workspace_id = ?;", (workspace_id,))
     conn.execute("DELETE FROM businesses WHERE id = ?;", (workspace_id,))
     conn.commit()
     conn.close()
@@ -916,7 +974,7 @@ def get_billing_info(workspace_id: Optional[str] = None) -> Dict[str, Any]:
     expires_at = ws.get("plan_expires_at")
 
     conn = get_connection()
-    knowledge_count = conn.execute("SELECT COUNT(*) FROM knowledge_items;").fetchone()[0]
+    knowledge_count = conn.execute("SELECT COUNT(*) FROM knowledge_items WHERE workspace_id = ?;", (workspace_id,)).fetchone()[0]
     catalog_count = min(knowledge_count * 2, 8)
     ig_chan = conn.execute("SELECT is_connected FROM channels WHERE channel_id = 'instagram';").fetchone()
     tg_chan = conn.execute("SELECT is_connected FROM channels WHERE channel_id = 'telegram';").fetchone()
@@ -1074,7 +1132,7 @@ def check_quota(workspace_id: str, action_type: str) -> Tuple[bool, str]:
         return True, "OK"
         
     elif action_type == "add_knowledge":
-        k_count = cursor.execute("SELECT COUNT(*) FROM knowledge_items;").fetchone()[0]
+        k_count = cursor.execute("SELECT COUNT(*) FROM knowledge_items WHERE workspace_id = ?;", (workspace_id,)).fetchone()[0]
         conn.close()
         if k_count >= limits["knowledge_max"]:
             return False, f"Tarif bo'yicha bilimlar bazasi limiti tugadi ({plan_id.capitalize()} tarifi: {limits['knowledge_max']} ta). Yangi bilim qo'shish uchun tarifni oshiring."

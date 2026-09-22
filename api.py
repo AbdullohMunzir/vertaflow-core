@@ -344,6 +344,9 @@ class TextKnowledge(BaseModel):
     content: str
     category: Optional[str] = "Katalog va Narxlar"
 
+class KnowledgeBatchDelete(BaseModel):
+    item_ids: List[int]
+
 class PersonaUpdate(BaseModel):
     name: Optional[str] = "Madina"
     company_name: Optional[str] = ""
@@ -790,7 +793,8 @@ async def add_url_knowledge(data: URLKnowledge):
 @app.delete("/api/knowledge/{item_id}")
 def delete_knowledge(item_id: int):
     """Deletes a knowledge item and its vector chunks from database."""
-    db.delete_knowledge_item(item_id)
+    ws_id = db.get_active_workspace_id()
+    db.delete_knowledge_item(item_id, workspace_id=ws_id)
     try:
         get_rag_engine().refresh_cache()
     except Exception:
@@ -798,21 +802,35 @@ def delete_knowledge(item_id: int):
     engine_cache.clear()
     return {"status": "success", "message": "Bilim va uning vektorlari muvaffaqiyatli o'chirildi!"}
 
+@app.post("/api/knowledge/batch-delete")
+def batch_delete_knowledge(req: KnowledgeBatchDelete):
+    """Deletes multiple knowledge items and their vector chunks from database."""
+    ws_id = db.get_active_workspace_id()
+    count = db.delete_knowledge_items_batch(req.item_ids, workspace_id=ws_id)
+    try:
+        get_rag_engine().refresh_cache()
+    except Exception:
+        pass
+    engine_cache.clear()
+    return {"status": "success", "deleted_count": count, "message": f"{count} ta bilim muvaffaqiyatli o'chirildi!"}
+
 # ----------------- AGENT PERSONA API -----------------
 
 @app.get("/api/agent/persona")
 @app.get("/api/persona")
 def get_persona():
     """Returns current AI agent persona and behavioral settings."""
-    return db.get_agent_persona()
+    ws_id = db.get_active_workspace_id()
+    return db.get_agent_persona(workspace_id=ws_id)
 
 @app.post("/api/agent/persona")
 def update_persona(p: PersonaUpdate):
     """Updates AI agent name, avatar, tone, greeting message, and handoff rules."""
+    ws_id = db.get_active_workspace_id()
     data = p.dict()
-    db.update_agent_persona(data)
+    db.update_agent_persona(data, workspace_id=ws_id)
     engine_cache.clear()
-    return {"status": "success", "persona": db.get_agent_persona(), "message": "Agent personasi saqlandi!"}
+    return {"status": "success", "persona": db.get_agent_persona(workspace_id=ws_id), "message": "Agent personasi saqlandi!"}
 
 # ----------------- CHANNELS & INTEGRATIONS API -----------------
 
@@ -1149,28 +1167,38 @@ def get_creator_template_details(template_id: str):
         raise HTTPException(status_code=404, detail="Andoza topilmadi")
     return {"template": tpl}
 
+def _background_sync_rag(ws_id: str):
+    try:
+        rag = get_rag_engine()
+        rag.sync_all_knowledge()
+    except Exception as e:
+        print(f"[RAG Background Sync Error]: {e}")
+
 @app.post("/api/creator/templates/{template_id}/apply")
-def apply_creator_template(template_id: str):
+def apply_creator_template(template_id: str, background_tasks: BackgroundTasks):
     """Applies a niche template into active business profile, persona, battlecards, and knowledge base."""
     tpl = get_template(template_id)
     if not tpl:
         raise HTTPException(status_code=404, detail="Andoza topilmadi")
 
-    # 1. Update business profile
+    ws_id = db.get_active_workspace_id()
+
+    # 1. Update business profile for this workspace
     db.update_business_profile(
         name=tpl["business_name"],
         desc=tpl["business_desc"],
         avg_check=tpl.get("avg_check", ""),
-        faq_list=tpl.get("faq_list", [])
+        faq_list=tpl.get("faq_list", []),
+        biz_id=ws_id
     )
 
-    # 2. Update agent persona
+    # 2. Update agent persona for this workspace
     persona_data = tpl.get("persona", {})
-    cur_persona = db.get_agent_persona()
+    cur_persona = db.get_agent_persona(workspace_id=ws_id)
     cur_persona.update(persona_data)
-    db.update_agent_persona(cur_persona)
+    db.update_agent_persona(cur_persona, workspace_id=ws_id)
 
-    # 3. Add battlecards
+    # 3. Add battlecards for this workspace
     for bc in tpl.get("battlecards", []):
         db.add_battlecard(
             name=bc["name"],
@@ -1178,29 +1206,23 @@ def apply_creator_template(template_id: str):
             weakness=bc.get("their_weakness") or bc.get("weakness", ""),
             reframe=bc.get("reframe_talk_track") or bc.get("reframe", ""),
             landmine=bc.get("landmine_question") or bc.get("landmine", ""),
-            strength=bc.get("their_strength") or bc.get("strength", "Past narx")
+            strength=bc.get("their_strength") or bc.get("strength", "Past narx"),
+            workspace_id=ws_id
         )
 
-    # 4. Index FAQs into knowledge base with RAG
-    rag = None
-    try:
-        rag = get_rag_engine()
-    except Exception:
-        pass
-
+    # 4. Insert FAQs into DB immediately (superfast <5ms)
     for faq in tpl.get("faq_list", []):
         meta = {"category": tpl["name"], "question": faq["question"], "answer": faq["answer"]}
-        item_id = db.add_knowledge_item(
+        db.add_knowledge_item(
             title=faq["question"],
             item_type="faq",
             content=faq["answer"],
-            metadata=meta
+            metadata=meta,
+            workspace_id=ws_id
         )
-        if rag:
-            try:
-                rag.index_document(parent_id=item_id, title=faq["question"], item_type="faq", content=faq["answer"], metadata=meta)
-            except Exception as e:
-                print(f"[RAG] Index error applying template FAQ: {e}")
+
+    # 5. Background task for RAG embeddings so UI response is instantaneous (<15ms)
+    background_tasks.add_task(_background_sync_rag, ws_id)
 
     engine_cache.clear()
     return {

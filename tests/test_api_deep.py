@@ -11,9 +11,11 @@ Covers:
 - Workspaces and settings
 """
 
+import os
 import sys
 import uuid
 import requests
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
     try:
@@ -35,6 +37,15 @@ def run_all_api_tests():
     print("=" * 60)
     
     requests.post(f"{BASE_URL}/api/test/reset_rate_limits")
+    import db
+    db.init_db()
+    db.set_active_workspace_id("default")
+    conn = db.get_connection()
+    conn.execute("UPDATE businesses SET plan_id = 'business' WHERE id = 'default';")
+    conn.execute("DELETE FROM knowledge_items WHERE id > 5 AND workspace_id = 'default';")
+    conn.execute("DELETE FROM knowledge_chunks WHERE parent_id > 5;")
+    conn.commit()
+    conn.close()
 
     session = requests.Session()
     

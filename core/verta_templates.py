@@ -20,7 +20,9 @@ NICHE_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "persona": {
             "name": "Madina",
             "role": "Mebel dizayneri va savdo maslahatchisi",
+            "avatar": "female_consultant",
             "tone": "friendly_closer",
+            "greeting": "Assalomu alaykum! Grand Mebel fabrikamizga xush kelibsiz. Sizga qaysi turdagi mebel kerak: individual oshxona, yotoqxona yoki shkaf-kupe?",
             "max_discount": "10%"
         },
         "faq_list": [
@@ -63,7 +65,9 @@ NICHE_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "persona": {
             "name": "Jasur",
             "role": "Ta'lim bo'yicha kordinator",
+            "avatar": "tech_expert",
             "tone": "friendly_closer",
+            "greeting": "Assalomu alaykum! Apex IT & Til akademiyamizga xush kelibsiz. Qaysi yo'nalish bo'yicha bepul sinov darsiga yozilmoqchisiz: Dasturlashmi yoki IELTS?",
             "max_discount": "15%"
         },
         "faq_list": [
@@ -106,7 +110,9 @@ NICHE_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "persona": {
             "name": "Nilufar",
             "role": "Klinika tibbiy administratori",
+            "avatar": "female_consultant",
             "tone": "corporate_formal",
+            "greeting": "Assalomu alaykum! Shifo Dent zamonaviy stomatologiya klinikamizga xush kelibsiz. Qanday tibbiy yoki stomatologik xizmat bo'yicha maslahat olmoqchisiz?",
             "max_discount": "5%"
         },
         "faq_list": [
@@ -149,7 +155,9 @@ NICHE_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "persona": {
             "name": "Dilshod",
             "role": "Katta usta va qabul muhandisi",
+            "avatar": "male_consultant",
             "tone": "direct_closer",
+            "greeting": "Assalomu alaykum! ProAuto servis markazimizga xush kelibsiz. Avtomobilingiz rusumi qanday va qanday xizmat kerak: diagnostika, moy almashtirish yoki ta'mirlash?",
             "max_discount": "5%"
         },
         "faq_list": [
@@ -188,7 +196,9 @@ NICHE_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "persona": {
             "name": "Kamola",
             "role": "Moda va stil bo'yicha maslahatchi",
+            "avatar": "vip_star",
             "tone": "friendly_closer",
+            "greeting": "Assalomu alaykum! Moda Elegance brend do'konimizga xush kelibsiz. Sizga qaysi turdagi libos yoki poyabzal kerak, razmeringizni bilasizmi?",
             "max_discount": "10%"
         },
         "faq_list": [
@@ -227,7 +237,9 @@ NICHE_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "persona": {
             "name": "Rustam",
             "role": "Investitsiya va ko'chmas mulk bo'yicha ekspert",
+            "avatar": "male_consultant",
             "tone": "corporate_formal",
+            "greeting": "Assalomu alaykum! Tashkent City Residences majmuamizga xush kelibsiz. Necha xonali xonadon yoki investitsiya varianti bilan qiziqyapsiz?",
             "max_discount": "5%"
         },
         "faq_list": [
