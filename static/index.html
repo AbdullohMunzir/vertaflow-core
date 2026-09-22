@@ -262,7 +262,7 @@
       </div>
       <div class="flex items-center gap-1.5">
         <span class="text-gray-400" data-i18n="topbar_biz_label">Korxona:</span>
-        <span class="font-bold text-gray-800" id="topbar-biz-name">Parfyumeriya Do'koni</span>
+        <span class="font-bold text-gray-800" id="topbar-biz-name">Mening Korxonam</span>
       </div>
       <div class="flex items-center gap-1.5">
         <span class="text-gray-400" data-i18n="topbar_agent_label">AI Agent:</span>
@@ -321,7 +321,7 @@
             <button onclick="toggleWorkspaceDropdown()" class="flex-1 flex items-center justify-between p-2.5 rounded-xl sidebar-card-light hover:bg-slate-50 border border-gray-200 text-xs font-bold text-gray-900 transition-all cursor-pointer">
               <div class="flex items-center gap-2 truncate">
                 <div id="ws-badge-icon" class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center shrink-0">D</div>
-                <span id="ws-active-name" class="truncate">Parfyumeriya Do'koni</span>
+                <span id="ws-active-name" class="truncate">Mening Korxonam</span>
               </div>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 shrink-0"></i>
             </button>
@@ -2213,10 +2213,14 @@
         }
         if (subEl) subEl.textContent = currentUser.identifier;
 
-        // Check channel lock: if registered via email and no channel is connected
+        // Check channel lock: if registered via email/google and no primary channel is connected
         const lockOverlay = document.getElementById('channel-lock-overlay');
         if (lockOverlay) {
-          const isEmailAuth = currentUser.auth_method === 'email';
+          const isEmailAuth = currentUser && (
+            currentUser.auth_method === 'email' ||
+            currentUser.auth_method === 'google' ||
+            (currentUser.identifier && currentUser.identifier.includes('@') && !currentUser.identifier.startsWith('@'))
+          );
           if (isEmailAuth && !data.has_primary_channel) {
             isChannelLocked = true;
             lockOverlay.classList.remove('hidden');
@@ -2244,6 +2248,21 @@
     // Init on load
     window.addEventListener('DOMContentLoaded', async () => {
       initLanguage();
+
+      // Instant pre-check: if cached user is Gmail/Email without connected channels, lock immediately to prevent UI flash
+      const rawUser = localStorage.getItem('vertaflow_user');
+      if (rawUser) {
+        try {
+          const u = JSON.parse(rawUser);
+          const isEmail = u && (u.auth_method === 'email' || u.auth_method === 'google' || (u.identifier && u.identifier.includes('@') && !u.identifier.startsWith('@')));
+          if (isEmail && !u.connected_channel) {
+            isChannelLocked = true;
+            const lockOverlay = document.getElementById('channel-lock-overlay');
+            if (lockOverlay) lockOverlay.classList.remove('hidden');
+          }
+        } catch (e) {}
+      }
+
       const authed = await checkAuthSession();
       if (!authed) return;
 
@@ -2310,6 +2329,15 @@
 
     // Tab Navigation with Apple-grade smooth reflow animation
     function switchTab(tabId) {
+      if (isChannelLocked) {
+        const lockEl = document.getElementById('channel-lock-overlay');
+        if (lockEl) {
+          lockEl.classList.remove('hidden');
+          lockEl.scrollIntoView({ behavior: 'smooth' });
+        }
+        return;
+      }
+
       activeTab = tabId;
       if (window.innerWidth < 768) {
         const aside = document.getElementById('main-sidebar');
@@ -2520,9 +2548,11 @@
       );
 
       const lockOverlay = document.getElementById('channel-lock-overlay');
-      if (!lockOverlay) return;
-
-      const isEmailAuth = user ? (user.auth_method === 'email' || (user.identifier && user.identifier.includes('@') && !user.identifier.startsWith('@'))) : false;
+      const isEmailAuth = user ? (
+        user.auth_method === 'email' || 
+        user.auth_method === 'google' || 
+        (user.identifier && user.identifier.includes('@') && !user.identifier.startsWith('@'))
+      ) : false;
 
       // If user came via email/gmail and no primary channel is connected:
       if (isEmailAuth && !hasPrimaryChannel) {
@@ -3041,6 +3071,26 @@
         const listEl = document.getElementById('inbox-convs-list');
         if (!listEl) return;
 
+        if (!conversationsData || conversationsData.length === 0) {
+          listEl.innerHTML = `
+            <div class="p-8 text-center text-gray-400 text-xs font-medium space-y-1">
+              <p class="font-semibold text-gray-600">Hozircha suhbatlar yo'q</p>
+              <p class="text-[11px] text-gray-400">Ulangan kanallardan yangi xabarlar kelishi bilan bu yerda paydo bo'ladi.</p>
+            </div>
+          `;
+          const chatMsgs = document.getElementById('active-chat-messages');
+          if (chatMsgs) {
+            chatMsgs.innerHTML = `
+              <div class="h-full flex flex-col items-center justify-center p-8 text-center text-gray-400 space-y-2">
+                <span class="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-xl">💬</span>
+                <p class="text-xs font-bold text-gray-600">Suhbat mavjud emas</p>
+                <p class="text-[11px] text-gray-400 max-w-xs">Kanal ulangandan so'ng mijozlar xabarlari avtomatik tarzda bu yerda ko'rinadi.</p>
+              </div>
+            `;
+          }
+          return;
+        }
+
         const chanIcons = {
           instagram: '<i data-lucide="camera" class="w-3.5 h-3.5 text-pink-500"></i>',
           telegram: '<i data-lucide="send" class="w-3.5 h-3.5 text-sky-500"></i>',
@@ -3172,28 +3222,12 @@
       loadConversations();
     }
 
-    // 6. CRM & LEADS (Contextually aligned with active Workspace)
+    // 6. CRM & LEADS
     async function loadLeads() {
       try {
         const res = await fetch('/api/leads');
         const data = await res.json();
-        let rawLeads = data.leads || [];
-
-        const activeWs = workspacesList.find(w => w.id === currentWorkspaceId) || { name: "Parfyumeriya Do'koni" };
-        const isPerfume = (activeWs.name || '').toLowerCase().includes('parfyum') || (activeWs.name || '').toLowerCase().includes('atir');
-
-        leadsData = rawLeads.map(l => {
-          if (isPerfume) {
-            if (l.name && (l.name.includes('Mebel') || l.name.includes('Jamshid'))) {
-              return {
-                ...l,
-                name: 'Farhod aka (Parfyumeriya VIP)',
-                pain: "Original testerlar va atirlar ulgurji xaridi"
-              };
-            }
-          }
-          return l;
-        });
+        leadsData = data.leads || [];
 
         renderLeadsTable(leadsData);
         renderRecentLeadsDashboard(leadsData.slice(0, 4));
@@ -3206,6 +3240,21 @@
     function renderLeadsTable(leads) {
       const tbody = document.getElementById('crm-leads-table-body');
       if (!tbody) return;
+
+      if (!leads || leads.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-12 text-center text-gray-400 font-medium text-xs">
+              <div class="flex flex-col items-center justify-center space-y-2">
+                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <p class="font-semibold text-gray-600">Hozircha lidlar mavjud emas</p>
+                <p class="text-[11px] text-gray-400 max-w-xs">Birinchi kanalni (Instagram, Telegram yoki WhatsApp) ulab, mijozlar bilan muloqotni boshlang.</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
       tbody.innerHTML = leads.map(l => `
         <tr class="hover:bg-gray-50/50">
@@ -3229,6 +3278,17 @@
     function renderRecentLeadsDashboard(recent) {
       const tbody = document.getElementById('dashboard-recent-leads');
       if (!tbody) return;
+
+      if (!recent || recent.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-gray-400 font-medium text-xs">
+              Hozircha faol lidlar yo'q. Kanal ulangandan so'ng yangi xaridorlar bu yerda aks etadi.
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
       tbody.innerHTML = recent.map(l => `
         <tr class="hover:bg-gray-50/50 cursor-pointer" onclick="switchTab('inbox'); selectConversation('${l.session_id}');">

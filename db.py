@@ -250,7 +250,7 @@ def init_db():
         cursor.execute("""
             INSERT INTO businesses (id, name, description, avg_check, faq_list)
             VALUES (?, ?, ?, ?, ?);
-        """, ("default", "Mebel Fabrikasi", "Oshxona va uy mebellari ishlab chiqarish", "5 000 000 so'm", json.dumps(default_faqs, ensure_ascii=False)))
+        """, ("default", "Mening Korxonam", "AI sotuv agenti bilan jihozlangan korxona", "1 000 000 so'm", json.dumps(default_faqs, ensure_ascii=False)))
 
     # Seed default battlecards if not exists
     cursor.execute("SELECT COUNT(*) FROM battlecards;")
@@ -375,10 +375,8 @@ def init_db():
             VALUES (?, ?, ?, ?);
         """, default_channels)
 
-    # Seed sample conversations and leads if empty
-    cursor.execute("SELECT COUNT(*) FROM conversations;")
-    if cursor.fetchone()[0] == 0:
-        seed_sample_data(cursor)
+    # Sample data seeding is disabled to prevent dummy data pollution on new accounts.
+    # seed_sample_data(cursor) can be invoked explicitly in isolated test suites if needed.
 
     conn.commit()
     conn.close()
@@ -835,7 +833,7 @@ def get_dashboard_stats() -> Dict[str, Any]:
     total_leads = conn.execute("SELECT COUNT(*) FROM leads;").fetchone()[0]
     hot_leads = conn.execute("SELECT COUNT(*) FROM leads WHERE score >= 70;").fetchone()[0]
     total_msgs = conn.execute("SELECT COUNT(*) FROM messages;").fetchone()[0]
-    active_chans = conn.execute("SELECT COUNT(*) FROM channels WHERE is_connected = 1;").fetchone()[0]
+    active_chans = conn.execute("SELECT COUNT(*) FROM channels WHERE is_connected = 1 AND channel_id != 'web_widget';").fetchone()[0]
     conn.close()
     return {
         "total_conversations": total_convs,
@@ -843,8 +841,8 @@ def get_dashboard_stats() -> Dict[str, Any]:
         "hot_leads": hot_leads,
         "total_messages": total_msgs,
         "active_channels": active_chans,
-        "avg_response_time": "1.1s",
-        "conversion_rate": f"{round((hot_leads / max(total_convs, 1)) * 100, 1)}%"
+        "avg_response_time": "1.1s" if total_convs > 0 else "0.0s",
+        "conversion_rate": f"{round((hot_leads / max(total_convs, 1)) * 100, 1)}%" if total_convs > 0 else "0.0%"
     }
 
 # ----------------- WORKSPACE & BILLING HELPERS -----------------
@@ -1164,6 +1162,16 @@ def register_user(auth_method: str, identifier: str, full_name: str = "", passwo
         VALUES (?, ?, ?, ?, ?, ?, 'default');
     """, (user_id, auth_method, clean_id, display_name, pwd_hash, selected_plan))
     
+    # Reset active workspace setting to default
+    cursor.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('active_workspace_id', 'default');")
+
+    # Personalize default workspace name to the newly registered user
+    biz_name = f"{display_name} Korxonasi" if display_name else "Mening Korxonam"
+    cursor.execute("UPDATE businesses SET name = ?, description = 'AI sotuv agenti bilan jihozlangan korxona' WHERE id = 'default';", (biz_name,))
+    
+    # Remove any extra mock workspaces from previous tests
+    cursor.execute("DELETE FROM businesses WHERE id != 'default';")
+
     # SECURITY HARDENING:
     # A user cannot gain paid 'pro' or 'business' tier for free on the workspace simply by registering!
     # The selected_plan is recorded as user preference, but the active workspace remains 'free'
@@ -1171,20 +1179,23 @@ def register_user(auth_method: str, identifier: str, full_name: str = "", passwo
     if selected_plan == "free":
         cursor.execute("UPDATE businesses SET plan_id = 'free' WHERE id = 'default'")
     
-    conn.commit()
-    conn.close()
-    return {
-        "status": "created",
-        "user": {
-            "id": user_id,
-            "auth_method": auth_method,
-            "identifier": clean_id,
-            "full_name": display_name,
-            "selected_plan": selected_plan,
-            "active_workspace_id": "default"
-        }
-    }
-    
+    # Clean workspace initialization: Wipe old mock conversations and leads so new user gets clean 0-state
+    cursor.execute("DELETE FROM messages;")
+    cursor.execute("DELETE FROM follow_ups;")
+    cursor.execute("DELETE FROM leads;")
+    cursor.execute("DELETE FROM conversations;")
+
+    # Channel connection rules:
+    # If registered with email/gmail/google, all external channels MUST be disconnected (0)
+    # until the user explicitly connects one in the channel gate overlay
+    is_email_or_google = auth_method in ('email', 'google') or ('@' in clean_id and not clean_id.startswith('@'))
+    if is_email_or_google:
+        cursor.execute("UPDATE channels SET is_connected = 0 WHERE channel_id IN ('instagram', 'telegram', 'whatsapp');")
+    else:
+        if auth_method in ('instagram', 'telegram', 'whatsapp'):
+            cursor.execute("UPDATE channels SET is_connected = 1 WHERE channel_id = ?;", (auth_method,))
+            cursor.execute("UPDATE channels SET is_connected = 0 WHERE channel_id != ? AND channel_id != 'web_widget';", (auth_method,))
+
     conn.commit()
     conn.close()
     return {
