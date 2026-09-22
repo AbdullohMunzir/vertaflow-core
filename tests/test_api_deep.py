@@ -15,6 +15,12 @@ import sys
 import uuid
 import requests
 
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 BASE_URL = "http://127.0.0.1:8000"
 
 def log_test(name, passed, details=""):

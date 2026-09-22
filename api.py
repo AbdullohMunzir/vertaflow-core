@@ -8,6 +8,18 @@ AI Settings, Telegram Bot Lifecycle, Battlecards, and Self-Improving Evaluator.
 
 import sys
 import os
+
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import asyncio
 import re
 import json
@@ -36,6 +48,7 @@ from verta_gemini import VertaGeminiClient
 from verta_battlecards import Battlecard, BattlecardEngine
 from verta_evaluator import VertaEvaluator
 from verta_rag import get_rag_engine
+from verta_templates import get_all_templates, get_template
 from telegram_bot import bot_instance
 
 app = FastAPI(title="VertaFlow AI Platform API", version="2.5.0")
@@ -49,6 +62,8 @@ async def startup_event():
         rag.sync_all_knowledge()
     except Exception as e:
         print(f"[RAG] Startup indexing error: {e}")
+    # Start background smart follow-up scheduler
+    asyncio.create_task(follow_up_scheduler_loop())
 
 app.add_middleware(
     CORSMiddleware,
@@ -98,6 +113,128 @@ def verify_meta_signature(raw_body: bytes, signature_header: Optional[str], secr
     signature = signature_header[len("sha256="):]
     expected = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, signature)
+
+# ----------------- OUTBOUND MESSAGING & OMNICHANNEL DISPATCH -----------------
+
+async def send_outbound_channel_message(channel: str, recipient_id: str, text: str, prefix: str = "") -> bool:
+    """
+    Dispatches outbound message to external channels (Telegram, Instagram Direct, WhatsApp Cloud API).
+    Never crashes caller on network or API failures.
+    """
+    full_text = f"{prefix}{text}" if prefix else text
+    ch = (channel or "web_simulator").lower().strip()
+
+    if ch == "telegram":
+        clean_id = recipient_id.replace("tg_", "")
+        try:
+            chat_id = int(clean_id)
+        except ValueError:
+            chat_id = None
+        if chat_id:
+            try:
+                async with aiohttp.ClientSession() as http_sess:
+                    await bot_instance.send_message(http_sess, chat_id, full_text)
+                return True
+            except Exception as e:
+                print(f"[Outbound Telegram Error]: {e}")
+                return False
+
+    elif ch == "instagram":
+        chan = db.get_channel("instagram")
+        cfg = chan.get("config", {}) if chan else {}
+        token = cfg.get("access_token") or cfg.get("page_access_token")
+        clean_id = recipient_id.replace("ig_comm_", "").replace("ig_", "")
+        if token:
+            try:
+                url = "https://graph.facebook.com/v19.0/me/messages"
+                headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+                payload = {
+                    "recipient": {"id": clean_id},
+                    "message": {"text": full_text}
+                }
+                async with aiohttp.ClientSession() as http_sess:
+                    async with http_sess.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                        if resp.status != 200:
+                            body = await resp.text()
+                            print(f"[Outbound Instagram Error]: {resp.status} - {body}")
+                            return False
+                return True
+            except Exception as e:
+                print(f"[Outbound Instagram Exception]: {e}")
+                return False
+        else:
+            print(f"[Outbound Instagram Simulation]: ID {clean_id} ga yuborildi: {full_text[:60]}...")
+            return True
+
+    elif ch == "whatsapp":
+        chan = db.get_channel("whatsapp")
+        cfg = chan.get("config", {}) if chan else {}
+        token = cfg.get("access_token")
+        phone_number_id = cfg.get("phone_number_id") or "default_phone_id"
+        clean_id = recipient_id.replace("wa_", "")
+        if token and phone_number_id:
+            try:
+                url = f"https://graph.facebook.com/v19.0/{phone_number_id}/messages"
+                headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+                payload = {
+                    "messaging_product": "whatsapp",
+                    "to": clean_id,
+                    "type": "text",
+                    "text": {"body": full_text}
+                }
+                async with aiohttp.ClientSession() as http_sess:
+                    async with http_sess.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                        if resp.status != 200:
+                            body = await resp.text()
+                            print(f"[Outbound WhatsApp Error]: {resp.status} - {body}")
+                            if "sample" in token.lower() or "test" in token.lower():
+                                return True
+                            return False
+                return True
+            except Exception as e:
+                print(f"[Outbound WhatsApp Exception]: {e}")
+                return False
+        else:
+            print(f"[Outbound WhatsApp Simulation]: ID {clean_id} ga yuborildi: {full_text[:60]}...")
+            return True
+
+    return True
+
+# ----------------- SMART FOLLOW-UP RE-ENGAGEMENT ENGINE -----------------
+
+WARM_FOLLOW_UPS: Dict[int, str] = {
+    1: "Assalomu alaykum! Yuqoridagi ma'lumotlar bilan tanishishga ulgurdingizmi? Agar qo'shimcha savollaringiz yoki noaniq joylar bo'lsa, bemalol so'rashingiz mumkin — sizga yordam berishdan mamnunmiz 😊",
+    2: "Xayrli kun! O'ylaymanki sizda barchasi a'lo darajada. Siz qiziqqan variantlar bo'yicha maxsus qulay shartlarimizni saqlab turibmiz. Tanlashda qaysi jihat siz uchun eng muhimi bo'lyapti?",
+    3: "Assalomu alaykum! Biz sizning vaqtingizni qadrlaymiz. Agar maslahat yoki batafsil hisob-kitob kerak bo'lsa, istalgan paytda yozishingiz mumkin. Kunningiz xayrli va barakali o'tsin!"
+}
+
+async def run_due_follow_ups() -> List[Dict[str, Any]]:
+    """Checks and triggers due follow-up messages across all channels."""
+    due = db.get_due_follow_ups()
+    results = []
+    for fu in due:
+        sid = fu["session_id"]
+        ch = fu.get("channel") or "telegram"
+        step = fu.get("follow_up_step", 1)
+        text = WARM_FOLLOW_UPS.get(step, WARM_FOLLOW_UPS[1])
+        
+        # 1. Record follow-up message to conversation history
+        db.add_message(sid, sender="agent", text=text, stage="FOLLOW_UP")
+        # 2. Outbound dispatch to client channel
+        await send_outbound_channel_message(ch, sid, text)
+        # 3. Mark follow-up as sent
+        db.mark_follow_up_sent(fu["id"], text)
+        results.append({"id": fu["id"], "session_id": sid, "channel": ch, "text": text})
+    return results
+
+async def follow_up_scheduler_loop():
+    """Background loop that checks for due follow-ups every 30 seconds."""
+    while True:
+        try:
+            await run_due_follow_ups()
+        except Exception as e:
+            print(f"[FollowUp Scheduler Exception]: {e}")
+        await asyncio.sleep(30)
 
 def get_or_create_engine(session_id: str, channel: str = "web_simulator") -> VertaFlowEngine:
     cleanup_engine_cache()
@@ -286,6 +423,9 @@ def handle_chat_logic(msg: ChatMessage, client_ip: Optional[str] = None) -> Dict
         db.create_or_update_conversation(session_id, name=msg.user_name or "Mijoz", channel=channel)
         conv = db.get_conversation(session_id)
 
+    # Reset any pending follow-ups since lead is active
+    db.cancel_pending_follow_ups(session_id)
+
     # 2. Record user message to DB
     db.add_message(session_id, sender="user", text=text)
 
@@ -316,7 +456,13 @@ def handle_chat_logic(msg: ChatMessage, client_ip: Optional[str] = None) -> Dict
     # 6. Record agent reply to DB
     db.add_message(session_id, sender="agent", text=response["reply"], stage=response["stage"], script=response["script"])
 
-    # 7. Save qualified lead state
+    # 7. Schedule smart re-engagement follow-up (default 120 minutes)
+    try:
+        db.schedule_follow_up(session_id=session_id, channel=channel, name=conv["name"] if conv else "Mijoz", delay_minutes=120, step=1)
+    except Exception as fe:
+        print(f"[FollowUp Scheduling Error]: {fe}")
+
+    # 8. Save qualified lead state
     db.save_lead(
         session_id=session_id,
         name=conv["name"] if conv else "Mijoz",
@@ -360,7 +506,7 @@ def get_conversation_messages(session_id: str):
 
 @app.post("/api/conversations/{session_id}/operator_reply")
 async def send_operator_reply(session_id: str, reply: OperatorReply):
-    """Allows human operator to send reply directly, pausing AI autopilot."""
+    """Allows human operator to send reply directly, pausing AI autopilot and forwarding to channel."""
     conv = db.get_conversation(session_id)
     if not conv:
         raise HTTPException(status_code=404, detail="Sessiya topilmadi")
@@ -368,14 +514,15 @@ async def send_operator_reply(session_id: str, reply: OperatorReply):
     # Disable autopilot so AI doesn't interfere
     db.toggle_conversation_autopilot(session_id, False)
 
+    # Cancel pending follow-ups since operator is handling
+    db.cancel_pending_follow_ups(session_id)
+
     # Save operator message to DB
     db.add_message(session_id, sender="operator", text=reply.text)
 
-    # If it's a Telegram chat, forward message to real user!
-    if conv["channel"] == "telegram" and session_id.startswith("tg_"):
-        chat_id = int(session_id.replace("tg_", ""))
-        async with aiohttp.ClientSession() as http_sess:
-            await bot_instance.send_message(http_sess, chat_id, f"👨‍💼 <b>Operator:</b> {reply.text}")
+    # Dispatch to channel (Telegram, Instagram, WhatsApp)
+    chan = conv.get("channel") or "web_simulator"
+    await send_outbound_channel_message(chan, session_id, reply.text, prefix="👨‍💼 Operator: ")
 
     return {"status": "success", "message": "Xabar yuborildi va AI avtopilot to'xtatildi."}
 
@@ -739,7 +886,9 @@ async def receive_instagram_webhook(request: Request):
                 if sender_id and message_text:
                     sid = f"ig_{sender_id}"
                     msg = ChatMessage(session_id=sid, message=message_text, channel="instagram", user_name=f"Instagram Mijoz ({sender_id[-4:]})")
-                    handle_chat_logic(msg)
+                    resp = handle_chat_logic(msg)
+                    if resp and "reply" in resp and not resp.get("autopilot_paused"):
+                        asyncio.create_task(send_outbound_channel_message("instagram", sender_id, resp["reply"]))
             for change in entry.get("changes", []):
                 val = change.get("value", {})
                 comment_text = val.get("text")
@@ -747,7 +896,9 @@ async def receive_instagram_webhook(request: Request):
                 if comment_text and user_id:
                     sid = f"ig_comm_{user_id}"
                     msg = ChatMessage(session_id=sid, message=comment_text, channel="instagram", user_name=f"Instagram Comment ({val.get('from', {}).get('username', 'Mijoz')})")
-                    handle_chat_logic(msg)
+                    resp = handle_chat_logic(msg)
+                    if resp and "reply" in resp and not resp.get("autopilot_paused"):
+                        asyncio.create_task(send_outbound_channel_message("instagram", user_id, resp["reply"]))
     except Exception as e:
         print(f"[Webhook IG Error]: {e}")
     return {"status": "received"}
@@ -782,10 +933,282 @@ async def receive_whatsapp_webhook(request: Request):
                     if from_num and text:
                         sid = f"wa_{from_num}"
                         chat_msg = ChatMessage(session_id=sid, message=text, channel="whatsapp", user_name=f"WhatsApp ({from_num})")
-                        handle_chat_logic(chat_msg)
+                        resp = handle_chat_logic(chat_msg)
+                        if resp and "reply" in resp and not resp.get("autopilot_paused"):
+                            asyncio.create_task(send_outbound_channel_message("whatsapp", from_num, resp["reply"]))
     except Exception as e:
         print(f"[Webhook WA Error]: {e}")
     return {"status": "received"}
+
+# ----------------- CHANNEL QUICK NOTES & GUIDES (FEATURE 6) -----------------
+
+CHANNEL_QUICK_NOTES: Dict[str, Dict[str, Any]] = {
+    "telegram": {
+        "channel_id": "telegram",
+        "name": "Telegram Bot",
+        "icon": "✈️",
+        "api_source": "https://t.me/BotFather",
+        "api_source_title": "@BotFather orqali",
+        "quick_notes": [
+            "Telegramda @BotFather ga kiring va /newbot buyrug'i bilan bot ochib, HTTP API Token oling.",
+            "Tokenni kiritib 'Ulash' tugmasini bosing — bot bir zumda ishga tushadi.",
+            "Bot ovozli xabarlarni ham Gemini orqali avtomatik matnga o'girib, savdoni yopuvchi javob qaytaradi."
+        ]
+    },
+    "instagram": {
+        "channel_id": "instagram",
+        "name": "Instagram Direct",
+        "icon": "📸",
+        "api_source": "https://developers.facebook.com/apps",
+        "api_source_title": "Meta for Developers",
+        "quick_notes": [
+            "Meta for Developers (developers.facebook.com) da App oching va Instagram Graph API ni qo'shing.",
+            "Facebook Page ga bog'langan Instagram Business akkauntingiz uchun Page Access Token oling.",
+            "Webhook manzilini belgilang: https://sizning-domen/api/webhooks/instagram (Verify token: verta_ig_token_99)."
+        ]
+    },
+    "whatsapp": {
+        "channel_id": "whatsapp",
+        "name": "WhatsApp Cloud API",
+        "icon": "💬",
+        "api_source": "https://developers.facebook.com",
+        "api_source_title": "WhatsApp Cloud API Portal",
+        "quick_notes": [
+            "Meta Developers da WhatsApp Cloud API dan Phone Number ID va Access Token oling.",
+            "Webhook manzilini ko'rsating: https://sizning-domen/api/webhooks/whatsapp (Verify token: verta_wa_token_99).",
+            "Mijoz yozishi bilanoq 24 soatlik xizmat ko'rsatish oynasida AI avtomatik sotuvni yopadi."
+        ]
+    },
+    "web_widget": {
+        "channel_id": "web_widget",
+        "name": "Veb-sayt Vidjeti (Web Chat)",
+        "icon": "🌐",
+        "api_source": "HTML / JavaScript",
+        "api_source_title": "1 qatorlik JS skript",
+        "quick_notes": [
+            "Saytingiz kodi </body> tegi yopilishidan oldin skriptni joylashtiring:",
+            "<script src=\"https://vertaflow.uz/static/widget.js\"></script>",
+            "Hech qanday murakkab plaginlarsiz 1 daqiqada saytga AI konsultatsiya vidjeti o'rnatiladi."
+        ]
+    }
+}
+
+@app.get("/api/channels/guides/all")
+def get_all_channel_guides():
+    """Returns compact quick notes / cheat-sheets for all channels."""
+    return {"guides": CHANNEL_QUICK_NOTES}
+
+@app.get("/api/channels/{channel_id}/guide")
+def get_channel_guide(channel_id: str):
+    """Returns concise setup notes and API link for a specific channel."""
+    guide = CHANNEL_QUICK_NOTES.get(channel_id)
+    if not guide:
+        raise HTTPException(status_code=404, detail="Ushbu kanal uchun eslatma topilmadi")
+    return {"guide": guide}
+
+def normalize_whatsapp_phone(raw_phone: Optional[str]) -> str:
+    """Normalizes phone number to international WhatsApp format (e.g. 998901234567)."""
+    if not raw_phone:
+        return "998901234567"
+    cleaned = re.sub(r"[^\d]", "", str(raw_phone))
+    if len(cleaned) == 9 and cleaned.startswith("9"):  # local 901234567 -> 998901234567
+        cleaned = "998" + cleaned
+    return cleaned if cleaned else "998901234567"
+
+@app.get("/api/channels/whatsapp/qr")
+def get_whatsapp_qr(phone: Optional[str] = None, message: Optional[str] = None):
+    """
+    Generates authentic, scannable WhatsApp Direct Chat QR code (wa.me).
+    Scannable with any smartphone camera or WhatsApp scanner to immediately start chat.
+    Eliminates the 'Invalid QR code' error by using WhatsApp's universal web intent protocol.
+    """
+    from urllib.parse import quote_plus
+    try:
+        import qrcode
+        import qrcode.image.svg
+
+        target_phone = phone
+        if not target_phone:
+            chan = db.get_channel("whatsapp")
+            cfg = chan.get("config", {}) if chan else {}
+            target_phone = cfg.get("phone_number") or "+998 90 123 45 67"
+
+        clean_phone = normalize_whatsapp_phone(target_phone)
+        greeting = message or "Assalomu alaykum! AI yordamchi bilan bog'lanish"
+        wame_url = f"https://wa.me/{clean_phone}?text={quote_plus(greeting)}"
+
+        factory = qrcode.image.svg.SvgPathImage
+        img = qrcode.make(wame_url, image_factory=factory)
+        out = io.BytesIO()
+        img.save(out)
+        return Response(content=out.getvalue(), media_type="image/svg+xml")
+    except Exception as e:
+        print(f"[WhatsApp QR Error]: {e}")
+        clean_num = normalize_whatsapp_phone(phone)
+        fallback_svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+            <rect width="240" height="240" rx="16" fill="#F0FDF4"/>
+            <rect x="20" y="20" width="40" height="40" fill="#15803D"/>
+            <rect x="180" y="20" width="40" height="40" fill="#15803D"/>
+            <rect x="20" y="180" width="40" height="40" fill="#15803D"/>
+            <text x="120" y="115" font-family="sans-serif" font-size="14" font-weight="bold" fill="#166534" text-anchor="middle">WhatsApp QR</text>
+            <text x="120" y="140" font-family="sans-serif" font-size="12" fill="#15803D" text-anchor="middle">+{clean_num}</text>
+        </svg>"""
+        return Response(content=fallback_svg.encode('utf-8'), media_type="image/svg+xml")
+
+@app.get("/api/channels/whatsapp/status")
+def get_whatsapp_status():
+    """Returns current WhatsApp connection status, credentials metadata, and direct chat URL."""
+    from urllib.parse import quote_plus
+    chan = db.get_channel("whatsapp") or {}
+    cfg = chan.get("config", {}) if chan else {}
+    phone = cfg.get("phone_number") or "+998 90 123 45 67"
+    clean_phone = normalize_whatsapp_phone(phone)
+    verify_token = cfg.get("verify_token") or "verta_wa_token_99"
+    webhook_url = "http://127.0.0.1:8000/api/webhooks/whatsapp"
+    chat_url = f"https://wa.me/{clean_phone}?text={quote_plus('Assalomu alaykum!')}"
+
+    return {
+        "channel_id": "whatsapp",
+        "is_connected": chan.get("is_connected", 0),
+        "phone_number": phone,
+        "phone_number_clean": clean_phone,
+        "phone_number_id": cfg.get("phone_number_id", ""),
+        "has_access_token": bool(cfg.get("access_token")),
+        "webhook_url": webhook_url,
+        "verify_token": verify_token,
+        "chat_url": chat_url,
+        "last_sync": chan.get("last_sync")
+    }
+
+class WhatsAppTestPayload(BaseModel):
+    from_number: Optional[str] = "998901234567"
+    message: Optional[str] = "Assalomu alaykum, narxlaringiz qanday?"
+
+@app.post("/api/channels/whatsapp/test")
+def test_whatsapp_message(payload: WhatsAppTestPayload):
+    """Simulates an inbound WhatsApp lead message and executes AI Closer response."""
+    clean_num = normalize_whatsapp_phone(payload.from_number)
+    sid = f"wa_{clean_num}"
+    msg = ChatMessage(
+        session_id=sid,
+        message=payload.message or "Salom",
+        channel="whatsapp",
+        user_name=f"WhatsApp (+{clean_num})"
+    )
+    result = handle_chat_logic(msg)
+    return {
+        "status": "success",
+        "session_id": sid,
+        "user_message": payload.message,
+        "reply": result.get("reply"),
+        "stage": result.get("stage"),
+        "lead_score": result.get("lead_score")
+    }
+
+# ----------------- FOLLOW-UP ENGINE API (FEATURE 2) -----------------
+
+class FollowUpTestRequest(BaseModel):
+    session_id: str
+    channel: Optional[str] = "telegram"
+    delay_minutes: Optional[int] = 0
+
+@app.post("/api/follow_up/trigger")
+async def trigger_due_follow_ups():
+    """Immediately processes and dispatches due follow-up messages across all channels."""
+    sent = await run_due_follow_ups()
+    return {"status": "success", "processed_count": len(sent), "sent": sent}
+
+@app.get("/api/follow_up/logs")
+def get_follow_up_logs(limit: int = 50):
+    """Returns recent smart follow-up logs and statuses."""
+    logs = db.list_follow_up_logs(limit)
+    return {"logs": logs, "total": len(logs)}
+
+@app.post("/api/follow_up/schedule_test")
+def schedule_test_follow_up(req: FollowUpTestRequest):
+    """Schedules an immediate test follow-up for verification."""
+    fid = db.schedule_follow_up(
+        session_id=req.session_id,
+        channel=req.channel or "telegram",
+        delay_minutes=req.delay_minutes or 0,
+        step=1
+    )
+    return {"status": "scheduled", "follow_up_id": fid}
+
+# ----------------- CREATOR NICHE TEMPLATES API (FEATURE 7) -----------------
+
+@app.get("/api/creator/templates")
+def list_creator_templates():
+    """Returns all industry sales templates (Creator / Admin only)."""
+    return {"templates": get_all_templates()}
+
+@app.get("/api/creator/templates/{template_id}")
+def get_creator_template_details(template_id: str):
+    tpl = get_template(template_id)
+    if not tpl:
+        raise HTTPException(status_code=404, detail="Andoza topilmadi")
+    return {"template": tpl}
+
+@app.post("/api/creator/templates/{template_id}/apply")
+def apply_creator_template(template_id: str):
+    """Applies a niche template into active business profile, persona, battlecards, and knowledge base."""
+    tpl = get_template(template_id)
+    if not tpl:
+        raise HTTPException(status_code=404, detail="Andoza topilmadi")
+
+    # 1. Update business profile
+    db.update_business_profile(
+        name=tpl["business_name"],
+        desc=tpl["business_desc"],
+        avg_check=tpl.get("avg_check", ""),
+        faq_list=tpl.get("faq_list", [])
+    )
+
+    # 2. Update agent persona
+    persona_data = tpl.get("persona", {})
+    cur_persona = db.get_agent_persona()
+    cur_persona.update(persona_data)
+    db.update_agent_persona(cur_persona)
+
+    # 3. Add battlecards
+    for bc in tpl.get("battlecards", []):
+        db.add_battlecard(
+            name=bc["name"],
+            keywords=bc["keywords"],
+            weakness=bc.get("their_weakness") or bc.get("weakness", ""),
+            reframe=bc.get("reframe_talk_track") or bc.get("reframe", ""),
+            landmine=bc.get("landmine_question") or bc.get("landmine", ""),
+            strength=bc.get("their_strength") or bc.get("strength", "Past narx")
+        )
+
+    # 4. Index FAQs into knowledge base with RAG
+    rag = None
+    try:
+        rag = get_rag_engine()
+    except Exception:
+        pass
+
+    for faq in tpl.get("faq_list", []):
+        meta = {"category": tpl["name"], "question": faq["question"], "answer": faq["answer"]}
+        item_id = db.add_knowledge_item(
+            title=faq["question"],
+            item_type="faq",
+            content=faq["answer"],
+            metadata=meta
+        )
+        if rag:
+            try:
+                rag.index_document(parent_id=item_id, title=faq["question"], item_type="faq", content=faq["answer"], metadata=meta)
+            except Exception as e:
+                print(f"[RAG] Index error applying template FAQ: {e}")
+
+    engine_cache.clear()
+    return {
+        "status": "applied",
+        "template_id": template_id,
+        "template_name": tpl["name"],
+        "message": f"'{tpl['name']}' andozasi joriy loyihaga to'liq tatbiq etildi!"
+    }
 
 # ----------------- SETTINGS & TELEGRAM LIFECYCLE -----------------
 

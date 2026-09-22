@@ -13,7 +13,17 @@ Covers:
 9. Legitimate Validated Checkout
 """
 
+import os
 import sys
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 import uuid
 import requests
 import db
@@ -112,6 +122,7 @@ def run_security_audit():
     # --- 4. QUOTA EXHAUSTION (402 PAYMENT REQUIRED) ---
     conn = db.get_connection()
     test_sid = f"quota_fill_{uuid.uuid4().hex[:6]}"
+    conn.execute("INSERT INTO conversations (session_id, name, channel) VALUES (?, 'Quota Test', 'web');", (test_sid,))
     for _ in range(102):
         conn.execute("INSERT INTO messages (session_id, sender, text) VALUES (?, 'agent', 'Test');", (test_sid,))
     conn.commit()
@@ -127,6 +138,7 @@ def run_security_audit():
     # Clean up test messages
     conn = db.get_connection()
     conn.execute("DELETE FROM messages WHERE session_id = ?;", (test_sid,))
+    conn.execute("DELETE FROM conversations WHERE session_id = ?;", (test_sid,))
     conn.commit()
     conn.close()
 

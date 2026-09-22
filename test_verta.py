@@ -9,8 +9,16 @@ Tests:
 5. 3-Line Lead Dossier Generation
 """
 
+import os
 import sys
-sys.path.append("/home/kinfolkt/verta-platform/core")
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "core"))
 
 from verta_engine import VertaFlowEngine
 

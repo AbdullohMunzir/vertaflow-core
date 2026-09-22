@@ -14,8 +14,14 @@ from typing import Dict, Any, List, Optional, Tuple
 DB_PATH = os.path.join(os.path.dirname(__file__), "vertaflow.db")
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10.0)
     conn.row_factory = sqlite3.Row
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA foreign_keys=ON;")
+    except Exception:
+        pass
     return conn
 
 def init_db():
@@ -170,6 +176,24 @@ def init_db():
         value TEXT
     );
     """)
+
+    # 6b. Follow-ups Table (Smart Re-engagement)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS follow_ups (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        name TEXT,
+        follow_up_step INTEGER DEFAULT 1,
+        status TEXT DEFAULT 'pending',
+        scheduled_at TIMESTAMP,
+        sent_at TIMESTAMP,
+        follow_up_text TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (session_id) REFERENCES conversations(session_id)
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_follow_ups_status ON follow_ups(status, scheduled_at);")
 
     # 7. Knowledge Items Table
     cursor.execute("""
@@ -959,7 +983,7 @@ PLAN_LIMITS = {
         "broadcast_max": 200,
         "instagram_max": 1,
         "telegram_max": 1,
-        "channels_max": 2,
+        "channels_max": 3,
         "reels_ai": True,
         "smart_model": False
     },
@@ -1248,6 +1272,86 @@ def has_connected_primary_channel() -> bool:
     count = cursor.fetchone()[0]
     conn.close()
     return count > 0
+
+# ----------------- FOLLOW-UP / RE-ENGAGEMENT FUNCTIONS -----------------
+
+def schedule_follow_up(session_id: str, channel: str = "telegram", name: str = "Mijoz", delay_minutes: int = 120, step: int = 1) -> Optional[int]:
+    """Schedules a smart, non-intrusive re-engagement follow-up for an idle lead."""
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        # 1. Ensure conversation row exists to satisfy foreign key constraint
+        conv = cursor.execute("SELECT session_id FROM conversations WHERE session_id = ?;", (session_id,)).fetchone()
+        if not conv:
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cursor.execute("""
+                INSERT OR IGNORE INTO conversations (session_id, name, channel, script_preference, autopilot_enabled, updated_at)
+                VALUES (?, ?, ?, 'spin', 1, ?);
+            """, (session_id, name, channel, now))
+            conn.commit()
+
+        # 2. Check if there is already a pending follow up for this session
+        existing = cursor.execute("SELECT id FROM follow_ups WHERE session_id = ? AND status = 'pending';", (session_id,)).fetchone()
+        if existing:
+            return existing["id"]
+
+        scheduled_at = (datetime.now() + timedelta(minutes=delay_minutes)).strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute("""
+            INSERT INTO follow_ups (session_id, channel, name, follow_up_step, status, scheduled_at)
+            VALUES (?, ?, ?, ?, 'pending', ?);
+        """, (session_id, channel, name, step, scheduled_at))
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()
+
+def get_due_follow_ups() -> List[Dict[str, Any]]:
+    """Fetches follow-ups that are pending and due to be sent."""
+    conn = get_connection()
+    try:
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        rows = conn.execute("""
+            SELECT f.*, c.autopilot_enabled, c.status as conv_status
+            FROM follow_ups f
+            JOIN conversations c ON f.session_id = c.session_id
+            WHERE f.status = 'pending' AND f.scheduled_at <= ? AND c.autopilot_enabled = 1
+            ORDER BY f.scheduled_at ASC LIMIT 20;
+        """, (now_str,)).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+def mark_follow_up_sent(follow_up_id: int, text: str):
+    """Marks follow-up as sent and records sent text."""
+    conn = get_connection()
+    try:
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn.execute("""
+            UPDATE follow_ups 
+            SET status = 'sent', sent_at = ?, follow_up_text = ?
+            WHERE id = ?;
+        """, (now_str, text, follow_up_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+def cancel_pending_follow_ups(session_id: str):
+    """Cancels pending follow-ups when user responds or interacts."""
+    conn = get_connection()
+    try:
+        conn.execute("UPDATE follow_ups SET status = 'replied' WHERE session_id = ? AND status = 'pending';", (session_id,))
+        conn.commit()
+    finally:
+        conn.close()
+
+def list_follow_up_logs(limit: int = 50) -> List[Dict[str, Any]]:
+    """Returns recent follow up events and history."""
+    conn = get_connection()
+    try:
+        rows = conn.execute("SELECT * FROM follow_ups ORDER BY id DESC LIMIT ?;", (limit,)).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
 
 # Initialize database on module import
 init_db()

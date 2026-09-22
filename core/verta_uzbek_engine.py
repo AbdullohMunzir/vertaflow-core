@@ -64,6 +64,32 @@ def to_cyrillic(text: str) -> str:
         res = res.replace(lat, cyr)
     return res
 
+CYRILLIC_TO_LATIN = {
+    "ш": "sh", "Ш": "Sh",
+    "ч": "ch", "Ч": "Ch",
+    "ё": "yo", "Ё": "Yo",
+    "ю": "yu", "Ю": "Yu",
+    "я": "ya", "Я": "Ya",
+    "ў": "o'", "Ў": "O'",
+    "ғ": "g'", "Ғ": "G'",
+    "а": "a", "б": "b", "д": "d", "е": "e", "ф": "f", "г": "g",
+    "ҳ": "h", "х": "x", "и": "i", "ж": "j", "к": "k", "l": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "қ": "q", "р": "r", "с": "s",
+    "т": "t", "у": "u", "в": "v", "й": "y", "з": "z", "ъ": "'", "ь": "",
+    "ц": "ts", "Ц": "Ts", "э": "e", "Э": "E",
+    "А": "A", "Б": "B", "Д": "D", "Е": "E", "Ф": "F", "Г": "G",
+    "Ҳ": "H", "Х": "X", "И": "I", "Ж": "J", "К": "K", "Л": "L", "М": "M",
+    "Н": "N", "О": "O", "П": "P", "Қ": "Q", "Р": "R", "С": "S",
+    "Т": "T", "У": "U", "В": "V", "Й": "Y", "З": "Z"
+}
+
+def to_latin(text: str) -> str:
+    """Converts Uzbek Cyrillic to Latin."""
+    res = text
+    for cyr, lat in CYRILLIC_TO_LATIN.items():
+        res = res.replace(cyr, lat)
+    return res
+
 def enforce_messenger_brevity(text: str, max_lines: int = 3) -> str:
     """
     Enforces messenger conversational constraints:

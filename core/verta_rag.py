@@ -19,8 +19,14 @@ from typing import List, Dict, Any, Optional, Tuple
 
 import os
 import db
-from core.verta_chunker import VertaChunker
-from core.verta_gemini import DEFAULT_GEMINI_KEY
+try:
+    from core.verta_chunker import VertaChunker
+    from core.verta_gemini import DEFAULT_GEMINI_KEY
+    from core.verta_uzbek_engine import to_latin
+except ImportError:
+    from verta_chunker import VertaChunker
+    from verta_gemini import DEFAULT_GEMINI_KEY
+    from verta_uzbek_engine import to_latin
 
 UZBEK_STOPWORDS = {
     "va", "ham", "esa", "bilan", "uchun", "haqida", "qanday", "nima",
@@ -106,11 +112,16 @@ class BM25Retriever:
         return scores
 
     def _tokenize(self, text: str) -> List[str]:
-        """Normalizes and tokenizes Uzbek text, removing stopwords and stemming suffixes."""
+        """Normalizes and tokenizes Uzbek text, mapping Cyrillic to canonical Latin, removing stopwords and stemming suffixes."""
+        # Normalize Cyrillic to canonical Latin so Cyrillic queries match Latin knowledge bases seamlessly
+        try:
+            text = to_latin(text)
+        except Exception:
+            pass
         # Convert to lowercase and normalize apostrophes
         text = text.lower().replace("‘", "'").replace("’", "'").replace("`", "'")
         # Remove punctuation except letters, digits, and apostrophes
-        words = re.findall(r"[a-zа-яё0-9_']+", text)
+        words = re.findall(r"[a-z0-9_']+", text)
         
         # Strip common Uzbek grammatical suffixes for better matching
         suffixes = ["ning", "dagi", "lar", "dan", "ga", "da", "ni", "mi", "chi", "ku"]
@@ -184,7 +195,7 @@ class VertaRAG:
         ]
         payload = {"requests": requests_list}
         try:
-            resp = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=10)
+            resp = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=8)
             if resp.status_code == 200:
                 data = resp.json()
                 embs = data.get("embeddings", [])
@@ -192,8 +203,7 @@ class VertaRAG:
         except Exception:
             pass
 
-        # Fallback to single requests if batch fails
-        return [self.generate_embedding(t) for t in texts]
+        return [None] * len(texts)
 
     def index_document(self, parent_id: int, title: str, item_type: str, content: str, metadata: Optional[Dict[str, Any]] = None):
         """Splits a document, embeds all chunks in batch, and stores them in DB."""

@@ -107,15 +107,54 @@ class VertaTelegramBot:
                 logger.error(f"Failed to notify sales manager: {e}")
 
     async def handle_update(self, session: aiohttp.ClientSession, update: Dict[str, Any]):
-        """Processes a single Telegram update message."""
+        """Processes a single Telegram update message (Text or Voice/Audio)."""
         message = update.get("message")
-        if not message or "text" not in message:
+        if not message:
             return
 
         chat_id = message["chat"]["id"]
-        text = message["text"].strip()
         user_name = message.get("from", {}).get("first_name", "Telegram Mijoz")
         session_id = f"tg_{chat_id}"
+
+        text = ""
+        # Check for voice note or audio message
+        if "voice" in message or "audio" in message:
+            audio_obj = message.get("voice") or message.get("audio")
+            file_id = audio_obj.get("file_id") if audio_obj else None
+            if file_id and self.token:
+                try:
+                    # 1. Get file path from Telegram API
+                    get_file_url = f"{BASE_TELEGRAM_URL}{self.token}/getFile?file_id={file_id}"
+                    async with session.get(get_file_url, timeout=aiohttp.ClientTimeout(total=10)) as gf_resp:
+                        if gf_resp.status == 200:
+                            gf_data = await gf_resp.json()
+                            file_path = gf_data.get("result", {}).get("file_path")
+                            if file_path:
+                                # 2. Download audio file bytes
+                                dl_url = f"https://api.telegram.org/file/bot{self.token}/{file_path}"
+                                async with session.get(dl_url, timeout=aiohttp.ClientTimeout(total=15)) as dl_resp:
+                                    if dl_resp.status == 200:
+                                        audio_bytes = await dl_resp.read()
+                                        # 3. Transcribe via Gemini Multimodal STT
+                                        from verta_gemini import VertaGeminiClient
+                                        gemini_client = VertaGeminiClient()
+                                        mime = audio_obj.get("mime_type", "audio/ogg")
+                                        transcribed = gemini_client.transcribe_audio(audio_bytes, mime_type=mime)
+                                        if transcribed:
+                                            text = transcribed
+                                            logger.info(f"[Voice STT tg_{chat_id}]: {text}")
+                except Exception as e:
+                    logger.error(f"Error downloading/transcribing voice note: {e}")
+
+            if not text:
+                text = "Assalomu alaykum! Ovozli xabaringiz qabul qilindi, qanday mahsulotimiz haqida ma'lumot kerak edi?"
+        elif "text" in message:
+            text = message["text"].strip()
+        else:
+            return
+
+        if not text:
+            return
 
         # 1. Check or create conversation in SQLite database
         conv = db.get_conversation(session_id)

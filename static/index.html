@@ -369,6 +369,13 @@
             <i data-lucide="bot" class="w-4 h-4"></i> <span data-i18n="nav_agent">Agent Sozlamalari</span>
           </button>
 
+          <button onclick="switchTab('templates')" id="nav-templates" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i> <span>Soha Andozalari</span>
+            </div>
+            <span class="text-[9px] font-black bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-md uppercase">Creator</span>
+          </button>
+
           <div class="pt-2 pb-1 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider" data-i18n="nav_section_operations">Muloqot va Sotuv</div>
 
           <button onclick="switchTab('inbox')" id="nav-inbox" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl transition-all">
@@ -703,9 +710,19 @@
                   <span id="chan-ig-acc" class="font-bold text-gray-800">@mebel_premium_uz</span>
                 </div>
               </div>
+
+              <!-- Tezkor Eslatma (Quick Note) -->
+              <div class="mt-3 p-3 bg-pink-50/70 rounded-xl border border-pink-100 text-[11px] text-gray-700 space-y-1">
+                <div class="font-bold text-pink-900 flex items-center gap-1.5">
+                  <span>📌</span> <span>Tezkor Eslatma:</span>
+                </div>
+                <div class="leading-relaxed"><b>1. API qayerdan:</b> <a href="https://developers.facebook.com" target="_blank" class="text-pink-600 underline font-semibold">Meta Developers</a> &rarr; App ochish &rarr; Instagram Graph API qo'shish.</div>
+                <div class="leading-relaxed"><b>2. Bog'lash:</b> Sahifa Access Token va Verify tokenni kiriting.</div>
+                <div class="leading-relaxed text-gray-500 font-mono text-[10px]">Webhook: /api/webhooks/instagram (Token: verta_ig_token_99)</div>
+              </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
+            <div class="mt-4 flex items-center gap-2 pt-3 border-t border-gray-100">
               <button onclick="openInstagramModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 <span class="inline-flex items-center gap-1.5"><i data-lucide="settings" class="w-3.5 h-3.5"></i> Instagramni Sozlash</span>
               </button>
@@ -727,7 +744,7 @@
                   </div>
                   <div>
                     <h3 class="font-extrabold text-base text-gray-900">Telegram Bot</h3>
-                    <p class="text-xs text-gray-500">BotFather tokeni & Rahbar dosyelari</p>
+                    <p class="text-xs text-gray-500">BotFather tokeni & Ovozli xabarlarni matnga o'girish</p>
                   </div>
                 </div>
                 <span id="chan-badge-telegram" class="text-xs font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
@@ -745,13 +762,23 @@
                   <span id="chan-tg-manager" class="font-bold text-gray-800">Kiritilmagan</span>
                 </div>
                 <div class="flex items-center justify-between">
-                  <span>Issiq dosye bildirishnomalari:</span>
-                  <span class="font-bold text-amber-600">✓ Avtomatik</span>
+                  <span>Ovozli xabar STT:</span>
+                  <span class="font-bold text-emerald-600">✓ Avtomatik (Faqat matnda javob)</span>
                 </div>
+              </div>
+
+              <!-- Tezkor Eslatma (Quick Note) -->
+              <div class="mt-3 p-3 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-gray-700 space-y-1">
+                <div class="font-bold text-sky-900 flex items-center gap-1.5">
+                  <span>📌</span> <span>Tezkor Eslatma:</span>
+                </div>
+                <div class="leading-relaxed"><b>1. API qayerdan:</b> Telegramda <a href="https://t.me/BotFather" target="_blank" class="text-sky-600 underline font-semibold">@BotFather</a> &rarr; <code>/newbot</code> &rarr; HTTP API Token oling.</div>
+                <div class="leading-relaxed"><b>2. Bog'lash:</b> Tokenni kiritib 'Ulash'ni bosing. Bot ovozli xabarlarni ham matnga o'girib yopuvchi javob beradi.</div>
+                <div class="leading-relaxed text-gray-500 font-mono text-[10px]">Rahbar ID: @userinfobot orqali olib kiritiladi.</div>
               </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
+            <div class="mt-4 flex items-center gap-2 pt-3 border-t border-gray-100">
               <button onclick="openTelegramModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 <span class="inline-flex items-center gap-1.5"><i data-lucide="settings" class="w-3.5 h-3.5"></i> Telegramni Sozlash</span>
               </button>
@@ -788,18 +815,28 @@
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Ulanish usuli:</span>
-                  <span class="font-bold text-gray-700">QR-kod / Webhook</span>
+                  <span class="font-bold text-gray-700">QR-kod (Tezkor) / Cloud API</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>Avto-javob:</span>
                   <span class="font-bold text-emerald-600">✓ O'zbek tilida</span>
                 </div>
               </div>
+
+              <!-- Tezkor Eslatma (Quick Note) -->
+              <div class="mt-3 p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-gray-700 space-y-1">
+                <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+                  <span>📌</span> <span>Tezkor Eslatma:</span>
+                </div>
+                <div class="leading-relaxed"><b>1. QR-kod orqali ulash:</b> 'WhatsAppni Sozlash' tugmasini bosing va telefoningizdagi WhatsApp &rarr; <i>Bog'langan qurilmalar</i> orqali QR-kodni skanerlang.</div>
+                <div class="leading-relaxed"><b>2. Rasmiy Cloud API:</b> <a href="https://developers.facebook.com" target="_blank" class="text-emerald-600 underline font-semibold">Meta Developers</a> &rarr; WhatsApp Phone Number ID va Token orqali ulanadi.</div>
+                <div class="leading-relaxed text-gray-500 font-mono text-[10px]">Webhook: /api/webhooks/whatsapp (Token: verta_wa_token_99)</div>
+              </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
+            <div class="mt-4 flex items-center gap-2 pt-3 border-t border-gray-100">
               <button onclick="openWhatsAppModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
-                ⚙️ WhatsAppni Sozlash / QR Kod
+                📱 WhatsAppni Sozlash / QR Kod
               </button>
               <button onclick="testChannelDirect('whatsapp')" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs rounded-xl transition-all">
                 <span class="inline-flex items-center gap-1"><i data-lucide="flask-conical" class="w-3 h-3"></i> Sinash</span>
@@ -841,9 +878,19 @@
                   <span class="font-bold text-emerald-600">Pastki o'ng burchak</span>
                 </div>
               </div>
+
+              <!-- Tezkor Eslatma (Quick Note) -->
+              <div class="mt-3 p-3 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-gray-700 space-y-1">
+                <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                  <span>📌</span> <span>Tezkor Eslatma:</span>
+                </div>
+                <div class="leading-relaxed"><b>1. O'rnatish:</b> Saytingiz <code>&lt;/body&gt;</code> tegi yopilishidan oldin 1 qator kodni qo'ying:</div>
+                <div class="font-mono text-[10px] bg-white p-1 rounded border border-amber-200 select-all text-gray-800">&lt;script src="https://vertaflow.uz/static/widget.js"&gt;&lt;/script&gt;</div>
+                <div class="leading-relaxed text-gray-500">Hech qanday murakkab plaginlarsiz 1 daqiqada faollashadi.</div>
+              </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-gray-100">
+            <div class="mt-4 flex items-center gap-2 pt-3 border-t border-gray-100">
               <button onclick="openWidgetModal()" class="flex-1 py-2.5 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl transition-all shadow-sm border border-pistachio">
                 📋 Kodni Olish & Sozlash
               </button>
@@ -853,6 +900,28 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- ================= TAB: SOXA ANDOZALARI (CREATOR ONLY) ================= -->
+      <div id="tab-templates" class="tab-content flex-1 flex-col p-6 overflow-y-auto custom-scrollbar space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 inline-flex items-center justify-center mr-1"><i data-lucide="sparkles" class="w-4 h-4"></i></span> Soha Andozalari (Creator Mode)
+            </h1>
+            <p class="text-xs text-gray-500 mt-1">
+              O'zbekiston biznesi uchun tayyorlangan konversion SPIN Selling va Challenger andozalari. 1-bosishda tizimga tatbiq qiling.
+            </p>
+          </div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+            Faqat Yaratuvchilar Uchun
+          </span>
+        </div>
+
+        <!-- Templates Grid Container -->
+        <div id="templates-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Dynamically populated via loadNicheTemplates() -->
         </div>
       </div>
 
@@ -1908,37 +1977,91 @@
     </div>
   </div>
 
-  <!-- Modal: WhatsApp QR Config -->
+  <!-- Modal: WhatsApp QR & Cloud API Config -->
   <div id="modal-whatsapp" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-gray-100 text-center">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-gray-100 text-center">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
         <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-600 inline-flex items-center justify-center mr-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></span> WhatsApp Business Ulash
+          <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-600 inline-flex items-center justify-center mr-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></span> WhatsApp Business Integratsiyasi
         </h3>
         <button onclick="closeModal('modal-whatsapp')" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
       </div>
-      
-      <div class="space-y-3">
-        <p class="text-xs text-gray-600">
-          Telefoningizdagi WhatsApp ilovasi orqali <b>Bog'langan qurilmalar (Linked devices)</b> bo'limiga kiring va ushbu QR-kodni skanerlang:
-        </p>
 
-        <!-- Simulated QR Box -->
-        <div class="w-48 h-48 mx-auto bg-white p-3 border-2 border-dashed border-emerald-500 rounded-2xl flex flex-col items-center justify-center shadow-inner">
-          <div class="text-6xl">📱</div>
-          <div class="text-[10px] font-bold text-emerald-700 mt-2">QR KOD TAYYOR</div>
-          <div class="text-[9px] text-gray-400">Skanerlashni kutyapti...</div>
+      <!-- Mode Switcher Tabs -->
+      <div class="grid grid-cols-2 gap-1.5 p-1 bg-gray-100 rounded-xl text-xs font-bold">
+        <button type="button" id="wa-tab-btn-qr" onclick="switchWhatsAppTab('qr')" class="py-2 rounded-lg bg-white shadow-xs text-emerald-800 transition-all">
+          📱 1. Jonli Chat QR Kodi
+        </button>
+        <button type="button" id="wa-tab-btn-api" onclick="switchWhatsAppTab('api')" class="py-2 rounded-lg text-gray-600 hover:text-gray-900 transition-all">
+          🏢 2. Meta Cloud API
+        </button>
+      </div>
+      
+      <!-- TAB 1: Direct Chat QR -->
+      <div id="wa-panel-qr" class="space-y-3 text-left">
+        <div class="text-xs">
+          <label class="block font-bold text-gray-700 mb-1">WhatsApp Telefon Raqamingiz:</label>
+          <div class="flex gap-2">
+            <input type="text" id="wa-phone-input" value="+998 90 123 45 67" onchange="loadWhatsAppQR()" class="flex-1 p-2.5 border border-gray-300 rounded-xl text-xs font-mono font-bold text-gray-800 focus:border-emerald-500">
+            <button type="button" onclick="loadWhatsAppQR()" class="px-3 py-2 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs hover:bg-emerald-100">
+              Yangilash
+            </button>
+          </div>
         </div>
 
-        <div class="text-left text-xs">
-          <label class="block font-semibold text-gray-700 mb-1">WhatsApp Telefon Raqam</label>
-          <input type="text" id="wa-phone-input" value="+998 90 123 45 67" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs">
+        <!-- Dynamic Visual QR Box -->
+        <div class="w-52 h-52 mx-auto bg-white p-2.5 border-2 border-emerald-500 rounded-2xl flex flex-col items-center justify-center shadow-md relative group">
+          <img id="wa-qr-image" src="/api/channels/whatsapp/qr" alt="WhatsApp QR" class="w-44 h-44 rounded-xl object-contain" />
+          <div class="absolute bottom-1 bg-white/95 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold text-emerald-800 shadow-xs border border-emerald-200">
+            ● Haqiqiy wa.me QR Kodi
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-2">
+          <button type="button" onclick="openDirectWhatsAppLink()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-xs">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> <span>WhatsApp'da Sinab Ko'rish</span>
+          </button>
+          <button type="button" onclick="testWhatsAppSimulation()" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold inline-flex items-center gap-1.5">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> <span>Test Xabar Simulyatsiyasi</span>
+          </button>
+        </div>
+
+        <div class="bg-emerald-50/80 p-3 rounded-xl border border-emerald-200 text-[11px] text-gray-700 space-y-1.5">
+          <div class="font-bold text-emerald-950 flex items-center gap-1.5">
+            <span>📷 To'g'ri skanerlash bo'yicha muhim ko'rsatma:</span>
+          </div>
+          <div>✓ Telefoningizning <b>oddiy kamerasi</b> yoki WhatsApp'dagi <b>Yangi chat ➔ QR kod</b> orqali skanerlang.</div>
+          <div class="text-amber-800 font-medium">⚠️ <i>"Bog'langan qurilmalar (Linked Devices)" orqali emas!</i> Chunki bu mijozlar to'g'ridan-to'g'ri AI botga yozishi uchun mo'ljallangan universal havoladir. Shunda <b>"Invalid QR code"</b> xatosi umuman chiqmaydi.</div>
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+      <!-- TAB 2: Official Meta Cloud API -->
+      <div id="wa-panel-api" class="space-y-3 text-left hidden">
+        <div class="text-xs space-y-2">
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Phone Number ID (Meta Developers)</label>
+            <input type="text" id="wa-api-phone-id" placeholder="Masalan: 109876543210987" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Permanent Access Token (System User)</label>
+            <input type="password" id="wa-api-access-token" placeholder="EAAX..." class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">App Secret (HMAC Xavfsizlik - Ixtiyoriy)</label>
+            <input type="text" id="wa-api-secret" placeholder="Ixtiyoriy" class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono">
+          </div>
+        </div>
+
+        <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-200 text-[11px] space-y-1">
+          <div class="font-bold text-gray-800">Meta Developers Webhook Sozlamalari:</div>
+          <div><b>Callback URL:</b> <code id="wa-webhook-url" class="text-emerald-700 select-all font-mono">http://127.0.0.1:8000/api/webhooks/whatsapp</code></div>
+          <div><b>Verify Token:</b> <code class="text-emerald-700 select-all font-bold">verta_wa_token_99</code></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
         <button onclick="closeModal('modal-whatsapp')" class="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">Yopish</button>
-        <button onclick="saveWhatsAppSettings()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl">✓ Ulangan deb Tasdiqlash</button>
+        <button onclick="saveWhatsAppSettings()" class="px-5 py-2 bg-pistachio hover:bg-[#a6ec6c] text-[#1A3E08] font-bold text-xs rounded-xl shadow-xs">✓ Saqlash va Ulash</button>
       </div>
     </div>
   </div>
@@ -2218,6 +2341,7 @@
       }
       if (tabId === 'crm') loadLeads();
       if (tabId === 'billing') loadBilling();
+      if (tabId === 'templates') loadNicheTemplates();
 
       if (isChannelLocked) {
         const lockEl = document.getElementById('channel-lock-overlay');
@@ -2226,6 +2350,70 @@
 
       refreshIcons();
       setTimeout(refreshIcons, 40);
+    }
+
+    // Creator Mode: Industry Templates Functions
+    async function loadNicheTemplates() {
+      const container = document.getElementById('templates-grid-container');
+      if (!container) return;
+      container.innerHTML = '<div class="col-span-full py-12 text-center text-xs text-gray-400">Andozalar yuklanmoqda...</div>';
+      try {
+        const res = await fetch('/api/creator/templates');
+        const data = await res.json();
+        const tpls = data.templates || [];
+        if (!tpls.length) {
+          container.innerHTML = '<div class="col-span-full py-12 text-center text-xs text-gray-400">Andozalar topilmadi.</div>';
+          return;
+        }
+        container.innerHTML = tpls.map(t => `
+          <div class="card-clean rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-purple-300 transition-all border border-gray-200">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-2xl">${t.icon || '💼'}</span>
+                  <div>
+                    <h3 class="font-extrabold text-sm text-gray-900">${t.name}</h3>
+                    <span class="text-[10px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">${t.category}</span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 leading-relaxed">${t.description}</p>
+              <div class="grid grid-cols-2 gap-2 text-[11px] bg-[#F8FAFC] p-2.5 rounded-xl border border-gray-100">
+                <div><span class="text-gray-400">O'rtacha chek:</span> <b class="text-gray-800">${t.avg_check || 'Noma\'lum'}</b></div>
+                <div><span class="text-gray-400">Savollar (FAQ):</span> <b class="text-emerald-700">${t.faq_count} ta</b></div>
+                <div class="col-span-2"><span class="text-gray-400">Raqobatchi battlecardi:</span> <b class="text-sky-700">${t.battlecard_count} ta</b></div>
+              </div>
+            </div>
+            <button onclick="applyNicheTemplate('${t.id}', '${t.name.replace(/'/g, "\\'")}')" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>⚡ Ushbu Andozani Qo'llash</span>
+            </button>
+          </div>
+        `).join('');
+        refreshIcons();
+      } catch (err) {
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-xs text-red-500">Yuklashda xatolik: ${err.message}</div>`;
+      }
+    }
+
+    async function applyNicheTemplate(templateId, templateName) {
+      if (!confirm("Haqiqatan ham '" + templateName + "' andozasini joriy loyihaga tatbiq etmoqchimisiz?\n\nBiznes profili, agent personasi, tez-tez beriladigan savollar va raqobatchi battlecardlari avtomatik yangilanadi.")) {
+        return;
+      }
+      try {
+        const res = await fetch('/api/creator/templates/' + templateId + '/apply', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'applied') {
+          alert("✅ " + data.message);
+          loadPersona();
+          loadKnowledge();
+          loadDashboardStats();
+          switchTab('dashboard');
+        } else {
+          alert("Xatolik: " + (data.detail || "Andozani qo'llashda muammo yuz berdi"));
+        }
+      } catch (err) {
+        alert("Ulanish xatosi: " + err.message);
+      }
     }
 
     // Modal Helpers
@@ -2280,6 +2468,7 @@
         const res = await fetch('/api/channels');
         const data = await res.json();
         channelsData = data.channels || [];
+        updateDynamicWebhookUrls();
 
         // Update badges
         channelsData.forEach(c => {
@@ -2420,6 +2609,21 @@
       `).join('');
     }
 
+    function updateDynamicWebhookUrls() {
+      const origin = window.location.origin;
+      const igEl = document.getElementById('ig-webhook-url');
+      if (igEl) igEl.textContent = `${origin}/api/webhooks/instagram`;
+      const waEl = document.getElementById('wa-webhook-url');
+      if (waEl) waEl.textContent = `${origin}/api/webhooks/whatsapp`;
+      const widgetEl = document.getElementById('widget-embed-code');
+      if (widgetEl) widgetEl.textContent = `<script src="${origin}/static/widget.js" data-verta-biz="default"></script>`;
+    }
+
+    function openInstagramModal() {
+      updateDynamicWebhookUrls();
+      openModal('modal-instagram');
+    }
+
     async function saveInstagramSettings() {
       const acc = document.getElementById('ig-account-input').value;
       const pageId = document.getElementById('ig-pageid-input').value;
@@ -2487,19 +2691,123 @@
       alert('Telegram bot to\'xtatildi.');
     }
 
+    async function openWhatsAppModal() {
+      openModal('modal-whatsapp');
+      switchWhatsAppTab('qr');
+      try {
+        const res = await fetch('/api/channels/whatsapp/status');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.phone_number) {
+            const pInput = document.getElementById('wa-phone-input');
+            if (pInput) pInput.value = data.phone_number;
+          }
+          if (data.phone_number_id) {
+            const idInput = document.getElementById('wa-api-phone-id');
+            if (idInput) idInput.value = data.phone_number_id;
+          }
+        }
+      } catch (e) {
+        console.warn('Status fetch error:', e);
+      }
+      loadWhatsAppQR();
+    }
+
+    function switchWhatsAppTab(tab) {
+      const btnQr = document.getElementById('wa-tab-btn-qr');
+      const btnApi = document.getElementById('wa-tab-btn-api');
+      const panelQr = document.getElementById('wa-panel-qr');
+      const panelApi = document.getElementById('wa-panel-api');
+
+      if (tab === 'qr') {
+        btnQr.className = 'py-2 rounded-lg bg-white shadow-xs text-emerald-800 transition-all font-bold';
+        btnApi.className = 'py-2 rounded-lg text-gray-600 hover:text-gray-900 transition-all font-bold';
+        panelQr.classList.remove('hidden');
+        panelApi.classList.add('hidden');
+      } else {
+        btnApi.className = 'py-2 rounded-lg bg-white shadow-xs text-emerald-800 transition-all font-bold';
+        btnQr.className = 'py-2 rounded-lg text-gray-600 hover:text-gray-900 transition-all font-bold';
+        panelApi.classList.remove('hidden');
+        panelQr.classList.add('hidden');
+      }
+    }
+
+    function loadWhatsAppQR() {
+      const qrImg = document.getElementById('wa-qr-image');
+      const phoneInput = document.getElementById('wa-phone-input');
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      if (qrImg) {
+        qrImg.src = '/api/channels/whatsapp/qr?phone=' + encodeURIComponent(phone) + '&t=' + Date.now();
+      }
+    }
+
+    function openDirectWhatsAppLink() {
+      const phoneInput = document.getElementById('wa-phone-input');
+      let phone = phoneInput ? phoneInput.value.replace(/\D/g, '') : '998901234567';
+      if (phone.length === 9) phone = '998' + phone;
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent("Assalomu alaykum! AI yordamchi bilan bog'lanish")}`;
+      window.open(url, '_blank');
+    }
+
+    async function testWhatsAppSimulation() {
+      const phoneInput = document.getElementById('wa-phone-input');
+      const phone = phoneInput ? phoneInput.value.trim() : '998901234567';
+      try {
+        const res = await fetch('/api/channels/whatsapp/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from_number: phone,
+            message: "Assalomu alaykum! Mahsulotlaringiz haqida ma'lumot bera olasizmi?"
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(`🤖 AI Closer WhatsApp Javobi:\n\n"${data.reply}"\n\n(Bosqich: ${data.stage}, Ball: ${data.lead_score})`);
+        } else {
+          alert('Xatolik yuz berdi: ' + (data.detail || 'Noma\'lum xato'));
+        }
+      } catch (err) {
+        alert('So\'rov yuborishda xatolik: ' + err.message);
+      }
+    }
+
     async function saveWhatsAppSettings() {
-      const phone = document.getElementById('wa-phone-input').value;
-      await fetch('/api/channels/whatsapp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          is_connected: 1,
-          config: { phone_number: phone, status: 'connected' }
-        })
-      });
-      closeModal('modal-whatsapp');
-      loadChannels();
-      alert('WhatsApp Business muvaffaqiyatli ulandi!');
+      const phone = document.getElementById('wa-phone-input').value.trim();
+      const phoneId = document.getElementById('wa-api-phone-id') ? document.getElementById('wa-api-phone-id').value.trim() : '';
+      const accessToken = document.getElementById('wa-api-access-token') ? document.getElementById('wa-api-access-token').value.trim() : '';
+      const appSecret = document.getElementById('wa-api-secret') ? document.getElementById('wa-api-secret').value.trim() : '';
+
+      const payload = {
+        is_connected: 1,
+        config: {
+          phone_number: phone,
+          phone_number_id: phoneId,
+          access_token: accessToken,
+          app_secret: appSecret,
+          status: 'connected',
+          webhook_url: 'http://127.0.0.1:8000/api/webhooks/whatsapp',
+          verify_token: 'verta_wa_token_99'
+        }
+      };
+
+      try {
+        const res = await fetch('/api/channels/whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          closeModal('modal-whatsapp');
+          loadChannels();
+          alert('✓ WhatsApp muvaffaqiyatli ulandi va sozlamalar saqlandi!');
+        } else {
+          const err = await res.json();
+          alert('Xatolik: ' + (err.detail || 'Sozlamalarni saqlashda xatolik yuz berdi'));
+        }
+      } catch (e) {
+        alert('Serverga ulanishda xatolik: ' + e.message);
+      }
     }
 
     function testChannelDirect(chan) {
