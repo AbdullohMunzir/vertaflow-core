@@ -666,9 +666,13 @@ def get_dashboard_stats():
 
 @app.get("/api/knowledge")
 def list_knowledge():
-    """Returns all company knowledge base documents, FAQs, and URLs."""
-    items = db.list_knowledge_items()
+    """Returns company knowledge base documents, FAQs, and URLs.
+    Internal training materials (training_book) are excluded — used only by RAG engine."""
+    all_items = db.list_knowledge_items()
+    # training_book — faqat RAG engine uchun, biznes egasiga ko'rsatilmaydi
+    items = [it for it in all_items if it.get("item_type") != "training_book"]
     return {"items": items, "total": len(items)}
+
 
 @app.post("/api/knowledge/faq")
 def add_faq(faq: FAQItem):

@@ -3206,15 +3206,14 @@
         const data = await res.json();
         const allItems = data.items || [];
 
-        // Training kitoblarini oddiy manbalardan ajrat
-        const trainingItems = allItems.filter(it => it.item_type === 'training_book');
+        // Training kitoblarini to'liq yashir — faqat agent o'rganadi, biznes egasi ko'rmaydi
         const items = allItems.filter(it => it.item_type !== 'training_book');
 
         const countBadge = document.getElementById('badge-knowledge-count');
         if (countBadge) countBadge.textContent = `${items.length} ta`;
         if (window.lucide) lucide.createIcons();
         const totalLabel = document.getElementById('knowledge-total-label');
-        if (totalLabel) totalLabel.textContent = `Jami: ${items.length} ta manba${trainingItems.length > 0 ? ` + ${trainingItems.length} ta ichki trening` : ''}`;
+        if (totalLabel) totalLabel.textContent = `Jami: ${items.length} ta manba`;
 
         const masterCb = document.getElementById('select-all-knowledge');
         if (masterCb) {
@@ -3226,14 +3225,7 @@
         const tbody = document.getElementById('knowledge-table-body');
         if (!tbody) return;
 
-        const typeBadges = {
-          file: '<span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-bold border border-blue-100">PDF / Hujjat</span>',
-          faq: '<span class="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 font-bold border border-purple-100">FAQ Savol</span>',
-          url: '<span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">Sayt URL</span>',
-          training_book: '<span class="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 font-bold border border-amber-100">🧠 Ichki Trening</span>'
-        };
-
-        if (items.length === 0 && trainingItems.length === 0) {
+        if (items.length === 0) {
           tbody.innerHTML = `
             <tr>
               <td colspan="6" class="py-10 text-center text-xs text-gray-400">
@@ -3244,26 +3236,13 @@
           return;
         }
 
-        // Training items — locked row (o'chirish yo'q, alohida ustunlar)
-        const trainingRows = trainingItems.map(it => `
-          <tr class="bg-amber-50/40 border-l-4 border-amber-400">
-            <td class="py-3 px-3 text-center">
-              <input type="checkbox" class="knowledge-item-cb rounded border-gray-300 text-amber-600 focus:ring-amber-500 cursor-pointer w-4 h-4" value="${it.id}" onchange="onKnowledgeItemCbChange()">
-            </td>
-            <td class="py-3 px-3">${typeBadges['training_book']}</td>
-            <td class="py-3 px-3 font-bold text-gray-900">${it.title}</td>
-            <td class="py-3 px-3 text-gray-500 text-xs">Ichki — mijozlarga ko'rinmaydi</td>
-            <td class="py-3 px-3 text-gray-400 max-w-xs truncate text-xs italic">${(it.content || '').slice(0, 80)}...</td>
-            <td class="py-3 px-3 text-right">
-              <button onclick="deleteKnowledgeItem(${it.id})" class="text-red-400 hover:text-red-600 text-xs transition-colors cursor-pointer">
-                O'chirish
-              </button>
-            </td>
-          </tr>
-        `).join('');
+        const typeBadges = {
+          file: '<span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-bold border border-blue-100">PDF / Hujjat</span>',
+          faq: '<span class="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 font-bold border border-purple-100">FAQ Savol</span>',
+          url: '<span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">Sayt URL</span>'
+        };
 
-        // Regular items
-        const regularRows = items.map(it => `
+        tbody.innerHTML = items.map(it => `
           <tr class="hover:bg-gray-50/70 transition-colors">
             <td class="py-3 px-3 text-center">
               <input type="checkbox" class="knowledge-item-cb rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer w-4 h-4" value="${it.id}" onchange="onKnowledgeItemCbChange()">
@@ -3279,8 +3258,6 @@
             </td>
           </tr>
         `).join('');
-
-        tbody.innerHTML = trainingRows + regularRows;
       } catch (err) {
         console.error('Knowledge load error', err);
       }
