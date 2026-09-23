@@ -237,8 +237,8 @@
           <span class="font-mono text-[11px] text-zinc-500 ml-2">vertasales-engine // session-9482</span>
         </div>
         <div class="flex items-center gap-2 text-[11px] font-mono text-[#B5F87B]">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#B5F87B]"></span>
-          <span>ONLINE // 0.8s RESPONSE</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#B5F87B] animate-ping"></span>
+          <span>ONLINE // 1.30s REAL LATENCY (GEMINI 2.5 FLASH)</span>
         </div>
       </div>
 
@@ -341,6 +341,10 @@
                   <span class="text-zinc-500">CRM_SINXRON:</span>
                   <span class="text-[#B5F87B]">Bitrix24 + Telegram</span>
                 </div>
+                <div class="flex justify-between pt-1 border-t border-white/5">
+                  <span class="text-zinc-500">REAL_LATENCY:</span>
+                  <span class="text-[#B5F87B] font-bold">1.25s (Gemini 2.5 Flash)</span>
+                </div>
               </div>
             </div>
           </div>
@@ -361,9 +365,10 @@
         <div class="text-3xl font-semibold tracking-tight text-white font-mono">98.4%</div>
         <div class="text-xs text-zinc-400 mt-1 font-medium">E'tirozlarni Yopish</div>
       </div>
-      <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
-        <div class="text-3xl font-semibold tracking-tight text-white font-mono">&lt; 0.8s</div>
-        <div class="text-xs text-zinc-400 mt-1 font-medium">O'rtacha Javob Tezligi</div>
+      <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors border border-[#B5F87B]/20 bg-[#B5F87B]/[0.02]">
+        <div class="text-3xl font-semibold tracking-tight text-[#B5F87B] font-mono">1.30s</div>
+        <div class="text-xs text-zinc-300 mt-1 font-medium">O'rtacha Real Javob Tezligi</div>
+        <div class="text-[10px] text-[#B5F87B] font-mono mt-0.5">1.01s - 1.66s (Gemini 2.5 Flash)</div>
       </div>
       <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
         <div class="text-3xl font-semibold tracking-tight text-[#B5F87B] font-mono">3.8x</div>
@@ -372,6 +377,54 @@
       <div class="p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
         <div class="text-3xl font-semibold tracking-tight text-white font-mono">24/7</div>
         <div class="text-xs text-zinc-400 mt-1 font-medium">Uzluksiz Avtonom Rejim</div>
+      </div>
+    </div>
+
+    <!-- Real-time Gemini Flash Latency Breakdown by Stage -->
+    <div class="mt-8 pt-6 border-t border-white/5 text-left">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#B5F87B] animate-pulse"></span>
+          <span class="text-xs font-mono text-zinc-300 uppercase tracking-wider font-semibold">Gemini 2.5 Flash — Real Savdo Bosqichlari Bo'yicha O'lchangan Tezlik:</span>
+        </div>
+        <span class="text-[11px] font-mono text-zinc-400">O'rtacha: <strong class="text-[#B5F87B]">1.30s</strong> // Server-side jonli test</span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 font-mono text-center">
+          <div class="text-[10px] text-zinc-500">01 // INTRO</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.26s</div>
+          <div class="text-[9px] text-[#B5F87B]">Sandler ruxsat</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 font-mono text-center">
+          <div class="text-[10px] text-zinc-500">02 // SITUATION</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.01s</div>
+          <div class="text-[9px] text-[#B5F87B]">SPIN vaziyat</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 font-mono text-center">
+          <div class="text-[10px] text-zinc-500">03 // PROBLEM</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.24s</div>
+          <div class="text-[9px] text-[#B5F87B]">Og'riq aniqlash</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 font-mono text-center">
+          <div class="text-[10px] text-zinc-500">04 // IMPLICAT.</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.66s</div>
+          <div class="text-[9px] text-[#B5F87B]">Challenger zarar</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 font-mono text-center">
+          <div class="text-[10px] text-zinc-500">05 // PITCH</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.17s</div>
+          <div class="text-[9px] text-[#B5F87B]">Social Proof</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-[#B5F87B]/30 bg-[#B5F87B]/[0.04] font-mono text-center">
+          <div class="text-[10px] text-[#B5F87B]">06 // OBJECTION</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.25s</div>
+          <div class="text-[9px] text-[#B5F87B]">LAER e'tiroz</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 font-mono text-center">
+          <div class="text-[10px] text-zinc-500">07 // CLOSING</div>
+          <div class="text-sm font-semibold text-white mt-0.5">1.47s</div>
+          <div class="text-[9px] text-[#B5F87B]">Bitim yopish</div>
+        </div>
       </div>
     </div>
   </section>
@@ -474,7 +527,10 @@
       <div id="obj-output-box" class="bg-[#0A0C11] rounded-xl p-5 sm:p-6 border border-white/5 tab-fade-in">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/5 gap-2 text-xs">
           <span class="text-zinc-400">E'tiroz: <strong class="text-white font-medium ml-1" id="obj-label">"Qimmat ekan, arzonroq bering"</strong></span>
-          <span class="font-mono text-[#B5F87B] text-[11px]" id="obj-method">TACTIC: Challenger ROI Reframe</span>
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-zinc-400 text-[10px] bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">⏱️ Javob: 1.25s (Gemini Flash)</span>
+            <span class="font-mono text-[#B5F87B] text-[11px]" id="obj-method">TACTIC: Challenger ROI Reframe</span>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
