@@ -74,13 +74,17 @@ class VertaFlowEngine:
         # 4. Attribute Extraction & Dynamic Scoring
         self._extract_lead_attributes(raw_msg)
 
-        # 5. State Machine Transition
+        # 5. State Machine Transition (Adaptive — telefon + og'riq aniqlansa tezroq yopadi)
+        has_phone = bool(self.state.collected_attributes.get("phone"))
+        has_pain = bool(self.state.collected_attributes.get("identified_pain"))
         next_stage = determine_next_stage(
             current_stage=self.state.current_stage,
             user_intent="normal",
             lead_score=self.state.lead_score,
             has_unresolved_objection=is_objection or has_competitor,
-            is_ready_for_close=self.state.is_lead_ready()
+            is_ready_for_close=self.state.is_lead_ready(),
+            has_phone=has_phone,
+            has_pain=has_pain
         )
         self.state.current_stage = next_stage
         self.state.questions_asked += 1
