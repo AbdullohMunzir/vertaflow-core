@@ -25,16 +25,24 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 3. Initialize SQLite Database
+# 3. Environment & Database Setup
+if [ ! -f ".env" ] && [ -f ".env.example" ]; then
+    echo "⚙️ .env fayli yaratilmoqda (.env.example nusxalandi)..."
+    cp .env.example .env
+fi
+
 echo "🗄️ Ma'lumotlar bazasi initsializatsiya qilinmoqda..."
 python3 -c "import db; print('✅ vertaflow.db tayyor!')"
 
-# 4. Verify Gemini 2.5 Flash Engine
-echo "🧠 Google Gemini 2.5 Flash tekshirilmoqda..."
+# 4. Verify Gemini Engine
+echo "🧠 Google Gemini tekshirilmoqda..."
 python3 -c "
 from core.verta_gemini import VertaGeminiClient
 client = VertaGeminiClient()
-print('✅ Gemini 2.5 Flash muvaffaqiyatli ulandi!')
+if client.api_key:
+    print('✅ Gemini API muvaffaqiyatli ulandi!')
+else:
+    print('⚠️ Eslatma: GEMINI_API_KEY .env fayliga kiritilishi kerak')
 "
 
 echo "================================================================="

@@ -8,7 +8,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - GEMINI_API_KEY=your_gemini_api_key_here
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./vertaflow.db:/app/vertaflow.db

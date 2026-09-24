@@ -39,6 +39,12 @@ from fastapi.responses import FileResponse, Response, RedirectResponse, JSONResp
 from pydantic import BaseModel
 import aiohttp
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # Add core engine to path
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "core"))

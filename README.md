@@ -71,28 +71,34 @@ vertaflow/
 
 ### 1. Repozitoriyni klonlash va virtual muhit yaratish
 ```bash
-git clone git@github.com:AbdullohMunzir/vertaflow.git
-cd vertaflow
+git clone https://github.com/AbdullohMunzir/vertaflow-core.git
+cd vertaflow-core
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. FastAPI Serverni ishga tushirish
+### 2. Muhit parametrlarini sozlash (.env)
+```bash
+cp .env.example .env
+# .env fayliga GEMINI_API_KEY yoki tegishli kalitlarni kiriting
+```
+
+### 3. FastAPI Serverni ishga tushirish
 ```bash
 python3 -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
 Brauzeringizda oching:
 👉 **http://localhost:8000**
 
-### 3. Telegram Botni ulash (Ixtiyoriy)
+### 4. Telegram Botni ulash (Ixtiyoriy)
 ```bash
 export TELEGRAM_BOT_TOKEN="your_botfather_token"
 export SALES_MANAGER_CHAT_ID="your_telegram_chat_id"
 python3 telegram_bot.py
 ```
 
-### 4. Saytingizga Vidjetni Joylash
+### 5. Saytingizga Vidjetni Joylash
 Saytingizning `</body>` tegi oldiga joylang:
 ```html
 <script src="http://localhost:8000/static/widget.js"></script>

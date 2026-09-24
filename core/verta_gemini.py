@@ -11,10 +11,16 @@ import logging
 from typing import Dict, Any, List, Optional
 import requests
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 logger = logging.getLogger("VertaGemini")
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
-DEFAULT_GEMINI_KEY = "your_gemini_api_key_here"
+DEFAULT_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "")
 
 class VertaGeminiClient:
     def __init__(self, api_key: Optional[str] = None):
