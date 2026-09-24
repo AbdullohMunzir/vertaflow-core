@@ -1,75 +1,164 @@
-# 🚀 VertaFlow AI — Autonomous AI Sales Closer Platform
+# VertaFlow AI | Autonomous AI Sales Closer Platform
 
-**VertaFlow AI** — O'zbekiston bozori va messenjerlar (Telegram, Instagram DM, Web Widget) uchun maxsus ishlab chiqilgan, shunchaki savol-javob qiluvchi oddiy FAQ bot emas, balki mijoz e'tirozlarini professional darajada yopuvchi va bitim tuzuvchi **avtonom sotuvchi agent (AI Closer)** platformasi.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688.svg)](https://fastapi.tiangolo.com/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite%20WAL-003B57.svg)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Architecture](https://img.shields.io/badge/Architecture-SPIN%20%2B%20Challenger-FF6F00.svg)]()
 
----
+**VertaFlow AI** is a production-grade autonomous conversational commerce engine and AI closer platform. Unlike generic FAQ chatbots that merely answer questions, VertaFlow actively guides prospects through a proven sales methodology, resolves stubborn objections in real time, scores purchase intent, and drives conversations to closed deals.
 
-## 🌟 Asosiy Imkoniyatlar (Core Features)
-
-- 🧠 **SPIN Selling & Challenger Sale Metodologiyasi**:
-  - `Situation` ➔ `Problem` ➔ `Implication` ➔ `Solution Pitch` ➔ `Objection Handling` ➔ `Closing` ➔ `Handoff Human`
-  - Mijozga keraksiz uzun ma'lumot tiqishtirmaydi, aksincha uning biznes og'rig'ini aniqlab, qiymatni hisoblab beradi.
-- ⚡ **Messenjer Qisqaligi Nazorati (Brevity Guard)**:
-  - Hech qachon 2-3 qatordan ortiq korporativ paragraflar yozmaydi.
-  - Har bir xabar doimo **1 ta aniq yopuvchi savol** bilan yakunlanadi.
-- 🇺🇿 **O'zbek Tili Ko'zgu Detektori (Dual-Script Engine)**:
-  - Mijoz **Kirill** alifbosida yozsa — agent avtomatik Kirillda javob qaytaradi.
-  - Mijoz **Lotin** alifbosida yozsa — agent Lotinda javob qaytaradi.
-  - Sun'iy ruscha/inglizcha kalka so'zlarni avtomatik tozalaydi.
-- 📊 **Dinamik Lead Scoring (0–100 Ball)**:
-  - Deterministik atributlar tahlili (Telefon raqami: +30, Og'riq: +25, Hajm: +20, Xarid muddati: +15).
-  - Lid holati: `HOT 🔥` (70–100), `WARM ⚡` (40–69), `COLD ❄️` (0–39).
-- 📋 **Avtomatlashtirilgan 3 Qatorlik Lead Dossier**:
-  - Sotuv bo'limi operatori 50 ta xabarni o'qib o'tirmaydi — agent zudlik bilan 3-4 qatorda tayyor mijoz dosyesini shakllantiradi.
-- ⚔️ **Raqobat Battlecards va Challenger Reframe**:
-  - Raqobatchilar eslanganda ularni kamsitmasdan, ularning zaif tomonlarini ko'rsatib, "Landmine" (tuzoq) savollari bilan muloqotni bizning foydamizga buradi.
-- 📈 **O'z-o'zini Rivojlantiruvchi Tungi Audit (Self-Improving Evaluator)**:
-  - Kunlik muloqotlarni tahlil qilib, tushib qolgan mijozlar sababini aniqlaydi va biznes egasiga 3 ta tayyor AI tavsiya taqdim etadi.
-- ✈️ **Telegram Bot & Omnichannel Dispatcher**:
-  - Telegram orqali muloqot va mijoz issiq holatga kelishi bilan sotuv menejerining shaxsiy Telegramiga darhol xabarnoma yuborish.
-- 🌐 **1 Qatorda O'rnatiluvchi Web Vidjet (`widget.js`)**:
-  - Har qanday veb-saytga bitta `<script>` orqali ulanuvchi zamonaviy suzuvchi chat.
+Built specifically for high-velocity messenger commerce across **Telegram**, **Instagram Direct**, **WhatsApp Business**, and **Web Chat Widgets**.
 
 ---
 
-## 🎨 Dizayn Tizimi (Design System)
+## Key Capabilities
 
-Platforma boshqaruv paneli va landing sahifasi **VertaFlow Obsidian Dark Luxury** eksklyuziv dizayn tizimida yaratilgan:
-- **Asosiy fon**: Chuqur Obsidian Dark (`#0B0F17`) va Deep Slate (`#0F172A`)
-- **Kartalar va bloklar**: Shaffof Glassmorphic Dark (`#131A26`), nozik chegara (`rgba(255, 255, 255, 0.08)`)
-- **Asosiy aksent**: Neon Pistachio Lime (`#B5F87B`) va Electric Emerald (`#10B981`)
-- **Lead Hot nishoni**: Amber Flame (`#F59E0B` / `#FEF08A`)
-- **Tipografika**: Plus Jakarta Sans
+### 1. 8-Stage Conversational State Machine
+VertaFlow runs on a structured, multi-stage sales progression model adapting principles from **SPIN Selling**, **The Challenger Sale**, **Sandler Selling System**, and **LAER Framework**:
+- `01 // INTRO`: Sandler upfront contract establishing permission to ask questions.
+- `02 // SITUATION`: Discovery of current workflow and volume parameters.
+- `03 // PROBLEM`: Identification of core business pain points and bottlenecks.
+- `04 // IMPLICATION`: Challenger calculation of recurring daily financial losses.
+- `05 // SOLUTION PITCH`: Social proof, quantifiable outcomes, and tailored value proposition.
+- `06 // OBJECTION DEFUSER`: LAER active listening and reframing (Price, Trust, Timing, Competition).
+- `07 // CLOSING`: Micro-commitments, trial offers, and payment links (Click, Payme).
+- `08 // HANDOFF`: Automated 3-line sales dossier dispatched to sales representatives.
+
+### 2. Brevity Guard & Engagement Rules
+- Eliminates lengthy corporate blocks of text: responses are constrained to 2-3 readable lines.
+- Every outgoing message ends with **exactly one closing question** to sustain conversational momentum.
+
+### 3. Dual-Script Language Engine (Latin & Cyrillic)
+- Automatically detects the prospect's script (Latin or Cyrillic Uzbek) and mirrors back identically.
+- Filters out unnatural machine-translation artifacts, preserving authentic commercial terminology.
+
+### 4. Deterministic Intent Scoring (0-100)
+- Real-time lead scoring based on explicit signals:
+  - Phone number captured: `+30 points`
+  - Pain point quantified: `+25 points`
+  - Order volume specified: `+20 points`
+  - Urgency / timeframe confirmed: `+15 points`
+- Categorization: `HOT 🔥` (70-100), `WARM ⚡` (40-69), `COLD ❄️` (0-39).
+
+### 5. Automated Sales Dossier
+- Generates an executive 3-line summary for human sales reps when a lead becomes hot:
+  - Prospect Name & Channel origin
+  - Specific product interest & calculated budget
+  - Recommended closing tactic and telephone contact
+
+### 6. Competitive Battlecards & Challenger Reframing
+- Counter-strategies against competitor mentions using non-disparaging "landmine" questions.
+- Reframes price objections into daily cost-of-inaction calculations.
+
+### 7. Self-Improving Nightly Evaluator
+- Analyzes daily conversation logs to detect drop-off reasons.
+- Delivers actionable prompt tuning and knowledge base expansion suggestions directly to the admin dashboard.
+
+### 8. Hybrid Retrieval-Augmented Generation (RAG)
+- Hybrid BM25 keyword matching and vector semantic retrieval.
+- Grounded strictly in validated knowledge base documents (PDF, DOCX, TXT, FAQ) to eliminate hallucinations.
 
 ---
 
-## 📂 Loyiha Tuzilishi
+## Architecture Overview
 
 ```
-vertaflow/
+                      [ Incoming Prospect Message ]
+                                    |
+      +-----------------------------+-----------------------------+
+      |                             |                             |
+[ Telegram Bot ]           [ Instagram / WhatsApp ]       [ Web Chat Widget ]
+      |                             |                             |
+      +-----------------------------+-----------------------------+
+                                    |
+                                    v
+                     [ FastAPI Central Hub (api.py) ]
+                                    |
+            +-----------------------+-----------------------+
+            |                       |                       |
+            v                       v                       v
+    [ Brevity Guard ]     [ Dual-Script Mirror ]   [ Rate Limiter & Auth ]
+            |                       |                       |
+            +-----------------------+-----------------------+
+                                    |
+                                    v
+                      [ VertaFlow Sales Engine ]
+                                    |
+            +-----------------------+-----------------------+
+            |                       |                       |
+            v                       v                       v
+     [ State Machine ]      [ RAG Knowledge ]     [ Battlecard Matrix ]
+   (SPIN / Challenger)     (BM25 + Semantic)       (Objection Handling)
+            |                       |                       |
+            +-----------------------+-----------------------+
+                                    |
+                                    v
+                     [ Intent Scorer (0-100) ]
+                                    |
+                  +-----------------+-----------------+
+                  |                                   |
+                  v                                   v
+          Score >= 70 (HOT)                   Score < 70 (NURTURE)
+                  |                                   |
+                  v                                   v
+      [ Instant Telegram Alert ]              [ Guided Follow-up ]
+```
+
+---
+
+## Tech Stack
+
+| Component | Technology | Rationale |
+|:---|:---|:---|
+| **Backend Framework** | FastAPI 0.115+ / Python 3.10+ | High-throughput asynchronous routing and native validation |
+| **Database** | SQLite with WAL mode (`db.py`) | Zero-latency embedded database, transactional integrity, automated online backups |
+| **LLM Inference** | Google Gemini 2.5 Flash / Hybrid Fallback | Sub-second generation speed, high reasoning benchmark scores, low token footprint |
+| **Frontend Dashboard** | Vanilla JS / Tailwind CSS / Plus Jakarta Sans | Single-bundle responsiveness, zero heavy SPA build steps, ultra-fast mobile loading |
+| **Compression** | Starlette GZipMiddleware | Reduces network payload by ~78% (72 KB down to 16 KB) |
+| **Testing** | Pytest / Playwright E2E | Multi-stage regression suites, automated browser verification, security auditing |
+
+---
+
+## Project Structure
+
+```
+vertaflow-core/
 ├── core/
-│   ├── verta_engine.py       # Markaziy boshqaruvchi (Orkestrator)
-│   ├── verta_stages.py       # 8 bosqichli SPIN & Challenger holatlar mashinasi
-│   ├── verta_state.py        # Lead scoring (0-100), atributlar va Lead Dossier
-│   ├── verta_uzbek_engine.py # Kirill/Lotin ko'zgu detektori va 2-3 qator filtri
-│   ├── verta_battlecards.py  # Raqobat battlecards va landmine savollari
-│   └── verta_evaluator.py   # Tungi audit va avto-tavsiyalar dvigateli
+│   ├── verta_engine.py       # Central sales orchestrator
+│   ├── verta_stages.py       # 8-stage SPIN & Challenger state machine
+│   ├── verta_state.py        # Lead scoring (0-100) & lead dossier generator
+│   ├── verta_uzbek_engine.py # Dual-script mirror & brevity guard filter
+│   ├── verta_rag.py          # Hybrid RAG retrieval engine
+│   ├── verta_battlecards.py  # Objection defuser and competitive battlecards
+│   ├── verta_evaluator.py   # Autonomous nightly conversation evaluator
+│   └── verta_gemini.py       # Native Google Gemini 2.5 Flash integration
 ├── static/
-│   ├── index.html            # VertaFlow Obsidian Dark Luxury boshqaruv paneli
-│   ├── landing.html          # VertaFlow rasmiy bosh sahifasi
-│   └── widget.js             # Veb-saytlar uchun embeddable chat vidjeti
-├── api.py                    # FastAPI server (Chat, CRM, Battlecards, Telegram)
-├── telegram_bot.py           # Telegram bot va xabarnomalar moduli
-├── test_verta.py             # CLI sinov skripti
-├── requirements.txt          # Kerakli Python kutubxonalari
-└── README.md
+│   ├── index.html            # Obsidian Dark Luxury SaaS admin platform
+│   ├── landing.html          # High-converting responsive landing page
+│   ├── onboarding.html       # 3-step merchant setup wizard
+│   ├── terms.html            # Public terms of service (Ommaviy Oferta)
+│   ├── privacy.html          # Public privacy policy
+│   ├── widget.js             # 1-line embeddable floating chat widget
+│   ├── robots.txt            # Search engine crawler policies
+│   └── sitemap.xml           # Structured sitemap
+├── tests/                    # Playwright E2E and API test suites
+├── api.py                    # Production FastAPI server & REST API
+├── backup_db.py              # Atomic SQLite backup rotation service
+├── db.py                     # Central SQLite schema, queries, and migrations
+├── telegram_bot.py           # Telegram bot integration & manager notification
+├── deploy.sh                 # 1-click Linux VPS automated deployment script
+├── docker-compose.yml        # Docker orchestration configuration
+├── Dockerfile                # Production container build recipe
+├── requirements.txt          # Python dependencies
+└── .env.example              # Environment configuration template
 ```
 
 ---
 
-## ⚡ Tezkor Ishga Tushirish (Quickstart)
+## Quickstart Guide
 
-### 1. Repozitoriyni klonlash va virtual muhit yaratish
+### 1. Clone Repository & Setup Environment
 ```bash
 git clone https://github.com/AbdullohMunzir/vertaflow-core.git
 cd vertaflow-core
@@ -78,41 +167,77 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Muhit parametrlarini sozlash (.env)
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env` and supply your credentials:
 ```bash
 cp .env.example .env
-# .env fayliga GEMINI_API_KEY yoki tegishli kalitlarni kiriting
 ```
 
-### 3. FastAPI Serverni ishga tushirish
+Edit `.env`:
+```ini
+# Google Gemini API Key (Required for primary closer brain)
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Telegram Bot Integration (Optional)
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+SALES_MANAGER_CHAT_ID=your_chat_id_here
+
+# Server Settings
+PORT=8000
+```
+
+### 3. Launch Development Server
 ```bash
 python3 -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
-Brauzeringizda oching:
-👉 **http://localhost:8000**
+Navigate to:
+- Landing Page: **http://localhost:8000/**
+- Admin Dashboard: **http://localhost:8000/app**
+- Health Check: **http://localhost:8000/health**
 
-### 4. Telegram Botni ulash (Ixtiyoriy)
+---
+
+## Docker Deployment
+
+To launch the complete platform inside an isolated container:
+
 ```bash
-export TELEGRAM_BOT_TOKEN="your_botfather_token"
-export SALES_MANAGER_CHAT_ID="your_telegram_chat_id"
-python3 telegram_bot.py
+# Set your Gemini API key in environment
+export GEMINI_API_KEY="your_gemini_api_key_here"
+
+# Build and start container
+docker-compose up -d --build
 ```
 
-### 5. Saytingizga Vidjetni Joylash
-Saytingizning `</body>` tegi oldiga joylang:
+---
+
+## Omnichannel Integrations
+
+### Telegram Bot Setup
+1. Create a bot using [@BotFather](https://t.me/BotFather) and obtain your token.
+2. In the VertaFlow Dashboard under **Channels -> Telegram**, enter the token and the manager chat ID.
+3. Start the bot worker:
+   ```bash
+   python3 telegram_bot.py
+   ```
+
+### Web Chat Widget Integration
+Embed the responsive floating chat widget into any website before `</body>`:
 ```html
-<script src="http://localhost:8000/static/widget.js"></script>
+<script src="https://vertaflow.uz/static/widget.js"></script>
 ```
 
 ---
 
-## 🧪 CLI Orqali Sinab Ko'rish
+## Automated Backups & Reliability
 
-```bash
-python3 test_verta.py
-```
+The database service utilizes SQLite's online backup API via `backup_db.py`:
+- Backs up active transactions without database locks or server restarts.
+- Executes automatically at startup and once every 24 hours.
+- Maintains rolling retention of the 14 most recent snapshot archives.
 
 ---
 
-## 📄 Litsenziya
-MIT License. Erkin foydalanish va rivojlantirish uchun ochiq.
+## License
+
+This project is licensed under the **MIT License**. Free for commercial and non-commercial development.
