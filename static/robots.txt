@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
-Allow: /app
+Allow: /onboarding
+Allow: /terms
+Allow: /privacy
 Disallow: /api/
+Disallow: /app
+Disallow: /dashboard
 
 Sitemap: https://vertaflow.uz/sitemap.xml

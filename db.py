@@ -235,9 +235,21 @@ def init_db():
     """)
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_chunks_parent ON knowledge_chunks(parent_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_session_time ON messages(session_id, timestamp ASC);")
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_conversations_channel_time ON conversations(channel, updated_at DESC);")
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_leads_tier_score ON leads(tier, score DESC, created_at DESC);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_items(item_type);")
+
+    # 10. Analytics Events Table (Native privacy-first telemetry)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS analytics_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        page TEXT NOT NULL,
+        metadata TEXT,
+        client_ip_hash TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_analytics_type ON analytics_events(event_type);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_analytics_time ON analytics_events(created_at DESC);")
 
     # Migrations for existing DBs
     try:
@@ -1419,6 +1431,41 @@ def list_follow_up_logs(limit: int = 50) -> List[Dict[str, Any]]:
     try:
         rows = conn.execute("SELECT * FROM follow_ups ORDER BY id DESC LIMIT ?;", (limit,)).fetchall()
         return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+def record_analytics_event(event_type: str, page: str = "/", metadata: Optional[Dict[str, Any]] = None, client_ip_hash: str = "") -> int:
+    """Records privacy-compliant telemetry event (pageview, CTA click)."""
+    conn = get_connection()
+    try:
+        meta_json = json.dumps(metadata or {}, ensure_ascii=False)
+        cursor = conn.execute(
+            "INSERT INTO analytics_events (event_type, page, metadata, client_ip_hash) VALUES (?, ?, ?, ?);",
+            (event_type, page, meta_json, client_ip_hash)
+        )
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()
+
+def get_analytics_summary() -> Dict[str, Any]:
+    """Returns analytics aggregate summary for dashboard."""
+    conn = get_connection()
+    try:
+        total_views = conn.execute("SELECT COUNT(*) FROM analytics_events WHERE event_type = 'pageview';").fetchone()[0]
+        total_clicks = conn.execute("SELECT COUNT(*) FROM analytics_events WHERE event_type = 'cta_click';").fetchone()[0]
+        top_ctas = conn.execute("""
+            SELECT metadata, COUNT(*) as cnt 
+            FROM analytics_events 
+            WHERE event_type = 'cta_click' 
+            GROUP BY metadata 
+            ORDER BY cnt DESC LIMIT 5;
+        """).fetchall()
+        return {
+            "pageviews": total_views,
+            "cta_clicks": total_clicks,
+            "top_ctas": [{"name": r[0], "count": r[1]} for r in top_ctas]
+        }
     finally:
         conn.close()
 

@@ -23,6 +23,7 @@ if sys.stderr and hasattr(sys.stderr, "reconfigure"):
 import asyncio
 import re
 import json
+from datetime import datetime
 from typing import Dict, Any, List, Optional
 from collections import defaultdict
 import io
@@ -32,6 +33,7 @@ import hmac
 import hashlib
 from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form, Request, Response, Cookie
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response, RedirectResponse, JSONResponse
 from pydantic import BaseModel
@@ -42,6 +44,7 @@ sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "core"))
 
 import db
+import backup_db
 from verta_engine import VertaFlowEngine
 from verta_llm import VertaLLMClient
 from verta_gemini import VertaGeminiClient
@@ -53,6 +56,15 @@ from telegram_bot import bot_instance
 
 app = FastAPI(title="VertaFlow AI Platform API", version="2.5.0")
 
+async def db_backup_scheduler_loop():
+    """Runs daily automated SQLite backup every 24 hours."""
+    while True:
+        await asyncio.sleep(86400)
+        try:
+            backup_db.run_backup()
+        except Exception as e:
+            print(f"[Backup] Scheduled backup error: {e}")
+
 @app.on_event("startup")
 async def startup_event():
     """Initializes DB and ensures all knowledge items are indexed with RAG vectors."""
@@ -62,14 +74,31 @@ async def startup_event():
         rag.sync_all_knowledge()
     except Exception as e:
         print(f"[RAG] Startup indexing error: {e}")
+    # Automated DB backup
+    try:
+        backup_db.run_backup()
+    except Exception as e:
+        print(f"[Backup] Startup backup warning: {e}")
+    asyncio.create_task(db_backup_scheduler_loop())
     # Start background smart follow-up scheduler
     asyncio.create_task(follow_up_scheduler_loop())
 
+# Performance: GZip compression (compresses 251KB HTML down to ~40KB on mobile)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Security: Restricted CORS origins
+ALLOWED_ORIGINS = [
+    origin.strip() for origin in os.getenv(
+        "ALLOWED_ORIGINS", 
+        "http://localhost:8000,http://127.0.0.1:8000,https://vertaflow.uz,https://www.vertaflow.uz"
+    ).split(",") if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -1439,15 +1468,6 @@ def auth_register(req: RegisterRequest, response: Response):
         "has_primary_channel": db.has_connected_primary_channel()
     }
 
-@app.post("/api/test/reset_rate_limits")
-def reset_rate_limits(request: Request):
-    """Local-only helper for automated test suites to clear sliding windows."""
-    client_ip = request.client.host if request.client else "127.0.0.1"
-    if client_ip not in ["127.0.0.1", "localhost", "testclient"]:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    rate_limiter.requests.clear()
-    return {"status": "cleared"}
-
 @app.post("/api/auth/login")
 def auth_login(req: LoginRequest, response: Response, request: Request):
     """Real authentication with identifier and password verifying against SQLite database."""
@@ -1577,13 +1597,76 @@ def serve_app(request: Request, vertaflow_session: Optional[str] = Cookie(None))
         return FileResponse(index_file)
     return {"message": "VertaFlow SaaS Platform index.html not found."}
 
+class AnalyticsEventRequest(BaseModel):
+    event_type: str
+    page: str = "/"
+    metadata: Optional[Dict[str, Any]] = None
+
+@app.get("/health")
+@app.head("/health")
+@app.get("/api/health")
+@app.head("/api/health")
+def health_check():
+    """System health check verifying database and engine readiness."""
+    try:
+        conn = db.get_connection()
+        conn.execute("SELECT 1;").fetchone()
+        conn.close()
+        db_status = "healthy"
+    except Exception as e:
+        db_status = f"unhealthy: {e}"
+    
+    return {
+        "status": "online" if db_status == "healthy" else "degraded",
+        "database": db_status,
+        "version": "2.5.0",
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/terms")
+@app.head("/terms")
+@app.get("/oferta")
+def serve_terms():
+    """Public Terms of Service (Ommaviy Oferta) page."""
+    terms_file = os.path.join(static_dir, "terms.html")
+    if os.path.exists(terms_file):
+        return FileResponse(terms_file)
+    return {"message": "Terms page not found."}
+
+@app.get("/privacy")
+@app.head("/privacy")
+def serve_privacy():
+    """Public Privacy Policy (Maxfiylik Siyosati) page."""
+    priv_file = os.path.join(static_dir, "privacy.html")
+    if os.path.exists(priv_file):
+        return FileResponse(priv_file)
+    return {"message": "Privacy policy page not found."}
+
+@app.post("/api/analytics/event")
+def log_analytics_event(req: AnalyticsEventRequest, request: Request):
+    """Logs lightweight anonymous user action (pageview, CTA click)."""
+    client_ip = request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")
+    ip_hash = hashlib.sha256(client_ip.encode("utf-8")).hexdigest()[:16]
+    event_id = db.record_analytics_event(
+        event_type=req.event_type,
+        page=req.page,
+        metadata=req.metadata,
+        client_ip_hash=ip_hash
+    )
+    return {"status": "recorded", "event_id": event_id}
+
+@app.get("/api/analytics/summary")
+def get_analytics_stats():
+    """Returns analytics aggregate summary for dashboard."""
+    return db.get_analytics_summary()
+
 @app.get("/robots.txt")
 def serve_robots():
     """Robots.txt for Googlebot and search crawlers."""
     robots_file = os.path.join(static_dir, "robots.txt")
     if os.path.exists(robots_file):
         return FileResponse(robots_file, media_type="text/plain")
-    return Response(content="User-agent: *\nAllow: /\nAllow: /app\nDisallow: /api/\nSitemap: https://vertaflow.uz/sitemap.xml", media_type="text/plain")
+    return Response(content="User-agent: *\nAllow: /\nAllow: /onboarding\nAllow: /terms\nAllow: /privacy\nDisallow: /api/\nDisallow: /app\n\nSitemap: https://vertaflow.uz/sitemap.xml", media_type="text/plain")
 
 @app.get("/sitemap.xml")
 def serve_sitemap():
@@ -1591,7 +1674,7 @@ def serve_sitemap():
     sitemap_file = os.path.join(static_dir, "sitemap.xml")
     if os.path.exists(sitemap_file):
         return FileResponse(sitemap_file, media_type="application/xml")
-    return Response(content="<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"><url><loc>https://vertaflow.uz/</loc></url></urlset>", media_type="application/xml")
+    return Response(content="<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"><url><loc>https://vertaflow.uz/</loc></url><url><loc>https://vertaflow.uz/terms</loc></url><url><loc>https://vertaflow.uz/privacy</loc></url><url><loc>https://vertaflow.uz/onboarding</loc></url></urlset>", media_type="application/xml")
 
 if __name__ == "__main__":
     import uvicorn

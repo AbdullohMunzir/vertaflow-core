@@ -3,9 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VertaFlow — Avtonom AI Closer Infratuzilmasi</title>
-  <meta name="description" content="Har bir murojaatni real savdoga aylantiruvchi avtonom AI Closer. SPIN va Challenger metodologiyasi orqali savdo e'tirozlarini psixologik aniqlikda yopadi.">
+  <title>VertaFlow | Avtonom AI Closer Infratuzilmasi</title>
+  <meta name="description" content="Har bir murojaatni real savdoga aylantiruvchi avtonom AI Closer. Instagram va Telegram'da 1.3 soniyada javob beradi, e'tirozlarni yopadi va to'lov havolasini taqdim etadi.">
+  <link rel="canonical" href="https://vertaflow.uz/">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23B5F87B'><path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'/></svg>">
+
+  <!-- Open Graph & Social Share -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="VertaFlow">
+  <meta property="og:title" content="VertaFlow | Avtonom AI Savdo Agenti">
+  <meta property="og:description" content="Instagram Direct va Telegram'da mijozlaringiz kutib qolmasin. 1.3 soniyada narx aytadi, e'tirozni yopadi va to'lovgacha yetaklaydi.">
+  <meta property="og:url" content="https://vertaflow.uz/">
+  <meta property="og:locale" content="uz_UZ">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VertaFlow | Avtonom AI Savdo Agenti">
+  <meta name="twitter:description" content="1.3 soniyada avtonom javob beruvchi va xaridorni to'lovgacha yetaklovchi AI sotuvchi.">
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "VertaFlow AI Closer",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web, Cloud",
+    "description": "Avtonom sun'iy intellekt savdo agenti platformasi",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "UZS"
+    }
+  }
+  </script>
   
   <!-- Fonts: Plus Jakarta Sans & JetBrains Mono (World-class Typography) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -159,7 +188,7 @@
 
   <!-- Top Navigation Header -->
   <header class="sticky top-4 z-50 px-4 sm:px-6 max-w-6xl mx-auto w-full">
-    <div class="bg-[#0E1015]/85 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl">
+    <div class="bg-[#0E1015]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl">
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2.5 group">
         <div class="w-8 h-8 rounded-lg bg-[#B5F87B] flex items-center justify-center text-[#08090C] shadow-sm group-hover:scale-105 transition-transform">
@@ -178,28 +207,51 @@
         <a href="#qiyos" class="hover:text-white transition-colors">Nega AI Closer?</a>
         <a href="#kanallar" class="hover:text-white transition-colors">Kanallar</a>
         <a href="#kalkulyator" class="hover:text-white transition-colors">ROI Hisoblagich</a>
+        <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
         <a href="#tariflar" class="hover:text-white transition-colors">Tariflar</a>
       </nav>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
-        <a href="/onboarding" onclick="triggerPageTransition(event, '/onboarding')" class="btn-pistachio px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer">
-          <span>Platformaga O'tish</span>
+      <!-- Action Buttons & Mobile Hamburger -->
+      <div class="flex items-center gap-2.5">
+        <a href="/onboarding" onclick="trackCTA('header_cta'); triggerPageTransition(event, '/onboarding')" class="btn-pistachio px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer">
+          <span>Boshlash</span>
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer border border-white/10" aria-label="Menyu">
+          <svg id="hamburger-icon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden md:hidden mt-2 p-4 bg-[#0E1015]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl flex flex-col space-y-2 text-xs font-medium">
+      <a href="#pipeline" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">Arxitektura</a>
+      <a href="#etirozlar" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">E'tirozlarni Yopish</a>
+      <a href="#qiyos" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">Nega AI Closer?</a>
+      <a href="#kanallar" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">Kanallar</a>
+      <a href="#kalkulyator" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">ROI Hisoblagich</a>
+      <a href="#faq" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">Ko'p Beriladigan Savollar</a>
+      <a href="#tariflar" onclick="closeMobileMenu()" class="text-zinc-300 hover:text-white py-2 px-3 rounded-lg hover:bg-white/5 transition-colors">Tariflar</a>
+      <div class="pt-2 border-t border-white/5 flex flex-col gap-2">
+        <a href="/onboarding" onclick="trackCTA('mobile_menu_cta'); triggerPageTransition(event, '/onboarding')" class="btn-pistachio py-2.5 rounded-xl text-center text-xs font-semibold cursor-pointer">
+          14 Kun Bepul Sinash
         </a>
       </div>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="pt-16 pb-20 px-4 sm:px-6 max-w-5xl mx-auto w-full text-center flex flex-col items-center">
+  <section class="pt-14 pb-20 px-4 sm:px-6 max-w-5xl mx-auto w-full text-center flex flex-col items-center">
     
     <!-- Status Eyebrow Badge -->
     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 text-xs font-medium text-zinc-300 mb-8 backdrop-blur-md">
       <span class="w-2 h-2 rounded-full bg-[#B5F87B] animate-pulse"></span>
       <span>Avtonom Sotuv Yopuvchi Agent</span>
       <span class="text-zinc-600">•</span>
-      <span class="text-[#B5F87B] font-medium">v2.4 Pro Nashri</span>
+      <span class="text-[#B5F87B] font-medium">v2.5 Nashri</span>
     </div>
 
     <!-- Main Headline -->
@@ -208,21 +260,24 @@
       <span class="text-[#B5F87B]">real savdoga</span> aylantiruvchi AI Agenti
     </h1>
 
-    <!-- Subheading -->
-    <p class="text-base sm:text-lg text-zinc-400 font-normal leading-relaxed max-w-2xl mt-6">
-      Oddiy savol-javob boti emas. VertaFlow mijozning og'riqli nuqtalarini aniqlaydi, "qimmat" va "o'ylab ko'raman" degan e'tirozlarini psixologik aniqlikda yopadi hamda to'lovgacha yetaklaydi.
+    <!-- Subheading: Direct, Alive & Relatable -->
+    <p class="text-base sm:text-lg text-zinc-300 font-normal leading-relaxed max-w-2xl mt-6">
+      Instagram Direct va Telegram'da mijozlaringiz tunda ham javobsiz qolmasin. VertaFlow 1.3 soniyada narx aytadi, "qimmat" va "o'ylab ko'raman" degan e'tirozlarni yopadi hamda Click/Payme to'lovigacha yetaklaydi.
     </p>
 
     <!-- CTAs -->
-    <div class="flex flex-col sm:flex-row items-center gap-3.5 mt-10 w-full sm:w-auto justify-center">
-      <a href="/onboarding" onclick="triggerPageTransition(event, '/onboarding')" class="btn-pistachio px-7 py-3.5 rounded-xl text-sm w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer shadow-lg">
-        <span>14 Kun Bepul Sinash</span>
+    <div class="flex flex-col sm:flex-row items-center gap-3.5 mt-9 w-full sm:w-auto justify-center">
+      <a href="/onboarding" onclick="trackCTA('hero_free_trial'); triggerPageTransition(event, '/onboarding')" class="btn-pistachio px-7 py-3.5 rounded-xl text-sm w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer shadow-lg font-semibold">
+        <span>14 Kun Bepul Boshlash</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
       </a>
-      <a href="#console" class="px-6 py-3.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer">
+      <a href="#console" onclick="trackCTA('hero_demo_click')" class="px-6 py-3.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer">
         <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 17l6-6-6-6m8 14h8"/></svg>
         <span>Jonli Tizim Simulyatori</span>
       </a>
+    </div>
+    <div class="text-[11px] text-zinc-500 font-mono mt-3">
+      Karta talab etilmaydi • 5 daqiqada ulanadi • 100% bepul sinov
     </div>
 
     <!-- Product Telemetry Console -->
@@ -388,7 +443,7 @@
         Uch bosqichli <span class="text-[#B5F87B]">Savdo Quvuri</span>
       </h2>
       <p class="text-zinc-400 text-sm mt-3">
-        Har bir murojaat bitta agent tomonidan emas, o'z sohasiga chuqur ixtisoslashgan 3 ta intellektual agent orqali yakunlanadi.
+        Har bir xaridor bilan 3 ta maxsus savdo mexanizmi ishlaydi: ehtiyojni aniqlash, e'tirozni yopish va to'lov havolasini shakllantirish.
       </p>
     </div>
 
@@ -778,7 +833,7 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
           </ul>
         </div>
 
-        <a href="/onboarding" onclick="triggerPageTransition(event, '/onboarding')" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all cursor-pointer">
+        <a href="/onboarding" onclick="trackCTA('pricing_starter'); triggerPageTransition(event, '/onboarding')" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all cursor-pointer">
           Boshlash
         </a>
       </div>
@@ -802,7 +857,7 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
           </ul>
         </div>
 
-        <a href="/onboarding" onclick="triggerPageTransition(event, '/onboarding')" class="btn-pistachio mt-8 w-full py-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+        <a href="/onboarding" onclick="trackCTA('pricing_pro'); triggerPageTransition(event, '/onboarding')" class="btn-pistachio mt-8 w-full py-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 cursor-pointer">
           <span>Pro Rejani Faollashtirish</span>
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </a>
@@ -824,9 +879,92 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
           </ul>
         </div>
 
-        <a href="/onboarding" onclick="triggerPageTransition(event, '/onboarding')" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all cursor-pointer">
+        <a href="/onboarding" onclick="trackCTA('pricing_enterprise'); triggerPageTransition(event, '/onboarding')" class="mt-8 w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.02] text-center text-xs font-medium text-zinc-200 transition-all cursor-pointer">
           Bog'lanish
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Accordion Section -->
+  <section id="faq" class="py-20 px-4 sm:px-6 max-w-4xl mx-auto w-full border-t border-white/5">
+    <div class="text-center max-w-xl mx-auto mb-12">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10 text-[11px] font-mono text-[#B5F87B] mb-3">
+        SAVOLLAR VA JAVOBLAR
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-white">
+        Ko'p Beriladigan <span class="text-[#B5F87B]">Savollar</span>
+      </h2>
+      <p class="text-zinc-400 text-sm mt-2">
+        VertaFlow AI Closer bo'yicha eng muhim savollarga ochiq va aniq javoblar.
+      </p>
+    </div>
+
+    <div class="space-y-3.5">
+      <!-- FAQ 0 -->
+      <div class="elite-card overflow-hidden border border-white/10 rounded-2xl bg-[#0E1015]/60 transition-colors">
+        <button onclick="toggleFaq(0)" class="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none">
+          <span class="text-sm sm:text-base font-medium text-white">VertaFlow qanday qilib oddiy Telegram botlardan farq qiladi?</span>
+          <svg id="faq-icon-0" class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="faq-ans-0" class="hidden px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-white/5">
+          Oddiy botlar faqat oldindan yozilgan qat'iy tugmalar ("1 ni bosing, 2 ni bosing") orqali ishlaydi va mijoz kutilmagan savol berganda to'xtab qoladi. VertaFlow esa tabiiy tilda xuddi tajribali sotuvchidek muloqot qiladi, SPINN va Sandler savdo metodologiyalari asosida mijozning haqiqiy ehtiyojini aniqlaydi, "qimmat" yoki "o'ylab ko'raman" degan e'tirozlarni professional tarzda yopadi va to'lov havolasini yuboradi.
+        </div>
+      </div>
+
+      <!-- FAQ 1 -->
+      <div class="elite-card overflow-hidden border border-white/10 rounded-2xl bg-[#0E1015]/60 transition-colors">
+        <button onclick="toggleFaq(1)" class="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none">
+          <span class="text-sm sm:text-base font-medium text-white">O'rnatish va ishga tushirish qancha vaqt oladi?</span>
+          <svg id="faq-icon-1" class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="faq-ans-1" class="hidden px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-white/5">
+          Atigi 10-15 daqiqa. Siz shunchaki mahsulotlaringiz katalogi, narxlar va tez-tez beriladigan savollar matnini kiritasiz (yoki PDF fayl yuklaysiz). Tizim avtomatik ravishda bilimlar bazasini shakllantiradi va Telegram yoki Instagram akkauntingizga ulanadi. Dasturchi yoki texnik mutaxassis yollash talab qilinmaydi.
+        </div>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="elite-card overflow-hidden border border-white/10 rounded-2xl bg-[#0E1015]/60 transition-colors">
+        <button onclick="toggleFaq(2)" class="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none">
+          <span class="text-sm sm:text-base font-medium text-white">14 kunlik bepul sinovda bank kartasi kiritish shartmi?</span>
+          <svg id="faq-icon-2" class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="faq-ans-2" class="hidden px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-white/5">
+          Yo'q, karta ma'lumotlari talab qilinmaydi. Shunchaki ro'yxatdan o'tasiz va 14 kun davomida tizimni barcha imkoniyatlari bilan to'liq bepul sinab ko'rasiz. Natija yoqsa, keyin o'zingizga ma'qul tarifni tanlaysiz. Hech qanday yashirin to'lov yoki majburiyat yo'q.
+        </div>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="elite-card overflow-hidden border border-white/10 rounded-2xl bg-[#0E1015]/60 transition-colors">
+        <button onclick="toggleFaq(3)" class="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none">
+          <span class="text-sm sm:text-base font-medium text-white">Telegram va Instagram'da bir vaqtning o'zida ishlay oladimi?</span>
+          <svg id="faq-icon-3" class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="faq-ans-3" class="hidden px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-white/5">
+          Ha, VertaFlow bir vaqtning o'zida ham Telegram bot, ham Instagram Direct, ham veb-saytingizdagi chat vidjetida bitta yagona bilimlar bazasi bilan ishlaydi. Barcha kiruvchi murojaatlar va savdo natijalari yagona boshqaruv panelida real vaqt rejimida aks etadi.
+        </div>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="elite-card overflow-hidden border border-white/10 rounded-2xl bg-[#0E1015]/60 transition-colors">
+        <button onclick="toggleFaq(4)" class="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none">
+          <span class="text-sm sm:text-base font-medium text-white">AI mijozlarga noto'g'ri narx yoki yolg'on ma'lumot aytib qo'ymaydimi?</span>
+          <svg id="faq-icon-4" class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="faq-ans-4" class="hidden px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-white/5">
+          Hech qachon. VertaFlow qat'iy "Grounding" (aniq faktlarga bog'lanish) tamoyili asosida ishlaydi. U faqat siz kiritgan bilimlar bazasidagi ma'lumotlarga tayanadi. Agar qaysidir savolga siz tomondan javob kiritilmagan bo'lsa, u o'zidan to'qimaydi, balki mijozdan aloqa raqamini olib, jonli menejeringizga xabar yo'llaydi.
+        </div>
+      </div>
+
+      <!-- FAQ 5 -->
+      <div class="elite-card overflow-hidden border border-white/10 rounded-2xl bg-[#0E1015]/60 transition-colors">
+        <button onclick="toggleFaq(5)" class="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none">
+          <span class="text-sm sm:text-base font-medium text-white">Click, Payme va CRM tizimlariga ulash mumkinmi?</span>
+          <svg id="faq-icon-5" class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="faq-ans-5" class="hidden px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-white/5">
+          Ha, Pro va Enterprise tariflarida Click va Payme to'lov havolalarini to'g'ridan-to'g'ri suhbat jarayonida shakllantirish imkoniyati mavjud. Shuningdek, 1C, Bitrix24, AmoCRM va boshqa tizimlarga API hamda vebhuklar orqali ulanish mumkin.
+        </div>
       </div>
     </div>
   </section>
@@ -839,10 +977,13 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
         <span>•</span>
         <span>© 2026 VertaFlow AI Technologies LLC. Barcha huquqlar himoyalangan.</span>
       </div>
-      <div class="flex items-center space-x-6 text-zinc-400">
-        <a href="#pipeline" class="hover:text-white">Arxitektura</a>
-        <a href="#tariflar" class="hover:text-white">Tariflar</a>
-        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="text-[#B5F87B] hover:underline cursor-pointer">Platformaga Kirish</a>
+      <div class="flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-zinc-400">
+        <a href="#pipeline" class="hover:text-white transition-colors">Arxitektura</a>
+        <a href="#tariflar" class="hover:text-white transition-colors">Tariflar</a>
+        <a href="#faq" class="hover:text-white transition-colors">Savollar (FAQ)</a>
+        <a href="/terms" class="hover:text-white transition-colors">Ommaviy Oferta</a>
+        <a href="/privacy" class="hover:text-white transition-colors">Maxfiylik Siyosati</a>
+        <a href="/app" onclick="triggerPageTransition(event, '/app')" class="text-[#B5F87B] hover:underline cursor-pointer font-medium">Platformaga Kirish</a>
       </div>
     </div>
   </footer>
@@ -893,7 +1034,7 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
         method: 'TACTIC: Hidden Cost Discovery',
         meaning: "Mijoz sirtqi narxni solishtirmoqda, lekin xizmat ko'rsatishdagi chuqur farqdan bexabar.",
         strategy: "Arzon yechimlarning mijozlarni yo'qotish xavfini ochib berish va sifat ustunligini isbotlash.",
-        script: "Ha, bozorda arzonroq variantlar borligidan xabarimiz bor. Lekin farq shundaki: arzon botlar oddiy qolipli shablonlar bo'lib, kutilmagan savol kelganda to'xtab qoladi va qimmatli xaridorlarni yo'qotadi.\n\nVertaFlow esa har bir e'tirozni savdoga aylantiruvchi sun'iy intellekt bilan jihozlangan. Arzon bot bilan 30% xaridorni yo'qotish — VertaFlow uchun to'lanadigan puldan ancha qimmatga tushadi.\n\n14 kun sinab ko'ring, farqni o'zingiz his qilasiz!"
+        script: "Ha, bozorda arzonroq variantlar borligidan xabarimiz bor. Lekin farq shundaki: arzon botlar oddiy qolipli shablonlar bo'lib, kutilmagan savol kelganda to'xtab qoladi va qimmatli xaridorlarni yo'qotadi.\n\nVertaFlow esa har bir e'tirozni savdoga aylantiruvchi sun'iy intellekt bilan jihozlangan. Arzon bot bilan 30% xaridorni yo'qotish - VertaFlow uchun to'lanadigan puldan ancha qimmatga tushadi.\n\n14 kun sinab ko'ring, farqni o'zingiz his qilasiz!"
       },
       {
         label: "\"Kafolat bormi, aldanib qolmaymanmi?\"",
@@ -964,6 +1105,88 @@ Bugun buyurtma qilsangiz yetkazib berishni bepul qilib berishimizni xohlaysizmi?
       document.getElementById('rate-pro').innerHTML = `${pro.toLocaleString()} <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>`;
       document.getElementById('rate-biz').innerHTML = `${biz.toLocaleString()} <span class="text-xs text-zinc-400 font-sans font-normal">so'm / oy</span>`;
     }
+
+    // Mobile Navigation Drawer Toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      const hamburger = document.getElementById('hamburger-icon');
+      const close = document.getElementById('close-icon');
+      if (menu) {
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          if (hamburger) hamburger.classList.add('hidden');
+          if (close) close.classList.remove('hidden');
+        } else {
+          menu.classList.add('hidden');
+          if (hamburger) hamburger.classList.remove('hidden');
+          if (close) close.classList.add('hidden');
+        }
+      }
+    }
+
+    function closeMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      const hamburger = document.getElementById('hamburger-icon');
+      const close = document.getElementById('close-icon');
+      if (menu) menu.classList.add('hidden');
+      if (hamburger) hamburger.classList.remove('hidden');
+      if (close) close.classList.add('hidden');
+    }
+
+    // FAQ Accordion Toggle
+    function toggleFaq(idx) {
+      const content = document.getElementById('faq-ans-' + idx);
+      const icon = document.getElementById('faq-icon-' + idx);
+      if (!content) return;
+      const isOpen = !content.classList.contains('hidden');
+      
+      // Close all other FAQs
+      for (let i = 0; i < 6; i++) {
+        const c = document.getElementById('faq-ans-' + i);
+        const ic = document.getElementById('faq-icon-' + i);
+        if (c) c.classList.add('hidden');
+        if (ic) ic.style.transform = 'rotate(0deg)';
+      }
+
+      if (!isOpen) {
+        content.classList.remove('hidden');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // Privacy-First Native Analytics Tracker
+    function trackEvent(eventType, metadata = {}) {
+      try {
+        const payload = {
+          event_type: eventType,
+          page: window.location.pathname || '/',
+          referrer: document.referrer || '',
+          metadata: metadata
+        };
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/analytics/event', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+        } else {
+          fetch('/api/analytics/event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            keepalive: true
+          }).catch(() => {});
+        }
+      } catch (err) {
+        // Analytics failure should never break user interactions
+      }
+    }
+
+    function trackCTA(name) {
+      trackEvent('cta_click', { cta: name });
+    }
+
+    // Track initial pageview on load
+    document.addEventListener('DOMContentLoaded', () => {
+      trackEvent('pageview');
+    });
   </script>
 </body>
 </html>

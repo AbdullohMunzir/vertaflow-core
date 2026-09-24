@@ -26,4 +26,5 @@ Thumbs.db
 # Databases
 *.db
 *.sqlite3
+backups/
 
